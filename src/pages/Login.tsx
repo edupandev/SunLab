@@ -149,6 +149,17 @@ export const Login: React.FC = () => {
   // Abrir seletor de conta do provedor social
   const handleOpenSocialChooser = (provider: LoginWithProvider) => {
     setErrorMessage(null);
+
+    // Se for Google e o SDK estiver disponível, dispara o prompt nativo do Google
+    if (provider === 'google' && (window as any).google?.accounts?.id) {
+      try {
+        (window as any).google.accounts.id.prompt();
+        return;
+      } catch (err) {
+        console.warn('Google prompt fallback:', err);
+      }
+    }
+
     setOauthModalProvider(provider);
 
     if (provider === 'google') {
@@ -372,6 +383,7 @@ export const Login: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-2.5">
+            <div id="google-btn-rendered" className="hidden" />
             {/* Google */}
             <button
               type="button"
