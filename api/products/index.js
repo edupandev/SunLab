@@ -11,9 +11,27 @@ try {
   console.warn('[Vercel Serverless] Falha ao carregar defaultCatalog.json:', err);
 }
 
+const TMP_FILE = '/tmp/sunlab_catalog.json';
+
+function getInitialProducts() {
+  try {
+    if (fs.existsSync(TMP_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TMP_FILE, 'utf8'));
+      if (Array.isArray(data) && data.length > 0) return data;
+    }
+  } catch (_) {}
+  return defaultProducts.length ? JSON.parse(JSON.stringify(defaultProducts)) : [];
+}
+
+function persistToTmp(products) {
+  try {
+    fs.writeFileSync(TMP_FILE, JSON.stringify(products), 'utf8');
+  } catch (_) {}
+}
+
 // Global serverless memory persistence across requests
 if (!global._sunlab_products || !global._sunlab_products.length) {
-  global._sunlab_products = defaultProducts.length ? JSON.parse(JSON.stringify(defaultProducts)) : [];
+  global._sunlab_products = getInitialProducts();
 }
 
 export default async function handler(req, res) {
@@ -41,6 +59,7 @@ export default async function handler(req, res) {
   // 1. POST /api/products/reset
   if (req.method === 'POST' && subpath === 'reset') {
     global._sunlab_products = JSON.parse(JSON.stringify(defaultProducts));
+    persistToTmp(global._sunlab_products);
     return res.status(200).json(global._sunlab_products);
   }
 
@@ -108,6 +127,7 @@ export default async function handler(req, res) {
       };
 
       global._sunlab_products.unshift(newProduct);
+      persistToTmp(global._sunlab_products);
       return res.status(201).json(newProduct);
     } catch (err) {
       return res.status(500).json({ error: 'Erro ao cadastrar produto.' });
@@ -131,6 +151,7 @@ export default async function handler(req, res) {
 
     current[camelField] = !current[camelField];
     global._sunlab_products[idx] = current;
+    persistToTmp(global._sunlab_products);
     return res.status(200).json(current);
   }
 
@@ -163,6 +184,7 @@ export default async function handler(req, res) {
       };
 
       global._sunlab_products[idx] = updated;
+      persistToTmp(global._sunlab_products);
       return res.status(200).json(updated);
     } catch (err) {
       return res.status(500).json({ error: 'Erro ao processar dados de atualização do produto.' });
@@ -178,6 +200,7 @@ export default async function handler(req, res) {
     if (global._sunlab_products.length === initialLen) {
       return res.status(404).json({ error: 'Produto não encontrado para remoção.' });
     }
+    persistToTmp(global._sunlab_products);
     return res.status(200).json({ success: true, message: 'Produto removido com sucesso.' });
   }
 
