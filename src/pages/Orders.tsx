@@ -395,9 +395,37 @@ export const Orders: React.FC = () => {
               minute: '2-digit'
             });
 
-            const whatsappMessage = encodeURIComponent(
-              `*Olá SunLab!* Gostaria de informações e acompanhamento do meu pedido *#${order.orderNumber}* no valor de R$ ${order.totalAmount.toFixed(2)}.`
-            );
+            const buildOrderWhatsAppMessage = (o: Order) => {
+              const itemsText = (o.items || [])
+                .map(
+                  (it, idx) =>
+                    `   ${idx + 1}. *${it.name}*\n` +
+                    `      🎨 Cor: ${it.color || 'Padrão'}${it.size ? ` | Tam: ${it.size}` : ''}\n` +
+                    `      🔢 Quantidade: ${it.quantity}x | Valor unit.: R$ ${Number(it.unitPrice).toFixed(2).replace('.', ',')}`
+                )
+                .join('\n\n');
+
+              return (
+                `👋 *Olá equipe SunLab 3D!*\n` +
+                `Gostaria de informações e acompanhamento sobre a produção/envio do meu pedido:\n\n` +
+                `🔖 *CÓDIGO DO PEDIDO:* #${o.orderNumber}\n` +
+                `📊 *Status Atual:* ${o.status}\n` +
+                `💰 *Valor Total Pago:* R$ ${Number(o.totalAmount).toFixed(2).replace('.', ',')} (Pix 5% OFF)\n` +
+                `💳 *Pagamento:* ${o.paymentMethod || 'Pix Instantâneo (5% OFF)'}\n\n` +
+                `👤 *MEUS DADOS:*\n` +
+                `• *Nome:* ${o.customerName}\n` +
+                `• *E-mail:* ${o.customerEmail}\n` +
+                `• *WhatsApp/Telefone:* ${o.customerPhone || 'Não informado'}\n\n` +
+                `📍 *ENDEREÇO DE ENTREGA:*\n` +
+                `• ${o.shippingAddress}\n\n` +
+                `📦 *ITENS DO PEDIDO:*\n` +
+                `${itemsText || '   (Projeto / Peça sob consulta)'}\n\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `Vocês poderiam me atualizar sobre a previsão de conclusão da impressão 3D e o envio/rastreio? Muito obrigado!`
+              );
+            };
+
+            const whatsappMessage = encodeURIComponent(buildOrderWhatsAppMessage(order));
 
             return (
               <div

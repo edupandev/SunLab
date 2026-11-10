@@ -339,7 +339,7 @@ export const CheckoutModal: React.FC = () => {
       unitPrice: item.unitPrice
     }));
 
-    let confirmedOrderNumber = `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
+    let confirmedOrderNumber = orderNumber || `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
     const finalPaymentMethodLabel = 'Pix Instantâneo (5% OFF)';
 
     const shippingAddr = `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''}${formData.neighborhood ? ', ' + formData.neighborhood : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`;
@@ -350,6 +350,7 @@ export const CheckoutModal: React.FC = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          orderNumber: confirmedOrderNumber,
           customerName: formData.name,
           customerEmail: formData.email,
           customerPhone: formData.phone,

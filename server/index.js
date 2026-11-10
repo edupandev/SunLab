@@ -1019,14 +1019,22 @@ app.post('/api/orders', (req, res) => {
       return res.status(400).json({ error: 'Dados obrigatórios do pedido ausentes.' });
     }
 
-    const id = `ord-${Date.now()}`;
-    const orderNumber = `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
+    const id = req.body.id || `ord-${Date.now()}`;
+    const orderNumber = (req.body.orderNumber || '').trim() || `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
 
     db.prepare(`
       INSERT INTO orders (
         id, order_number, customer_name, customer_email, customer_phone,
         shipping_address, payment_method, items_json, total_amount, status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(order_number) DO UPDATE SET
+        customer_name = excluded.customer_name,
+        customer_email = excluded.customer_email,
+        customer_phone = excluded.customer_phone,
+        shipping_address = excluded.shipping_address,
+        payment_method = excluded.payment_method,
+        items_json = excluded.items_json,
+        total_amount = excluded.total_amount
     `).run(
       id,
       orderNumber,
@@ -1034,7 +1042,7 @@ app.post('/api/orders', (req, res) => {
       customerEmail,
       customerPhone || '',
       shippingAddress,
-      paymentMethod || 'Pix Instantâneo',
+      paymentMethod || 'Pix Instantâneo (5% OFF)',
       JSON.stringify(items || []),
       Number(totalAmount),
       'Pendente'

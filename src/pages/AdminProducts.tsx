@@ -81,6 +81,8 @@ export const AdminProducts: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [copiedCodeOrder, setCopiedCodeOrder] = useState<string | null>(null);
 
   // Configurações Oficiais Pix & Loja
   const [pixSettings, setPixSettings] = useState({
@@ -170,10 +172,47 @@ export const AdminProducts: React.FC = () => {
     setLoadingOrders(true);
     try {
       const res = await fetch('/api/orders');
+      let apiOrders: Order[] = [];
       if (res.ok) {
-        const data = await res.json();
-        setOrders(data);
+        apiOrders = await res.json();
       }
+
+      // Sincronizar também pedidos registrados localmente no navegador (garante achar qualquer pedido gerado)
+      let localOrders: Order[] = [];
+      try {
+        const stored = localStorage.getItem('sunlab_my_orders');
+        if (stored) {
+          localOrders = JSON.parse(stored);
+        }
+      } catch (_) {}
+
+      // Mapear por orderNumber para evitar duplicatas, mesclando dados
+      const ordersMap = new Map<string, Order>();
+      for (const o of apiOrders) {
+        if (o.orderNumber) ordersMap.set(o.orderNumber.toUpperCase(), o);
+      }
+      for (const o of localOrders) {
+        if (o.orderNumber && !ordersMap.has(o.orderNumber.toUpperCase())) {
+          ordersMap.set(o.orderNumber.toUpperCase(), {
+            id: o.id || `ord-${o.orderNumber}`,
+            orderNumber: o.orderNumber,
+            customerName: o.customerName || 'Cliente SunLab',
+            customerEmail: o.customerEmail || '',
+            customerPhone: o.customerPhone || '',
+            shippingAddress: o.shippingAddress || 'Endereço registrado no checkout',
+            paymentMethod: o.paymentMethod || 'Pix Instantâneo (5% OFF)',
+            items: o.items || [],
+            totalAmount: Number(o.totalAmount) || 0,
+            status: o.status || 'Pendente',
+            createdAt: o.createdAt || new Date().toISOString()
+          });
+        }
+      }
+
+      const merged = Array.from(ordersMap.values()).sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setOrders(merged);
     } catch (err) {
       console.warn('Erro ao carregar pedidos:', err);
     } finally {
@@ -316,14 +355,23 @@ export const AdminProducts: React.FC = () => {
 
   const filteredOrders = orders.filter(o => {
     if (orderStatusFilter !== 'all' && o.status !== orderStatusFilter) return false;
-    if (searchFilter.trim()) {
-      const q = searchFilter.toLowerCase();
-      return (
-        o.orderNumber.toLowerCase().includes(q) ||
-        o.customerName.toLowerCase().includes(q) ||
-        o.customerEmail.toLowerCase().includes(q) ||
-        o.customerPhone.includes(q)
-      );
+    
+    const query = orderSearchQuery.trim().toLowerCase();
+    if (query) {
+      // Normalização para busca flexível do código do pedido (#SLB-123456, 123456, SLB123456)
+      const cleanQ = query.replace(/[^a-z0-9]/g, '');
+      const cleanOrderNum = (o.orderNumber || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      
+      const matchByCode =
+        o.orderNumber.toLowerCase().includes(query) ||
+        (cleanQ.length >= 2 && cleanOrderNum.includes(cleanQ));
+      
+      const matchByName = (o.customerName || '').toLowerCase().includes(query);
+      const matchByEmail = (o.customerEmail || '').toLowerCase().includes(query);
+      const matchByPhone = (o.customerPhone || '').replace(/\D/g, '').includes(query.replace(/\D/g, ''));
+      const matchByItem = (o.items || []).some(it => (it.name || '').toLowerCase().includes(query));
+
+      return matchByCode || matchByName || matchByEmail || matchByPhone || matchByItem;
     }
     return true;
   });
@@ -815,36 +863,51 @@ export const AdminProducts: React.FC = () => {
 
           {/* Orders Toolbar & Filters */}
           <div className="p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
-            <div className="flex flex-1 items-center gap-3">
-              <div className="relative flex-1 max-w-sm">
+            <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative flex-1 max-w-md">
                 <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  value={searchFilter}
-                  onChange={(e) => setSearchFilter(e.target.value)}
-                  placeholder="Buscar por nº, cliente, email ou tel..."
-                  className="w-full bg-zinc-50 border border-zinc-300 rounded-xl pl-10 pr-4 py-2 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:bg-white focus:border-zinc-500"
+                  value={orderSearchQuery}
+                  onChange={(e) => setOrderSearchQuery(e.target.value)}
+                  placeholder="Localizar pedido por código (#SLB-...), cliente, tel ou e-mail..."
+                  className="w-full bg-zinc-50 border border-zinc-300 rounded-xl pl-10 pr-9 py-2 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 font-medium"
                 />
+                {orderSearchQuery && (
+                  <button
+                    onClick={() => setOrderSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                    title="Limpar pesquisa"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
               </div>
+
+              {orderSearchQuery && (
+                <span className="px-2.5 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-900 text-xs font-semibold shrink-0">
+                  {filteredOrders.length} {filteredOrders.length === 1 ? 'pedido encontrado' : 'pedidos encontrados'}
+                </span>
+              )}
 
               <select
                 value={orderStatusFilter}
                 onChange={(e) => setOrderStatusFilter(e.target.value)}
-                className="bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-800 outline-none focus:border-zinc-500 cursor-pointer"
+                className="bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-800 outline-none focus:border-zinc-500 cursor-pointer shrink-0"
               >
                 <option value="all">Todos os Status</option>
-                <option value="Pendente">Pendente</option>
-                <option value="Em Produção 3D">Em Produção 3D</option>
-                <option value="Enviado">Enviado</option>
-                <option value="Concluído">Concluído</option>
-                <option value="Cancelado">Cancelado</option>
+                <option value="Pendente">🕒 Pendente</option>
+                <option value="Em Produção 3D">⚙️ Em Produção 3D</option>
+                <option value="Enviado">🚚 Enviado</option>
+                <option value="Concluído">✅ Concluído</option>
+                <option value="Cancelado">❌ Cancelado</option>
               </select>
             </div>
 
             <button
               onClick={fetchOrders}
               disabled={loadingOrders}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-xs font-medium text-zinc-700 transition-colors cursor-pointer border border-zinc-200"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-xs font-medium text-zinc-700 transition-colors cursor-pointer border border-zinc-200 shrink-0"
             >
               <RotateCcw className={`w-3.5 h-3.5 ${loadingOrders ? 'animate-spin' : ''}`} />
               <span>Atualizar Pedidos</span>
@@ -857,7 +920,7 @@ export const AdminProducts: React.FC = () => {
               <table className="w-full text-left text-xs">
                 <thead className="bg-zinc-50 border-b border-zinc-200 text-blue-800 font-semibold uppercase tracking-wider text-[11px]">
                   <tr>
-                    <th className="py-3.5 px-4">Pedido / Data</th>
+                    <th className="py-3.5 px-4">Código / Data</th>
                     <th className="py-3.5 px-4">Cliente & Contato</th>
                     <th className="py-3.5 px-4">Itens Impressos</th>
                     <th className="py-3.5 px-4">Pagamento & Total</th>
@@ -869,24 +932,66 @@ export const AdminProducts: React.FC = () => {
                   {filteredOrders.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-12 text-center text-zinc-500">
-                        Nenhum pedido encontrado no banco de dados.
+                        {orderSearchQuery ? (
+                          <div className="space-y-1.5 max-w-sm mx-auto">
+                            <p className="font-semibold text-zinc-700">Nenhum pedido encontrado para "{orderSearchQuery}".</p>
+                            <p className="text-[11px] text-zinc-400">Verifique os dígitos do código do pedido (ex: SLB-450135 ou 450135).</p>
+                            <button
+                              onClick={() => setOrderSearchQuery('')}
+                              className="mt-2 text-xs text-blue-600 hover:underline font-semibold cursor-pointer"
+                            >
+                              Limpar busca e ver todos
+                            </button>
+                          </div>
+                        ) : (
+                          'Nenhum pedido registrado no banco de dados ainda.'
+                        )}
                       </td>
                     </tr>
                   ) : (
                     filteredOrders.map((o) => {
                       const cleanPhone = o.customerPhone.replace(/\D/g, '');
                       const whatsappText = encodeURIComponent(
-                        `Olá ${o.customerName}, tudo bem? Sou da SunLab Impressão 3D e estou acompanhando seu pedido #${o.orderNumber}.`
+                        `👋 Olá ${o.customerName}! Sou da equipe SunLab Impressão 3D.\n` +
+                        `Estou entrando em contato sobre o seu pedido *#${o.orderNumber}* no valor de R$ ${Number(o.totalAmount).toFixed(2).replace('.', ',')}.\n` +
+                        `Status Atual: ${o.status}.\nComo posso te ajudar hoje?`
+                      );
+
+                      const isCodeMatched = orderSearchQuery && (
+                        o.orderNumber.toLowerCase().includes(orderSearchQuery.toLowerCase().trim()) ||
+                        (orderSearchQuery.replace(/\D/g, '').length >= 3 && o.orderNumber.includes(orderSearchQuery.replace(/\D/g, '')))
                       );
 
                       return (
                         <tr key={o.id} className="hover:bg-zinc-50 transition-colors align-top">
                           {/* Order Number & Date */}
                           <td className="py-3.5 px-4">
-                            <span className="font-mono font-bold text-zinc-900 text-sm block">
-                              #{o.orderNumber}
-                            </span>
-                            <span className="text-[11px] text-zinc-400">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`font-mono font-extrabold text-xs px-2 py-0.5 rounded-lg border transition-all ${
+                                isCodeMatched
+                                  ? 'bg-amber-100 text-amber-950 border-amber-300 ring-2 ring-amber-300/50'
+                                  : 'bg-zinc-100 text-blue-950 border-zinc-200'
+                              }`}>
+                                #{o.orderNumber}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(o.orderNumber);
+                                  setCopiedCodeOrder(o.orderNumber);
+                                  setTimeout(() => setCopiedCodeOrder(null), 2000);
+                                }}
+                                className="p-1 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition-colors cursor-pointer"
+                                title="Copiar código do pedido"
+                              >
+                                {copiedCodeOrder === o.orderNumber ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+                            <span className="text-[11px] text-zinc-400 mt-1 block">
                               {new Date(o.createdAt).toLocaleDateString('pt-BR', {
                                 day: '2-digit',
                                 month: '2-digit',
