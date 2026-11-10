@@ -177,8 +177,6 @@ export const CheckoutModal: React.FC = () => {
     fetchSettings();
   }, []);
 
-  if (!isCheckoutOpen) return null;
-
   const pixDiscount = paymentMethod === 'pix' ? total * 0.05 : 0;
   const finalPayableTotal = Math.max(0, total - pixDiscount);
 
@@ -467,6 +465,8 @@ export const CheckoutModal: React.FC = () => {
       setTimeout(() => setCopiedWhatsAppText(false), 3000);
     }
   };
+
+  if (!isCheckoutOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
@@ -988,7 +988,7 @@ export const CheckoutModal: React.FC = () => {
                 <div className="flex justify-between pt-2 border-t border-zinc-200">
                   <span className="font-bold text-zinc-900">Total Pago:</span>
                   <span className="text-zinc-900 font-extrabold text-base">
-                    R$ {finalPayableTotal.toFixed(2).replace('.', ',')}
+                    R$ {(completedOrderData?.totalAmount || finalPayableTotal).toFixed(2).replace('.', ',')}
                   </span>
                 </div>
               </div>

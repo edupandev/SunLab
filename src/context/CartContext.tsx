@@ -74,6 +74,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const previousUserRef = useRef<string | null>(user?.email || null);
+
+  // Ao deslogar, limpa imediatamente os itens do carrinho e cache local
+  useEffect(() => {
+    if (previousUserRef.current && !user) {
+      setCart([]);
+      try {
+        localStorage.removeItem(CART_STORAGE_KEY);
+      } catch (_) {}
+    }
+    previousUserRef.current = user?.email || null;
+  }, [user]);
 
   // Auto-abrir checkout se veio de redirecionamento de login (?checkout=true)
   useEffect(() => {

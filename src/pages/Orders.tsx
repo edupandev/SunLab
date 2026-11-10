@@ -15,7 +15,9 @@ import {
   Calendar,
   CreditCard,
   Sparkles,
-  LogOut
+  LogOut,
+  Lock,
+  LogIn
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -54,8 +56,14 @@ export const Orders: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [customerEmailFilter, setCustomerEmailFilter] = useState('');
 
-  // Fetch orders from server + localStorage
+  // Fetch orders from server + localStorage (somente para usuário autenticado)
   const loadOrders = async () => {
+    if (!user) {
+      setOrders([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     try {
       // 1. Limpar pedidos mockados antigos do localStorage
@@ -85,7 +93,6 @@ export const Orders: React.FC = () => {
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {
-            // Filtrar produtos inexistentes caso algum tenha ficado no banco
             serverOrders = data.filter((o: Order) => 
               !o.items?.some(i => 
                 i.name?.includes('Waveform') || 
@@ -117,14 +124,11 @@ export const Orders: React.FC = () => {
 
       let combined = Array.from(mergedMap.values());
 
-      // Se for cliente comum (não admin), mostrar apenas os pedidos DELE
+      // Se for cliente comum (não admin), mostrar exclusivamente os pedidos vinculados ao e-mail dele
       if (!isAdmin && user?.email) {
         combined = combined.filter(o => 
           o.customerEmail.toLowerCase().trim() === user.email.toLowerCase().trim()
         );
-      } else if (!isAdmin && !user) {
-        // Visitante não logado só vê pedidos feitos pelo próprio navegador
-        combined = localOrders;
       }
 
       // Ordenar mais recentes primeiro
@@ -140,14 +144,13 @@ export const Orders: React.FC = () => {
   };
 
   useEffect(() => {
-    loadOrders();
     if (user?.email) {
       setCustomerEmailFilter(user.email);
+      loadOrders();
     } else {
-      const savedEmail = localStorage.getItem('sunlab_customer_email');
-      if (savedEmail) {
-        setCustomerEmailFilter(savedEmail);
-      }
+      setOrders([]);
+      setCustomerEmailFilter('');
+      setLoading(false);
     }
   }, [user]);
 
@@ -252,6 +255,44 @@ export const Orders: React.FC = () => {
         return 1;
     }
   };
+
+  // Se o usuário não estiver logado, não exibir compras ou dados de pedidos
+  if (!user) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full animate-in fade-in duration-200">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-8 sm:p-12 text-center shadow-xs space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-xs">
+            <Lock className="w-8 h-8" />
+          </div>
+          <div className="space-y-2 max-w-md mx-auto">
+            <h2 className="text-2xl font-bold text-zinc-900 font-display">
+              Acesso Protegido aos Pedidos
+            </h2>
+            <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed">
+              Para sua privacidade e segurança, as compras e pedidos só ficam visíveis quando você estiver conectado à sua conta SunLab.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Link
+              to="/login?redirect=/orders"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs transition-all shadow-sm cursor-pointer"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Fazer Login</span>
+            </Link>
+            <Link
+              to="/catalog"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs border border-zinc-200 transition-all cursor-pointer"
+            >
+              <ShoppingBag className="w-4 h-4 text-zinc-600" />
+              <span>Ver Catálogo</span>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8 animate-in fade-in duration-200">

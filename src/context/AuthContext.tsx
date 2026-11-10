@@ -209,8 +209,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem(AUTH_USER_KEY);
-    localStorage.removeItem(AUTH_TOKEN_KEY);
+    try {
+      localStorage.removeItem(AUTH_USER_KEY);
+      localStorage.removeItem(AUTH_TOKEN_KEY);
+      localStorage.removeItem('sunlab_my_orders');
+      localStorage.removeItem('sunlab_customer_email');
+      localStorage.removeItem('sunlab_cart_v1');
+      localStorage.removeItem('sunlab_cart');
+      // Limpa dados de perfil/checkout salvos em cache
+      Object.keys(localStorage).forEach(key => {
+        if (key.startsWith('sunlab_checkout_profile_') || key.startsWith('sunlab_customer_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (e) {
+      console.warn('Erro ao limpar cache no logout:', e);
+    }
   };
 
   const isAdmin = user?.role === 'admin';
