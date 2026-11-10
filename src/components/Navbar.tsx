@@ -71,12 +71,12 @@ export const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2.5 whitespace-nowrap">
+          <nav className="hidden lg:flex items-center gap-1.5 xl:gap-2.5 2xl:gap-3 whitespace-nowrap shrink-0">
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
-                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -89,7 +89,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/catalog"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -105,7 +105,7 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                 onMouseEnter={() => setIsCategoryDropdownOpen(true)}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs xl:text-sm font-medium text-blue-700 hover:text-blue-950 hover:bg-blue-50/60 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium text-blue-700 hover:text-blue-950 hover:bg-blue-50/60 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>Categorias</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isCategoryDropdownOpen ? 'rotate-180 text-blue-900' : 'text-blue-500'}`} />
@@ -136,7 +136,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/custom"
               className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                `flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 border border-blue-200 font-semibold shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -150,20 +150,20 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/aboutus"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
                 }`
               }
             >
-              Sobre a SunLab
+              Sobre Nós
             </NavLink>
 
             <NavLink
               to="/contact"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -173,18 +173,20 @@ export const Navbar: React.FC = () => {
               Contato
             </NavLink>
 
-            <NavLink
-              to="/orders"
-              className={({ isActive }) =>
-                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
-                  isActive
-                    ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
-                    : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
-                }`
-              }
-            >
-              Meus Pedidos
-            </NavLink>
+            {!user && (
+              <NavLink
+                to="/orders"
+                className={({ isActive }) =>
+                  `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
+                    isActive
+                      ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
+                      : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                  }`
+                }
+              >
+                Meus Pedidos
+              </NavLink>
+            )}
           </nav>
 
           {/* Right Action Icons (Search, Cart, Mobile Menu) */}
@@ -196,7 +198,7 @@ export const Navbar: React.FC = () => {
               title="Buscar produtos"
             >
               <Search className="w-4 h-4 text-blue-500 shrink-0" />
-              <span className="text-xs text-blue-600 hidden 2xl:inline font-normal whitespace-nowrap">Buscar no catálogo...</span>
+              <span className="text-xs text-blue-600 hidden 2xl:inline font-normal whitespace-nowrap">Buscar...</span>
             </button>
 
             {/* Login / Admin Action & Sair */}
@@ -274,7 +276,7 @@ export const Navbar: React.FC = () => {
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-zinc-200 px-5 py-6 space-y-4 animate-in slide-in-from-top duration-200 shadow-md">
+          <div className="lg:hidden bg-white border-b border-zinc-200 px-5 py-6 space-y-4 animate-in slide-in-from-top duration-200 shadow-md">
             <nav className="flex flex-col space-y-2">
               <Link
                 to="/"

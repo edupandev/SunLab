@@ -188,8 +188,11 @@ export const Footer: React.FC = () => {
 
         {/* Payment badges */}
         <div className="flex items-center gap-2 text-zinc-600">
-          <span className="text-[10px] uppercase font-semibold text-zinc-400">Pagamento Exclusivo:</span>
-          <span className="px-2 py-0.5 rounded bg-white border border-emerald-300 text-[10px] font-mono text-emerald-800 font-bold shadow-xs">PIX INSTANTÂNEO 5% OFF</span>
+          <span className="text-[10px] uppercase font-semibold text-zinc-400">Pagamento:</span>
+          <span className="px-2.5 py-1 rounded bg-emerald-50 border border-emerald-300 text-[11px] font-medium text-emerald-800 font-semibold shadow-xs flex items-center gap-1.5">
+            <MessageCircle className="w-3.5 h-3.5 text-emerald-600" />
+            DIRETO NO WHATSAPP
+          </span>
         </div>
       </div>
     </footer>

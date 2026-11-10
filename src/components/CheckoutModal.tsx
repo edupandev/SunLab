@@ -3,51 +3,32 @@ import { useNavigate } from 'react-router';
 import {
   X,
   CheckCircle,
-  CheckCircle2,
   ShieldCheck,
-  QrCode,
   Copy,
   Check,
   MessageCircle,
   Truck,
-  Lock,
   Clock,
   Printer,
   Package,
   UserCheck,
   LogIn,
   UserPlus,
-  Sparkles,
-  Loader2,
-  Key
+  Loader2
 } from 'lucide-react';
 import { useCart, type CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import {
-  generatePixPayload,
-  generatePixQRCode,
-  DEFAULT_PIX_CONFIG,
-  type PixConfig
-} from '../utils/pix';
 
 export const CheckoutModal: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isCheckoutOpen, closeCheckout, total, clearCart, cart } = useCart();
-  const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
-  const paymentMethod = 'pix';
-  const [copiedPix, setCopiedPix] = useState(false);
-  const [copiedPixKey, setCopiedPixKey] = useState(false);
+  const [step, setStep] = useState<'form' | 'success'>('form');
   const [copiedWhatsAppText, setCopiedWhatsAppText] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
 
-  // Pix Oficial Banco Central (Payload e QR Code real)
-  const [pixConfig, setPixConfig] = useState<PixConfig>(DEFAULT_PIX_CONFIG);
-  const [pixPayload, setPixPayload] = useState('');
-  const [pixQrCodeUrl, setPixQrCodeUrl] = useState('');
-  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [completedOrderData, setCompletedOrderData] = useState<{
     orderNumber: string;
     customerName: string;
@@ -66,9 +47,6 @@ export const CheckoutModal: React.FC = () => {
     }>;
     totalAmount: number;
   } | null>(null);
-
-  // Pix Countdown Timer (15 minutes)
-  const [timeLeft, setTimeLeft] = useState(15 * 60);
 
   // Chave de armazenamento por conta de usuário
   const getUserProfileKey = (userEmail: string) => `sunlab_checkout_profile_${userEmail.toLowerCase().trim()}`;
@@ -139,92 +117,9 @@ export const CheckoutModal: React.FC = () => {
       setCompletedOrderData(null);
       setOrderNumber('');
       setIsProcessing(false);
-      setTimeLeft(15 * 60);
-      setCopiedPix(false);
       setCopiedWhatsAppText(false);
     }
   }, [isCheckoutOpen]);
-
-  useEffect(() => {
-    let timer: any;
-    if (step === 'payment' && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [step, timeLeft]);
-
-  // Carregar configurações oficiais do Pix e Loja
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const res = await fetch('/api/settings');
-        if (res.ok) {
-          const data = await res.json();
-          if (data && data.pix_key) {
-            setPixConfig({
-              key: data.pix_key,
-              keyType: data.pix_key_type || 'phone',
-              merchantName: data.pix_merchant_name || 'SunLab 3D',
-              merchantCity: data.pix_merchant_city || 'SANTOS',
-              whatsapp: data.store_whatsapp || '13996061681'
-            });
-          }
-        }
-      } catch (e) {
-        console.warn('Usando configurações padrão para o Pix:', e);
-      }
-    };
-    fetchSettings();
-  }, []);
-
-  const pixDiscount = paymentMethod === 'pix' ? total * 0.05 : 0;
-  const finalPayableTotal = Math.max(0, total - pixDiscount);
-
-  // Gerar dinamicamente o código Pix Copia e Cola e o QR Code real (padrão oficial Banco Central)
-  useEffect(() => {
-    if (finalPayableTotal > 0) {
-      try {
-        setIsGeneratingPix(true);
-        const payload = generatePixPayload({
-          key: pixConfig.key,
-          keyType: pixConfig.keyType,
-          name: pixConfig.merchantName,
-          city: pixConfig.merchantCity,
-          amount: finalPayableTotal,
-          txid: '***'
-        });
-        setPixPayload(payload);
-        generatePixQRCode(payload)
-          .then(url => {
-            setPixQrCodeUrl(url);
-            setIsGeneratingPix(false);
-          })
-          .catch(() => {
-            setIsGeneratingPix(false);
-          });
-      } catch (err) {
-        console.error('Erro gerando Pix BRCode:', err);
-        setIsGeneratingPix(false);
-      }
-    }
-  }, [finalPayableTotal, pixConfig, orderNumber, step]);
-
-  const formatFriendlyKey = (k: string) => {
-    const raw = k.replace(/\D/g, '');
-    if (raw.length === 13 && raw.startsWith('55')) {
-      const ddd = raw.slice(2, 4);
-      const part1 = raw.slice(4, 9);
-      const part2 = raw.slice(9);
-      return `(${ddd}) ${part1}-${part2}`;
-    }
-    if (raw.length === 11) {
-      const ddd = raw.slice(0, 2);
-      const part1 = raw.slice(2, 7);
-      const part2 = raw.slice(7);
-      return `(${ddd}) ${part1}-${part2}`;
-    }
-    return k;
-  };
 
   // Formatação de CPF com máscara
   const handleCpfChange = (val: string) => {
@@ -257,12 +152,15 @@ export const CheckoutModal: React.FC = () => {
   // Busca automática de endereço por CEP (ViaCEP)
   const handleCepChange = async (val: string) => {
     const raw = val.replace(/\D/g, '').slice(0, 8);
-    const formatted = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
+    let formatted = raw;
+    if (raw.length > 5) {
+      formatted = `${raw.slice(0, 5)}-${raw.slice(5)}`;
+    }
     setFormData(prev => ({ ...prev, cep: formatted }));
 
     if (raw.length === 8) {
+      setIsLoadingCep(true);
       try {
-        setIsLoadingCep(true);
         const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`);
         if (res.ok) {
           const data = await res.json();
@@ -272,20 +170,20 @@ export const CheckoutModal: React.FC = () => {
               street: data.logradouro || prev.street,
               neighborhood: data.bairro || prev.neighborhood,
               city: data.localidade || prev.city,
-              state: data.uf || prev.state,
-              complement: data.complemento || prev.complement
+              state: data.uf || prev.state
             }));
           }
         }
-      } catch (_) {
+      } catch (e) {
+        console.warn('Erro ao consultar ViaCEP:', e);
       } finally {
         setIsLoadingCep(false);
       }
     }
   };
 
-  // Validação matemática de CPF brasileiro
-  const isValidCPF = (cpf: string): boolean => {
+  // Validação simples de CPF
+  const isValidCPF = (cpf: string) => {
     const clean = cpf.replace(/\D/g, '');
     if (clean.length !== 11) return false;
     if (/^(\d)\1{10}$/.test(clean)) return false;
@@ -299,12 +197,6 @@ export const CheckoutModal: React.FC = () => {
     rev = 11 - (sum % 11);
     if (rev === 10 || rev === 11) rev = 0;
     return rev === parseInt(clean.charAt(10), 10);
-  };
-
-  const handleNextToPayment = (e: React.FormEvent) => {
-    e.preventDefault();
-    saveUserProfile(formData);
-    setStep('payment');
   };
 
   const handleCloseModal = () => {
@@ -326,7 +218,43 @@ export const CheckoutModal: React.FC = () => {
     formData.state.trim()
   );
 
-  const handleCompleteOrder = async () => {
+  // Gerador da mensagem completa e detalhada para o WhatsApp
+  const generateWhatsAppMessage = (order: NonNullable<typeof completedOrderData>) => {
+    const itemsText = order.items
+      .map(
+        (it, idx) =>
+          `*${idx + 1}. ${it.name}*\n` +
+          `   🎨 Cor: ${it.color || 'Padrão'}${it.size ? ` | Tam: ${it.size}` : ''}\n` +
+          `   🔢 Qtd: ${it.quantity} un. | Valor: R$ ${(it.quantity * it.unitPrice).toFixed(2).replace('.', ',')}`
+      )
+      .join('\n\n');
+
+    return (
+      `🌊 *NOVO PEDIDO REALIZADO — SUNLAB 3D*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `🔖 *PEDIDO:* #${order.orderNumber}\n` +
+      `📅 *DATA:* ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}\n\n` +
+      `👤 *DADOS DO CLIENTE:*\n` +
+      `• *Nome:* ${order.customerName}\n` +
+      `• *E-mail:* ${order.customerEmail}\n` +
+      `• *Telefone/WhatsApp:* ${order.customerPhone || 'Não informado'}\n\n` +
+      `📍 *ENDEREÇO DE ENTREGA:*\n` +
+      `• ${order.shippingAddress}\n\n` +
+      `📦 *PRODUTOS ESCOLHIDOS:*\n` +
+      `${itemsText}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `💰 *VALOR TOTAL: R$ ${order.totalAmount.toFixed(2).replace('.', ',')}*\n` +
+      `🚚 *FRETE:* Grátis para todo o Brasil\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `💬 *Olá SunLab! Gostaria de confirmar meu pedido #${order.orderNumber} e receber as informações para pagamento e início da fabricação 3D!*\n` +
+      `_SunLab Design & Fabricação Digital_`
+    );
+  };
+
+  const handleCompleteOrder = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!isProfileComplete || isProcessing) return;
+
     setIsProcessing(true);
     const itemsPayload = cart.map((item: CartItem) => ({
       name: item.product.name,
@@ -339,7 +267,8 @@ export const CheckoutModal: React.FC = () => {
     }));
 
     let confirmedOrderNumber = orderNumber || `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
-    const finalPaymentMethodLabel = 'Pix Instantâneo (5% OFF)';
+    const finalPaymentMethodLabel = 'WhatsApp (A Combinar)';
+    const payableTotal = total;
 
     const shippingAddr = `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''}${formData.neighborhood ? ', ' + formData.neighborhood : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`;
 
@@ -356,7 +285,7 @@ export const CheckoutModal: React.FC = () => {
           shippingAddress: shippingAddr,
           paymentMethod: finalPaymentMethodLabel,
           items: itemsPayload,
-          totalAmount: finalPayableTotal
+          totalAmount: payableTotal
         })
       });
       if (res.ok) {
@@ -376,7 +305,7 @@ export const CheckoutModal: React.FC = () => {
       shippingAddress: shippingAddr,
       paymentMethod: finalPaymentMethodLabel,
       items: itemsPayload,
-      totalAmount: finalPayableTotal,
+      totalAmount: payableTotal,
       orderNumber: confirmedOrderNumber,
       createdAt: new Date().toISOString()
     };
@@ -384,8 +313,6 @@ export const CheckoutModal: React.FC = () => {
     setCompletedOrderData(fullOrder);
     setOrderNumber(confirmedOrderNumber);
     saveUserProfile(formData);
-    setIsProcessing(false);
-    setStep('success');
 
     // Salvar localmente para visualização instantânea na página "Meus Pedidos"
     try {
@@ -398,68 +325,20 @@ export const CheckoutModal: React.FC = () => {
     }
 
     clearCart();
-  };
+    setIsProcessing(false);
+    setStep('success');
 
-  const copyPixCode = () => {
-    if (!pixPayload) return;
-    navigator.clipboard.writeText(pixPayload);
-    setCopiedPix(true);
-    setTimeout(() => setCopiedPix(false), 2500);
-  };
-
-  const copyDirectPixKey = () => {
-    const rawToCopy = pixConfig.key.startsWith('+55') ? pixConfig.key.slice(3) : pixConfig.key;
-    navigator.clipboard.writeText(rawToCopy);
-    setCopiedPixKey(true);
-    setTimeout(() => setCopiedPixKey(false), 2500);
-  };
-
-  const formatTimer = (sec: number) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  };
-
-  // Gerador da mensagem completa e detalhada para o WhatsApp
-  const generateFullWhatsAppMessage = () => {
-    const order = completedOrderData;
-    if (!order) return '';
-
-    const itemsText = order.items
-      .map(
-        (it, idx) =>
-          `*${idx + 1}. ${it.name}*\n` +
-          `   🎨 Cor: ${it.color || 'Padrão'}${it.size ? ` | Tam: ${it.size}` : ''}\n` +
-          `   🔢 Qtd: ${it.quantity} un. | Valor unit.: R$ ${it.unitPrice.toFixed(2).replace('.', ',')}\n` +
-          `   🏷️ Subtotal: R$ ${(it.quantity * it.unitPrice).toFixed(2).replace('.', ',')}`
-      )
-      .join('\n\n');
-
-    return (
-      `🌊 *NOVO PEDIDO REALIZADO — SUNLAB 3D*\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `🔖 *PEDIDO:* #${order.orderNumber}\n` +
-      `📅 *DATA:* ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}\n\n` +
-      `👤 *DADOS DO COMPRADOR:*\n` +
-      `• *Nome:* ${order.customerName}\n` +
-      `• *E-mail:* ${order.customerEmail}\n` +
-      `• *Telefone/WhatsApp:* ${order.customerPhone || 'Não informado'}\n\n` +
-      `📍 *ENDEREÇO DE ENTREGA:*\n` +
-      `• ${order.shippingAddress}\n\n` +
-      `💳 *FORMA DE PAGAMENTO:*\n` +
-      `• ${order.paymentMethod}\n\n` +
-      `📦 *PRODUTOS COMPRADOS:*\n` +
-      `${itemsText}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `💰 *VALOR TOTAL: R$ ${order.totalAmount.toFixed(2).replace('.', ',')}*\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `⚙️ *Status Inicial:* Aguardando início na impressora 3D\n` +
-      `_SunLab Design & Fabricação Digital_`
-    );
+    // Redirecionar / Abrir conversa no WhatsApp automaticamente
+    const msg = generateWhatsAppMessage(fullOrder);
+    const waUrl = `https://wa.me/5513996061681?text=${encodeURIComponent(msg)}`;
+    try {
+      window.open(waUrl, '_blank');
+    } catch (_) {}
   };
 
   const copyWhatsAppDetails = () => {
-    const text = generateFullWhatsAppMessage();
+    if (!completedOrderData) return;
+    const text = generateWhatsAppMessage(completedOrderData);
     if (text) {
       navigator.clipboard.writeText(text);
       setCopiedWhatsAppText(true);
@@ -486,9 +365,8 @@ export const CheckoutModal: React.FC = () => {
           <div className="flex items-center gap-2 sm:gap-2.5">
             <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700 shrink-0" />
             <h3 className="text-sm sm:text-base font-bold text-blue-950 truncate max-w-[260px] sm:max-w-none">
-              {step === 'form' && 'Finalizar Pedido — Envio'}
-              {step === 'payment' && 'Pagamento Seguro via Pix (5% OFF)'}
-              {step === 'success' && 'Pedido Confirmado!'}
+              {step === 'form' && 'Finalizar Pedido — Dados de Entrega'}
+              {step === 'success' && 'Pedido Registrado com Sucesso!'}
             </h3>
           </div>
           {step !== 'success' && (
@@ -559,499 +437,375 @@ export const CheckoutModal: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* STEP 1: Address Form */}
+              {/* STEP 1: Formulário de Entrega e Envio Direto ao WhatsApp */}
               {step === 'form' && (
-                <form onSubmit={handleNextToPayment} className="space-y-4">
-                  {/* Banner de Status dos Dados da Conta */}
-                  {!isProfileComplete ? (
-                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-xs flex items-start gap-2.5 shadow-2xs">
-                      <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                      <div className="space-y-0.5">
-                        <strong className="font-bold">Complete seus dados cadastrais e endereço:</strong>
-                        <p className="text-[11px] text-amber-800 leading-relaxed">
-                          Preencha seu nome e endereço abaixo. Suas informações ficarão salvas automaticamente na sua conta <strong>({user.email})</strong> para você não precisar digitar nas próximas compras!
-                        </p>
+                <form onSubmit={handleCompleteOrder} className="space-y-4">
+                  {/* Banner de Identificação do Usuário */}
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-xs">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-[10px]">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <span className="font-semibold text-blue-950 block">{user.name}</span>
+                        <span className="text-blue-700 text-[11px]">{user.email}</span>
                       </div>
                     </div>
-                  ) : (
-                    <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex items-center justify-between shadow-2xs">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="text-[11px] font-medium truncate">
-                          Dados de entrega salvos e vinculados à conta <strong>{user.email}</strong>
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full shrink-0">
-                        Salvo
-                      </span>
-                    </div>
-                  )}
+                    <span className="text-[10px] bg-white px-2 py-0.5 rounded-full border border-blue-200 text-blue-800 font-medium">
+                      Conta Conectada
+                    </span>
+                  </div>
 
-                  {/* Row 1: Nome Completo e E-mail da Conta */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Nome Completo *</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                        Nome Completo do Destinatário *
+                      </label>
                       <input
-                        required
                         type="text"
-                        placeholder="Ex: Ana Clara Silva"
+                        required
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                        placeholder="Nome e Sobrenome"
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                       />
                     </div>
+
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1 flex items-center justify-between">
-                        <span>E-mail da Conta *</span>
-                        <span className="text-[10px] text-zinc-400 font-normal flex items-center gap-1">
-                          <Lock className="w-3 h-3" /> Vinculado
-                        </span>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                        WhatsApp / Celular com DDD *
                       </label>
                       <input
-                        disabled
-                        type="email"
-                        value={user.email}
-                        className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-xs text-zinc-600 cursor-not-allowed outline-none select-none"
-                        title="O e-mail é vinculado à sua conta logada"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Row 2: WhatsApp e CPF */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">WhatsApp / Telefone *</label>
-                      <input
+                        type="tel"
                         required
-                        type="text"
-                        placeholder="(11) 98765-4321"
                         value={formData.phone}
                         onChange={(e) => handlePhoneChange(e.target.value)}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">CPF do Titular *</label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="000.000.000-00"
-                        value={formData.cpf}
-                        onChange={(e) => handleCpfChange(e.target.value)}
+                        placeholder="(13) 99999-9999"
                         className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
                       />
                     </div>
-                  </div>
 
-                  {/* Row 3: CEP e Bairro */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1 flex items-center justify-between">
-                        <span>CEP *</span>
-                        {isLoadingCep && <span className="text-[10px] text-blue-600 animate-pulse">Buscando CEP...</span>}
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                        CPF do Titular *
                       </label>
                       <input
+                        type="text"
                         required
-                        type="text"
-                        placeholder="00000-000"
-                        value={formData.cep}
-                        onChange={(e) => handleCepChange(e.target.value)}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
+                        value={formData.cpf}
+                        onChange={(e) => handleCpfChange(e.target.value)}
+                        placeholder="000.000.000-00"
+                        className={`w-full bg-white border rounded-xl px-3 py-2 text-xs text-zinc-900 focus:ring-1 outline-none font-mono ${
+                          formData.cpf && !isValidCPF(formData.cpf)
+                            ? 'border-red-400 focus:border-red-500 focus:ring-red-400'
+                            : 'border-zinc-300 focus:border-blue-500 focus:ring-blue-500'
+                        }`}
                       />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Bairro</label>
-                      <input
-                        type="text"
-                        placeholder="Ex: Centro, Bela Vista"
-                        value={formData.neighborhood}
-                        onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                      />
+                      {formData.cpf && !isValidCPF(formData.cpf) && (
+                        <span className="text-[10px] text-red-500 mt-0.5 block">CPF inválido</span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Row 4: Logradouro e Número */}
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <div className="sm:col-span-3">
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Endereço (Rua, Av.) *</label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="Ex: Rua das Flores"
-                        value={formData.street}
-                        onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Número *</label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="Ex: 120"
-                        value={formData.number}
-                        onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                      />
-                    </div>
-                  </div>
+                  {/* Endereço de Entrega */}
+                  <div className="pt-2 border-t border-zinc-100 space-y-3">
+                    <span className="text-xs font-bold text-zinc-900 block">
+                      Endereço de Entrega (Frete Grátis)
+                    </span>
 
-                  {/* Row 5: Complemento, Cidade e Estado */}
-                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                    <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Complemento (Opcional)</label>
-                      <input
-                        type="text"
-                        placeholder="Apto 42, Bloco B, Casa 2"
-                        value={formData.complement}
-                        onChange={(e) => setFormData({ ...formData, complement: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          CEP * {isLoadingCep && <span className="text-blue-600 text-[10px] animate-pulse">Buscando...</span>}
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.cep}
+                          onChange={(e) => handleCepChange(e.target.value)}
+                          placeholder="00000-000"
+                          maxLength={9}
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          Rua / Avenida *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.street}
+                          onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                          placeholder="Nome do logradouro"
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Cidade *</label>
-                      <input
-                        required
-                        type="text"
-                        placeholder="Cidade"
-                        value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                      />
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          Número *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.number}
+                          onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                          placeholder="Ex: 123"
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          Complemento (opcional)
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.complement}
+                          onChange={(e) => setFormData({ ...formData, complement: e.target.value })}
+                          placeholder="Apto 42, Bloco B..."
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-zinc-700 mb-1">UF *</label>
-                      <input
-                        required
-                        type="text"
-                        maxLength={2}
-                        placeholder="SP"
-                        value={formData.state}
-                        onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none uppercase font-mono"
-                      />
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          Bairro *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.neighborhood}
+                          onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
+                          placeholder="Bairro"
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          Cidade *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.city}
+                          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                          placeholder="Cidade"
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-700 mb-1">
+                          Estado (UF) *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          maxLength={2}
+                          value={formData.state}
+                          onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
+                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none uppercase font-mono"
+                        />
+                      </div>
                     </div>
                   </div>
 
                   {/* Order Mini Summary */}
                   <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
                     <div className="flex items-center gap-2 text-zinc-600">
-                      <Truck className="w-4 h-4 text-blue-600" />
-                      <span>Envio com seguro e rastreio via Correios / Jadlog</span>
+                      <Truck className="w-4 h-4 text-emerald-600" />
+                      <span>Frete Grátis com rastreamento</span>
                     </div>
                     <div className="text-right">
-                      <span className="text-zinc-400 text-[10px] block">Total estimado</span>
+                      <span className="text-zinc-400 text-[10px] block">Valor Total</span>
                       <span className="font-bold text-zinc-900 text-sm">
                         R$ {total.toFixed(2).replace('.', ',')}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-3 pt-3">
-                    <button
-                      type="button"
-                      onClick={closeCheckout}
-                      className="px-4 py-2.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-800 cursor-pointer"
-                    >
-                      Cancelar
-                    </button>
+                  {/* Submit Button */}
+                  <div className="space-y-2 pt-2">
                     <button
                       type="submit"
-                      className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
+                      disabled={!isProfileComplete || isProcessing}
+                      className="w-full flex items-center justify-center gap-2.5 py-3.5 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 disabled:bg-zinc-300 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm transition-all shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer"
                     >
-                      Ir para Pagamento com Pix (5% OFF) →
+                      {isProcessing ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin text-white" />
+                          <span>Registrando pedido e abrindo WhatsApp...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
+                          <span>Finalizar Pedido e Pagar no WhatsApp</span>
+                        </>
+                      )}
                     </button>
+                    
+                    <p className="text-[11px] text-zinc-500 text-center flex items-center justify-center gap-1.5 pt-0.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <span>O pedido ficará salvo na sua conta e o WhatsApp abrirá para envio do comprovante.</span>
+                    </p>
                   </div>
                 </form>
               )}
 
-          {/* STEP 2: Pagamento Exclusivo via Pix (5% OFF & QR Code Oficial) */}
-          {step === 'payment' && (
-            <div className="space-y-6">
-              
-              {/* Trust Badge do Pix */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
-                    <QrCode className="w-4 h-4" />
+              {/* STEP 2: Pedido Registrado e Confirmação via WhatsApp */}
+              {step === 'success' && (
+                <div className="text-center py-6 space-y-6 animate-in fade-in">
+                  <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
+                    <CheckCircle className="w-8 h-8 text-emerald-600" />
                   </div>
+
                   <div>
-                    <div className="font-bold flex items-center gap-1.5 text-zinc-900">
-                      <span>Pix Oficial Instantâneo</span>
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">5% OFF</span>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-900 text-xs font-semibold mb-2 shadow-xs">
+                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
+                      <span>Pedido Registrado • Aguardando Pagamento no WhatsApp</span>
                     </div>
-                    <p className="text-[10px] text-zinc-500">Aprovação imediata • Sem taxas • Pedido entra na fila 3D na hora</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
-                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                  <span className="hidden sm:inline">Criptografia BCB</span>
-                </div>
-              </div>
-
-              {/* PIX AREA (BANCO CENTRAL BRCODE & QR CODE OFICIAL) */}
-              <div className="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center text-center space-y-4">
-                
-                {/* Countdown Timer */}
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-300 text-zinc-700 text-xs font-mono font-semibold">
-                  <Clock className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Expira em: {formatTimer(timeLeft)}</span>
-                </div>
-
-                {/* Real Scannable Pix QR Code */}
-                <div className="w-48 h-48 bg-white p-3 rounded-2xl flex items-center justify-center shadow-sm border-2 border-emerald-500/30 relative">
-                  {isGeneratingPix || !pixQrCodeUrl ? (
-                    <div className="flex flex-col items-center justify-center gap-2 text-zinc-400">
-                      <Loader2 className="w-7 h-7 animate-spin text-emerald-600" />
-                      <span className="text-[11px] font-medium text-zinc-500">Gerando QR Code Pix...</span>
+                    <div className="block mt-1">
+                      <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-zinc-700 uppercase tracking-widest">
+                        Pedido #{orderNumber}
+                      </span>
                     </div>
-                  ) : (
-                    <img
-                      src={pixQrCodeUrl}
-                      alt="QR Code Pix Oficial SunLab"
-                      className="w-full h-full object-contain rounded-xl select-none"
-                    />
-                  )}
-                </div>
-
-                <div>
-                  <span className="text-xs text-zinc-500">Total com 5% de desconto no Pix:</span>
-                  <h4 className="text-3xl font-extrabold text-zinc-900 font-display mt-0.5">
-                    R$ {finalPayableTotal.toFixed(2).replace('.', ',')}
-                  </h4>
-                  <span className="text-[11px] text-zinc-500 mt-1 block">
-                    Aprovação instantânea • Liberação imediata para a fila de impressão 3D
-                  </span>
-                </div>
-
-                {/* Informações Oficiais da Chave Pix da Loja */}
-                <div className="w-full max-w-sm p-3.5 rounded-xl bg-white border border-zinc-200 text-left text-xs space-y-1.5 shadow-xs">
-                  <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
-                    <span className="text-zinc-500 font-medium">Chave Pix Oficial:</span>
-                    <strong className="text-zinc-900 font-mono font-bold">
-                      {formatFriendlyKey(pixConfig.key)}
-                    </strong>
+                    <h4 className="text-2xl font-extrabold text-zinc-900 font-display mt-3">
+                      Pedido Realizado com Sucesso!
+                    </h4>
+                    <p className="text-xs text-zinc-500 max-w-md mx-auto mt-1 leading-relaxed">
+                      O seu pedido já está salvo na sua conta SunLab. Você foi direcionado ao WhatsApp da loja para combinar o pagamento. Assim que recebido, confirmamos o status e iniciamos a fabricação 3D!
+                    </p>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-500">Favorecido / Nome:</span>
-                    <span className="text-zinc-800 font-semibold">{pixConfig.merchantName}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-zinc-500">Cidade do Titular:</span>
-                    <span className="text-zinc-700">{pixConfig.merchantCity} - SP</span>
-                  </div>
-                </div>
 
-                {/* Botões de Cópia: Copia e Cola + Chave Direta */}
-                <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm">
-                  <button
-                    type="button"
-                    onClick={copyPixCode}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-                  >
-                    {copiedPix ? (
-                      <>
-                        <Check className="w-4 h-4 text-emerald-300" />
-                        <span>Código Pix Copiado!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4" />
-                        <span>Copiar Pix Copia e Cola</span>
-                      </>
-                    )}
-                  </button>
+                  {/* Order Receipt Box with Products Breakdown */}
+                  <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 max-w-lg mx-auto text-left space-y-3">
+                    <div className="flex justify-between pb-2 border-b border-zinc-200">
+                      <span className="text-zinc-500">Status do Pedido:</span>
+                      <span className="text-amber-800 font-semibold flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <span>Aguardando Pagamento no WhatsApp</span>
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">Destinatário:</span>
+                      <span className="text-zinc-900 font-medium">{formData.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">WhatsApp / Telefone:</span>
+                      <span className="text-zinc-900 font-medium font-mono">{formData.phone}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-zinc-500">Endereço de Entrega:</span>
+                      <span className="text-zinc-900 font-medium text-right max-w-[260px] truncate" title={`${formData.street}, ${formData.number} — ${formData.city}/${formData.state}`}>
+                        {formData.street}, {formData.number} — {formData.city}/${formData.state}
+                      </span>
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={copyDirectPixKey}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-                  >
-                    {copiedPixKey ? (
-                      <>
-                        <Check className="w-4 h-4 text-emerald-600" />
-                        <span>Chave Copiada!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Key className="w-4 h-4 text-zinc-500" />
-                        <span>Copiar Chave ({formatFriendlyKey(pixConfig.key)})</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Bottom Payment Actions */}
-              <div className="flex justify-between items-center pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep('form')}
-                  className="text-xs text-zinc-500 hover:text-zinc-800 cursor-pointer"
-                >
-                  ← Alterar endereço
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCompleteOrder}
-                  disabled={isProcessing}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs transition-all shadow-md cursor-pointer bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
-                >
-                  <Lock className="w-3.5 h-3.5" />
-                  <span>
-                    {isProcessing ? 'Confirmando Pedido...' : 'Confirmar Pagamento Pix Realizado'}
-                  </span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Order Confirmed & Receipt */}
-          {step === 'success' && (
-            <div className="text-center py-6 space-y-6">
-              <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto shadow-xs">
-                <CheckCircle className="w-8 h-8 text-emerald-600" />
-              </div>
-
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold mb-2 shadow-xs">
-                  <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-extrabold">PIX</span>
-                  <span>Pagamento Registrado via Pix Instantâneo (5% OFF)</span>
-                </div>
-                <div className="block mt-1">
-                  <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-zinc-700 uppercase tracking-widest">
-                    Pedido #{orderNumber}
-                  </span>
-                </div>
-                <h4 className="text-2xl font-extrabold text-zinc-900 font-display mt-3">
-                  Compra Confirmada!
-                </h4>
-                <p className="text-xs text-zinc-500 max-w-md mx-auto mt-1 leading-relaxed">
-                  Seu pagamento Pix foi confirmado com sucesso e seu pedido já entrou na fila de manufatura 3D.
-                </p>
-              </div>
-
-              {/* Order Receipt Box with Products Breakdown */}
-              <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 max-w-lg mx-auto text-left space-y-3">
-                <div className="flex justify-between pb-2 border-b border-zinc-200">
-                  <span className="text-zinc-500">Forma de Pagamento:</span>
-                  <span className="text-zinc-900 font-semibold flex items-center gap-1.5">
-                    <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">PIX</span>
-                    <span>{completedOrderData?.paymentMethod || 'Pix Instantâneo (5% OFF)'}</span>
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Destinatário:</span>
-                  <span className="text-zinc-900 font-medium">{formData.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">WhatsApp / Telefone:</span>
-                  <span className="text-zinc-900 font-medium font-mono">{formData.phone}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-zinc-500">Endereço de Entrega:</span>
-                  <span className="text-zinc-900 font-medium text-right max-w-[260px] truncate" title={`${formData.street}, ${formData.number} — ${formData.city}/${formData.state}`}>
-                    {formData.street}, {formData.number} — {formData.city}/{formData.state}
-                  </span>
-                </div>
-
-                {/* Purchased Products Detailed List */}
-                {completedOrderData && completedOrderData.items && completedOrderData.items.length > 0 && (
-                  <div className="pt-2 border-t border-zinc-200 space-y-2">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 block">
-                      Itens do Pedido ({completedOrderData.items.length}):
-                    </span>
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
-                      {completedOrderData.items.map((it, idx) => (
-                        <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-xl border border-zinc-200">
-                          <div className="flex items-center gap-2.5">
-                            {it.image && (
-                              <img src={it.image} alt={it.name} className="w-8 h-8 rounded-lg object-cover border border-zinc-200" />
-                            )}
-                            <div>
-                              <div className="font-semibold text-zinc-900 text-xs">{it.name}</div>
-                              <div className="text-[10px] text-zinc-500">
-                                {it.color && `Cor: ${it.color}`} {it.size && `• Tam: ${it.size}`} • {it.quantity}x
+                    {/* Purchased Products Detailed List */}
+                    {completedOrderData && completedOrderData.items && completedOrderData.items.length > 0 && (
+                      <div className="pt-2 border-t border-zinc-200 space-y-2">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 block">
+                          Itens do Pedido ({completedOrderData.items.length}):
+                        </span>
+                        <div className="space-y-1.5 max-h-40 overflow-y-auto pr-1">
+                          {completedOrderData.items.map((it, idx) => (
+                            <div key={idx} className="flex items-center justify-between bg-white p-2 rounded-xl border border-zinc-200">
+                              <div className="flex items-center gap-2.5">
+                                {it.image && (
+                                  <img src={it.image} alt={it.name} className="w-8 h-8 rounded-lg object-cover border border-zinc-200" />
+                                )}
+                                <div>
+                                  <div className="font-semibold text-zinc-900 text-xs">{it.name}</div>
+                                  <div className="text-[10px] text-zinc-500">
+                                    {it.color && `Cor: ${it.color}`} {it.size && `• Tam: ${it.size}`} • {it.quantity}x
+                                  </div>
+                                </div>
                               </div>
+                              <span className="font-mono font-bold text-zinc-900 text-xs">
+                                R$ {(it.quantity * it.unitPrice).toFixed(2).replace('.', ',')}
+                              </span>
                             </div>
-                          </div>
-                          <span className="font-mono font-bold text-zinc-900 text-xs">
-                            R$ {(it.quantity * it.unitPrice).toFixed(2).replace('.', ',')}
-                          </span>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    )}
+
+                    <div className="flex justify-between pt-2 border-t border-zinc-200">
+                      <span className="font-bold text-zinc-900">Total a Pagar:</span>
+                      <span className="text-zinc-900 font-extrabold text-base">
+                        R$ {(completedOrderData?.totalAmount || total).toFixed(2).replace('.', ',')}
+                      </span>
                     </div>
                   </div>
-                )}
 
-                <div className="flex justify-between pt-2 border-t border-zinc-200">
-                  <span className="font-bold text-zinc-900">Total Pago:</span>
-                  <span className="text-zinc-900 font-extrabold text-base">
-                    R$ {(completedOrderData?.totalAmount || finalPayableTotal).toFixed(2).replace('.', ',')}
-                  </span>
+                  {/* Action Buttons for WhatsApp & Orders Page */}
+                  <div className="space-y-2.5 max-w-lg mx-auto pt-1">
+                    {/* Primary: Send Full Order Details to WhatsApp */}
+                    <a
+                      href={`https://wa.me/5513996061681?text=${encodeURIComponent(
+                        completedOrderData ? generateWhatsAppMessage(completedOrderData) : ''
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.99]"
+                    >
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
+                      <span>Abrir WhatsApp da SunLab para Pagamento</span>
+                    </a>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={copyWhatsAppDetails}
+                        className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs transition-colors cursor-pointer border border-zinc-200"
+                      >
+                        {copiedWhatsAppText ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-zinc-600" />}
+                        <span>{copiedWhatsAppText ? 'Copiado!' : 'Copiar Texto'}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleCloseModal();
+                          navigate('/orders');
+                        }}
+                        className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 font-semibold text-xs transition-colors cursor-pointer border border-blue-200"
+                      >
+                        <Package className="w-3.5 h-3.5 text-blue-700" />
+                        <span>Ver Meus Pedidos</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => window.print()}
+                        className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-zinc-100 text-zinc-700 font-medium text-xs transition-colors cursor-pointer border border-zinc-200"
+                      >
+                        <Printer className="w-3.5 h-3.5 text-zinc-600" />
+                        <span>Imprimir</span>
+                      </button>
+                    </div>
+
+                    <div className="pt-2">
+                      <button
+                        type="button"
+                        onClick={handleCloseModal}
+                        className="text-xs text-zinc-500 hover:text-zinc-800 underline underline-offset-4 cursor-pointer"
+                      >
+                        Concluir e voltar à loja
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* Action Buttons for WhatsApp & Orders Page */}
-              <div className="space-y-2.5 max-w-lg mx-auto pt-1">
-                {/* Primary: Send Full Order Details to WhatsApp */}
-                <a
-                  href={`https://wa.me/5513996061681?text=${encodeURIComponent(generateFullWhatsAppMessage())}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.99]"
-                >
-                  <MessageCircle className="w-4 h-4 fill-white" />
-                  <span>Enviar Pedido Completo para o WhatsApp da Loja</span>
-                </a>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={copyWhatsAppDetails}
-                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-semibold text-xs transition-colors cursor-pointer border border-zinc-200"
-                  >
-                    {copiedWhatsAppText ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-zinc-600" />}
-                    <span>{copiedWhatsAppText ? 'Copiado!' : 'Copiar Texto'}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handleCloseModal();
-                      navigate('/orders');
-                    }}
-                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 font-semibold text-xs transition-colors cursor-pointer border border-blue-200"
-                  >
-                    <Package className="w-3.5 h-3.5 text-blue-700" />
-                    <span>Ver Meus Pedidos</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-zinc-100 text-zinc-700 font-medium text-xs transition-colors cursor-pointer border border-zinc-200"
-                  >
-                    <Printer className="w-3.5 h-3.5 text-zinc-600" />
-                    <span>Imprimir</span>
-                  </button>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="text-xs text-zinc-500 hover:text-zinc-800 underline underline-offset-4 cursor-pointer"
-                  >
-                    Concluir e voltar à loja
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-          </>
+              )}
+            </>
           )}
 
         </div>
@@ -1059,5 +813,3 @@ export const CheckoutModal: React.FC = () => {
     </div>
   );
 };
-
-export default CheckoutModal;

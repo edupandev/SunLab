@@ -1,7 +1,29 @@
+import fs from 'fs';
+
 // Vercel Serverless Function: Orders per user
 // Stores customer purchases tied to their user account / email
 
-let memoryOrders = global._sunlab_orders || [];
+const TMP_ORDERS_FILE = '/tmp/sunlab_orders.json';
+
+function getPersistedOrders() {
+  try {
+    if (fs.existsSync(TMP_ORDERS_FILE)) {
+      const data = JSON.parse(fs.readFileSync(TMP_ORDERS_FILE, 'utf8'));
+      if (Array.isArray(data)) return data;
+    }
+  } catch (_) {}
+  return [];
+}
+
+function persistOrders(orders) {
+  try {
+    fs.writeFileSync(TMP_ORDERS_FILE, JSON.stringify(orders), 'utf8');
+  } catch (_) {}
+}
+
+let memoryOrders = global._sunlab_orders && global._sunlab_orders.length 
+  ? global._sunlab_orders 
+  : getPersistedOrders();
 global._sunlab_orders = memoryOrders;
 
 export default async function handler(req, res) {
@@ -12,6 +34,53 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
+  }
+
+  // Determine subpath / route
+  const urlParts = req.url.split('?')[0].split('/').filter(Boolean);
+  const ordersIdx = urlParts.indexOf('orders');
+  let subpath = '';
+  if (ordersIdx !== -1 && urlParts.length > ordersIdx + 1) {
+    subpath = urlParts.slice(ordersIdx + 1).join('/');
+  } else if (req.query.path) {
+    subpath = Array.isArray(req.query.path) ? req.query.path.join('/') : String(req.query.path);
+  }
+
+  // PATCH / PUT update order status
+  if (req.method === 'PATCH' || req.method === 'PUT') {
+    try {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+      const { status } = body || {};
+      const targetId = subpath.replace('/status', '');
+
+      const idx = memoryOrders.findIndex(o => o.id === targetId || o.orderNumber === targetId);
+      if (idx === -1) {
+        return res.status(404).json({ error: 'Pedido não encontrado.' });
+      }
+
+      if (status) {
+        memoryOrders[idx].status = status;
+        memoryOrders[idx].updatedAt = new Date().toISOString();
+        persistOrders(memoryOrders);
+      }
+      return res.status(200).json({ success: true, order: memoryOrders[idx] });
+    } catch (err) {
+      return res.status(500).json({ error: 'Erro ao atualizar status do pedido.' });
+    }
+  }
+
+  // DELETE order
+  if (req.method === 'DELETE') {
+    const targetId = subpath;
+    const initialLen = memoryOrders.length;
+    memoryOrders = memoryOrders.filter(o => o.id !== targetId && o.orderNumber !== targetId);
+    global._sunlab_orders = memoryOrders;
+    persistOrders(memoryOrders);
+
+    if (memoryOrders.length === initialLen) {
+      return res.status(404).json({ error: 'Pedido não encontrado para remoção.' });
+    }
+    return res.status(200).json({ success: true, message: 'Pedido excluído com sucesso.' });
   }
 
   // GET Orders
@@ -57,7 +126,7 @@ export default async function handler(req, res) {
         customerEmail: customerEmail.trim().toLowerCase(),
         customerPhone: customerPhone || '',
         shippingAddress: shippingAddress || 'Retirada / A combinar',
-        paymentMethod: paymentMethod || 'Pix Instantâneo (5% OFF)',
+        paymentMethod: paymentMethod || 'WhatsApp (A Combinar)',
         items: items || [],
         totalAmount: Number(totalAmount),
         status: 'Pendente',
@@ -70,6 +139,9 @@ export default async function handler(req, res) {
       } else {
         memoryOrders.unshift(newOrder);
       }
+      global._sunlab_orders = memoryOrders;
+      persistOrders(memoryOrders);
+
       return res.status(201).json({ success: true, order: newOrder, orderNumber: newOrder.orderNumber });
     } catch (err) {
       return res.status(500).json({ error: 'Erro ao processar pedido' });

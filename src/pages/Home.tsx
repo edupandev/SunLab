@@ -162,7 +162,7 @@ export const Home: React.FC = () => {
           </span>
           <span className="text-zinc-500">•</span>
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Pagamento Instantâneo Oficial <strong>(Pix com 5% de Desconto Imediato)</strong>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Atendimento e Pagamento Direto no <strong>WhatsApp</strong>
           </span>
           <span className="text-zinc-500">•</span>
           <span className="flex items-center gap-1.5">
@@ -188,7 +188,7 @@ export const Home: React.FC = () => {
           </span>
           <span className="text-zinc-500">•</span>
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Pagamento Instantâneo Oficial <strong>(Pix com 5% de Desconto Imediato)</strong>
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Atendimento e Pagamento Direto no <strong>WhatsApp</strong>
           </span>
         </div>
       </div>

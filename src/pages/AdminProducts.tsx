@@ -897,7 +897,8 @@ export const AdminProducts: React.FC = () => {
                 className="bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-800 outline-none focus:border-zinc-500 cursor-pointer shrink-0"
               >
                 <option value="all">Todos os Status</option>
-                <option value="Pendente">🕒 Pendente</option>
+                <option value="Pendente">🕒 Pendente (Aguardando)</option>
+                <option value="Confirmado">💳 Confirmado (Pago)</option>
                 <option value="Em Produção 3D">⚙️ Em Produção 3D</option>
                 <option value="Enviado">🚚 Enviado</option>
                 <option value="Concluído">✅ Concluído</option>
@@ -1067,6 +1068,8 @@ export const AdminProducts: React.FC = () => {
                               className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border outline-none cursor-pointer transition-all ${
                                 o.status === 'Pendente'
                                   ? 'bg-amber-50 text-amber-800 border-amber-300'
+                                  : o.status === 'Confirmado'
+                                  ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold'
                                   : o.status === 'Em Produção 3D'
                                   ? 'bg-blue-50 text-blue-800 border-blue-300'
                                   : o.status === 'Enviado'
@@ -1076,7 +1079,8 @@ export const AdminProducts: React.FC = () => {
                                   : 'bg-zinc-100 text-zinc-700 border-zinc-200'
                               }`}
                             >
-                              <option value="Pendente">🕒 Pendente</option>
+                              <option value="Pendente">🕒 Pendente (Aguardando)</option>
+                              <option value="Confirmado">💳 Confirmado (Pago)</option>
                               <option value="Em Produção 3D">⚙️ Em Produção 3D</option>
                               <option value="Enviado">🚚 Enviado</option>
                               <option value="Concluído">✅ Concluído</option>

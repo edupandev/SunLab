@@ -208,7 +208,14 @@ export const Orders: React.FC = () => {
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200">
             <Clock className="w-3.5 h-3.5 text-amber-600 animate-spin" />
-            <span>Aguardando Início</span>
+            <span>Aguardando Pagamento no WhatsApp</span>
+          </span>
+        );
+      case 'Confirmado':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span>Pagamento Confirmado</span>
           </span>
         );
       case 'Em Produção 3D':
@@ -232,6 +239,12 @@ export const Orders: React.FC = () => {
             <span>Pedido Entregue</span>
           </span>
         );
+      case 'Cancelado':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-800 border border-red-200">
+            <span>Cancelado</span>
+          </span>
+        );
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-zinc-100 text-zinc-700 border border-zinc-200">
@@ -245,6 +258,8 @@ export const Orders: React.FC = () => {
     switch (status) {
       case 'Pendente':
         return 1;
+      case 'Confirmado':
+        return 2;
       case 'Em Produção 3D':
         return 2;
       case 'Enviado':

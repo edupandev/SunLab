@@ -195,12 +195,12 @@ export const ProductDetail: React.FC = () => {
                       R$ {product.originalPrice.toFixed(2).replace('.', ',')}
                     </span>
                   )}
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded bg-zinc-200 text-zinc-700 border border-zinc-300">
-                    5% OFF no Pix
+                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
+                    Pagamento via WhatsApp
                   </span>
                 </div>
                 <p className="text-xs text-emerald-700 font-medium">
-                  Aprovação instantânea e liberação imediata para a fila de produção 3D
+                  Atendimento direto e liberação para a fila de manufatura 3D
                 </p>
               </>
             ) : (
