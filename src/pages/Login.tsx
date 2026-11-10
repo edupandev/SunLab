@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { useNavigate, Link, useSearchParams } from 'react-router';
 import {
   Lock,
   Mail,
@@ -16,7 +16,18 @@ import { useAuth, type LoginWithProvider } from '@/context/AuthContext';
 import SunLabLogo from '@/components/SunLabLogo';
 
 export const Login: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'login' | 'register'>(() => {
+    return searchParams.get('tab') === 'register' ? 'register' : 'login';
+  });
+
+  const getRedirectUrl = (role?: string) => {
+    const redirectParam = searchParams.get('redirect');
+    if (role === 'admin') return '/admin';
+    if (redirectParam === 'checkout') return '/?checkout=true';
+    if (redirectParam) return redirectParam;
+    return '/orders';
+  };
   
   // Login fields
   const [email, setEmail] = useState('');
@@ -85,7 +96,7 @@ export const Login: React.FC = () => {
               if (data.token) localStorage.setItem('sunlab_auth_token', data.token);
             }
             setTimeout(() => {
-              window.location.href = data.user?.role === 'admin' ? '/admin' : '/minha-conta';
+              window.location.href = getRedirectUrl(data.user?.role);
             }, 500);
             return;
           }
@@ -111,7 +122,7 @@ export const Login: React.FC = () => {
         localStorage.setItem('sunlab_auth_token', response.credential);
         setSuccessMessage('Autenticado com sucesso via Google!');
         setTimeout(() => {
-          window.location.href = googleUser.role === 'admin' ? '/admin' : '/minha-conta';
+          window.location.href = getRedirectUrl(googleUser.role);
         }, 500);
       } else {
         setErrorMessage('Não foi possível autenticar o token do Google.');
@@ -170,8 +181,9 @@ export const Login: React.FC = () => {
       const res = await login(email, password);
       if (res.success) {
         setSuccessMessage('Login autenticado com sucesso! Entrando...');
+        const role = email.trim().toLowerCase() === 'admin@sunlab.com.br' ? 'admin' : 'customer';
         setTimeout(() => {
-          navigate('/admin');
+          navigate(getRedirectUrl(role));
         }, 500);
       } else {
         setErrorMessage(res.message || 'Credenciais inválidas.');
@@ -206,7 +218,7 @@ export const Login: React.FC = () => {
       if (res.success) {
         setSuccessMessage('Conta criada com sucesso no banco de dados! Entrando...');
         setTimeout(() => {
-          navigate('/orders');
+          navigate(getRedirectUrl('customer'));
         }, 500);
       } else {
         setErrorMessage(res.message || 'Erro ao registrar conta.');
@@ -265,11 +277,7 @@ export const Login: React.FC = () => {
         setOauthModalProvider(null);
         setSuccessMessage(`Conectado com sucesso via ${oauthModalProvider.toUpperCase()}!`);
         setTimeout(() => {
-          if (res.user?.role === 'admin') {
-            navigate('/admin');
-          } else {
-            navigate('/orders');
-          }
+          navigate(getRedirectUrl(res.user?.role));
         }, 500);
       } else {
         setErrorMessage(res.message || `Erro ao autenticar com ${oauthModalProvider}.`);

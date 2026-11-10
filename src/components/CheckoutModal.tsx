@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import {
   X,
   CheckCircle,
+  CheckCircle2,
   ShieldCheck,
   QrCode,
   CreditCard,
@@ -14,12 +15,18 @@ import {
   Clock,
   Printer,
   Package,
-  FileText
+  FileText,
+  UserCheck,
+  LogIn,
+  UserPlus,
+  Sparkles
 } from 'lucide-react';
 import { useCart, type CartItem } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 export const CheckoutModal: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { isCheckoutOpen, closeCheckout, total, clearCart, cart } = useCart();
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit' | 'boleto'>('pix');
@@ -28,6 +35,7 @@ export const CheckoutModal: React.FC = () => {
   const [copiedWhatsAppText, setCopiedWhatsAppText] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoadingCep, setIsLoadingCep] = useState(false);
   const [completedOrderData, setCompletedOrderData] = useState<{
     orderNumber: string;
     customerName: string;
@@ -50,27 +58,75 @@ export const CheckoutModal: React.FC = () => {
   // Pix Countdown Timer (15 minutes)
   const [timeLeft, setTimeLeft] = useState(15 * 60);
 
-  // Address & Payer Form States (Mercado Pago Requer CPF)
-  const [formData, setFormData] = useState({
-    name: 'Miguel Nogueira',
-    email: 'cliente@sunlab.com.br',
-    phone: '(11) 98765-4321',
-    cpf: '381.286.008-30',
-    cep: '01310-100',
-    street: 'Av. Paulista',
-    number: '1000',
-    complement: 'Apto 82',
-    city: 'São Paulo',
-    state: 'SP'
+  // Chave de armazenamento por conta de usuário
+  const getUserProfileKey = (userEmail: string) => `sunlab_checkout_profile_${userEmail.toLowerCase().trim()}`;
+
+  const loadSavedProfile = (userEmail?: string) => {
+    if (!userEmail) return null;
+    try {
+      const stored = localStorage.getItem(getUserProfileKey(userEmail));
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (_) {}
+    return null;
+  };
+
+  // Address & Payer Form States (inicia vazio ou com os dados salvos da conta do usuário)
+  const [formData, setFormData] = useState(() => {
+    const saved = user?.email ? loadSavedProfile(user.email) : null;
+    return {
+      name: saved?.name || (user?.name && user.name !== 'SunLab Admin' && !user.name.includes('@') ? user.name : ''),
+      email: user?.email || '',
+      phone: saved?.phone || '',
+      cpf: saved?.cpf || '',
+      cep: saved?.cep || '',
+      street: saved?.street || '',
+      number: saved?.number || '',
+      complement: saved?.complement || '',
+      neighborhood: saved?.neighborhood || '',
+      city: saved?.city || '',
+      state: saved?.state || ''
+    };
   });
+
+  // Salvar perfil do usuário para compras futuras
+  const saveUserProfile = (data: typeof formData) => {
+    if (!user?.email) return;
+    try {
+      localStorage.setItem(getUserProfileKey(user.email), JSON.stringify(data));
+      localStorage.setItem('sunlab_customer_email', user.email);
+    } catch (_) {}
+  };
+
+  // Carregar dados salvos da conta sempre que o modal abre ou usuário loga
+  useEffect(() => {
+    if (user?.email) {
+      const saved = loadSavedProfile(user.email);
+      setFormData(prev => ({
+        ...prev,
+        name: saved?.name || (user.name && user.name !== 'SunLab Admin' && !user.name.includes('@') ? user.name : prev.name || ''),
+        email: user.email,
+        phone: saved?.phone || prev.phone || '',
+        cpf: saved?.cpf || prev.cpf || '',
+        cep: saved?.cep || prev.cep || '',
+        street: saved?.street || prev.street || '',
+        number: saved?.number || prev.number || '',
+        complement: saved?.complement || prev.complement || '',
+        neighborhood: saved?.neighborhood || prev.neighborhood || '',
+        city: saved?.city || prev.city || '',
+        state: saved?.state || prev.state || ''
+      }));
+    }
+  }, [user, isCheckoutOpen]);
 
   // Credit Card States (Mercado Pago Transparent Checkout)
   const [cardData, setCardData] = useState({
-    number: '4532 8920 1827 4921',
-    holder: 'MIGUEL NOGUEIRA',
-    cpf: '381.286.008-30',
-    expiry: '08/29',
-    cvv: '842',
+    number: '',
+    holder: '',
+    cpf: '',
+    expiry: '',
+    cvv: '',
     installments: '1'
   });
 
@@ -88,6 +144,64 @@ export const CheckoutModal: React.FC = () => {
 
   const pixDiscount = paymentMethod === 'pix' ? total * 0.05 : 0;
   const finalPayableTotal = Math.max(0, total - pixDiscount);
+
+  // Formatação de CPF com máscara
+  const handleCpfChange = (val: string) => {
+    const raw = val.replace(/\D/g, '').slice(0, 11);
+    let formatted = raw;
+    if (raw.length > 9) {
+      formatted = `${raw.slice(0, 3)}.${raw.slice(3, 6)}.${raw.slice(6, 9)}-${raw.slice(9)}`;
+    } else if (raw.length > 6) {
+      formatted = `${raw.slice(0, 3)}.${raw.slice(3, 6)}.${raw.slice(6)}`;
+    } else if (raw.length > 3) {
+      formatted = `${raw.slice(0, 3)}.${raw.slice(3)}`;
+    }
+    setFormData(prev => ({ ...prev, cpf: formatted }));
+  };
+
+  // Formatação de Telefone / WhatsApp com máscara
+  const handlePhoneChange = (val: string) => {
+    const raw = val.replace(/\D/g, '').slice(0, 11);
+    let formatted = raw;
+    if (raw.length > 10) {
+      formatted = `(${raw.slice(0, 2)}) ${raw.slice(2, 7)}-${raw.slice(7)}`;
+    } else if (raw.length > 6) {
+      formatted = `(${raw.slice(0, 2)}) ${raw.slice(2, 6)}-${raw.slice(6)}`;
+    } else if (raw.length > 2) {
+      formatted = `(${raw.slice(0, 2)}) ${raw.slice(2)}`;
+    }
+    setFormData(prev => ({ ...prev, phone: formatted }));
+  };
+
+  // Busca automática de endereço por CEP (ViaCEP)
+  const handleCepChange = async (val: string) => {
+    const raw = val.replace(/\D/g, '').slice(0, 8);
+    const formatted = raw.length > 5 ? `${raw.slice(0, 5)}-${raw.slice(5)}` : raw;
+    setFormData(prev => ({ ...prev, cep: formatted }));
+
+    if (raw.length === 8) {
+      try {
+        setIsLoadingCep(true);
+        const res = await fetch(`https://viacep.com.br/ws/${raw}/json/`);
+        if (res.ok) {
+          const data = await res.json();
+          if (!data.erro) {
+            setFormData(prev => ({
+              ...prev,
+              street: data.logradouro || prev.street,
+              neighborhood: data.bairro || prev.neighborhood,
+              city: data.localidade || prev.city,
+              state: data.uf || prev.state,
+              complement: data.complemento || prev.complement
+            }));
+          }
+        }
+      } catch (_) {
+      } finally {
+        setIsLoadingCep(false);
+      }
+    }
+  };
 
   // Format Card Number
   const handleCardNumberChange = (val: string) => {
@@ -109,8 +223,25 @@ export const CheckoutModal: React.FC = () => {
 
   const handleNextToPayment = (e: React.FormEvent) => {
     e.preventDefault();
+    saveUserProfile(formData);
+    setCardData(prev => ({
+      ...prev,
+      holder: prev.holder || (formData.name || '').toUpperCase(),
+      cpf: prev.cpf || formData.cpf || ''
+    }));
     setStep('payment');
   };
+
+  const isProfileComplete = Boolean(
+    formData.name.trim() &&
+    formData.phone.trim() &&
+    formData.cpf.trim() &&
+    formData.cep.trim() &&
+    formData.street.trim() &&
+    formData.number.trim() &&
+    formData.city.trim() &&
+    formData.state.trim()
+  );
 
   const handleCompleteOrder = async () => {
     setIsProcessing(true);
@@ -303,133 +434,267 @@ export const CheckoutModal: React.FC = () => {
         {/* Modal Content */}
         <div className="p-4 sm:p-6 overflow-y-auto">
           
-          {/* STEP 1: Address Form */}
-          {step === 'form' && (
-            <form onSubmit={handleNextToPayment} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-blue-800 mb-1">Nome Completo *</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-blue-950 focus:bg-white focus:border-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-blue-800 mb-1">E-mail para Recibo *</label>
-                  <input
-                    required
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
-                  />
-                </div>
+          {/* CASO NÃO ESTEJA LOGADO: EXIGIR LOGIN OU CADASTRO PARA FINALIZAR COMPRA */}
+          {!user ? (
+            <div className="py-6 px-2 sm:px-4 text-center space-y-5 animate-in fade-in">
+              <div className="w-16 h-16 rounded-full bg-blue-50 border border-blue-200 text-blue-600 mx-auto flex items-center justify-center shadow-xs">
+                <UserCheck className="w-8 h-8" />
+              </div>
+              <div className="space-y-1.5 max-w-sm mx-auto">
+                <h3 className="text-xl font-bold text-zinc-900 font-display">
+                  Identifique-se para Continuar
+                </h3>
+                <p className="text-xs text-zinc-600 leading-relaxed">
+                  Para acompanhar seu pedido, receber o rastreio e salvar seus dados de entrega com segurança, faça login ou crie sua conta antes de finalizar.
+                </p>
               </div>
 
-              {/* Row 2: WhatsApp, CPF, CEP */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 mb-1">WhatsApp *</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 mb-1">CPF do Titular *</label>
-                  <input
-                    required
-                    type="text"
-                    placeholder="000.000.000-00"
-                    value={formData.cpf}
-                    onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                    className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 mb-1">CEP *</label>
-                  <input
-                    required
-                    type="text"
-                    value={formData.cep}
-                    onChange={(e) => setFormData({ ...formData, cep: e.target.value })}
-                    className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
-                  />
-                </div>
+              {/* Resumo rápido do carrinho */}
+              <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 max-w-sm mx-auto flex items-center justify-between text-xs">
+                <span className="text-zinc-600 font-medium">Total do seu carrinho ({cart.length} {cart.length === 1 ? 'item' : 'itens'}):</span>
+                <strong className="text-blue-900 font-bold text-sm">R$ {total.toFixed(2).replace('.', ',')}</strong>
               </div>
 
-              {/* Row 3: City, Street, Number */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-zinc-700 mb-1">Cidade / UF *</label>
-                  <input
-                    required
-                    type="text"
-                    value={`${formData.city} / ${formData.state}`}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-zinc-700 mb-1">Endereço (Rua, Av.) e Número *</label>
-                  <div className="flex gap-2">
-                    <input
-                      required
-                      type="text"
-                      placeholder="Logradouro"
-                      value={formData.street}
-                      onChange={(e) => setFormData({ ...formData, street: e.target.value })}
-                      className="flex-1 bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
-                    />
-                    <input
-                      required
-                      type="text"
-                      placeholder="Nº"
-                      value={formData.number}
-                      onChange={(e) => setFormData({ ...formData, number: e.target.value })}
-                      className="w-20 bg-zinc-50 border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Order Mini Summary */}
-              <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
-                <div className="flex items-center gap-2 text-zinc-600">
-                  <Truck className="w-4 h-4 text-blue-600" />
-                  <span>Envio com seguro e rastreio via Correios / Jadlog</span>
-                </div>
-                <div className="text-right">
-                  <span className="text-zinc-400 text-[10px] block">Total estimado</span>
-                  <span className="font-bold text-zinc-900 text-sm">
-                    R$ {total.toFixed(2).replace('.', ',')}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-3">
+              <div className="space-y-2.5 max-w-sm mx-auto pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeCheckout();
+                    navigate('/login?redirect=checkout');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md cursor-pointer"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Entrar com Minha Conta</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeCheckout();
+                    navigate('/login?tab=register&redirect=checkout');
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 font-semibold text-xs transition-colors cursor-pointer"
+                >
+                  <UserPlus className="w-4 h-4 text-zinc-600" />
+                  <span>Criar Nova Conta SunLab</span>
+                </button>
                 <button
                   type="button"
                   onClick={closeCheckout}
-                  className="px-4 py-2.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-800 cursor-pointer"
+                  className="text-xs text-zinc-500 hover:text-zinc-800 pt-2 cursor-pointer transition-colors block mx-auto"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
-                >
-                  Ir para Pagamento com Mercado Pago →
+                  Voltar ao Carrinho
                 </button>
               </div>
-            </form>
-          )}
+            </div>
+          ) : (
+            <>
+              {/* STEP 1: Address Form */}
+              {step === 'form' && (
+                <form onSubmit={handleNextToPayment} className="space-y-4">
+                  {/* Banner de Status dos Dados da Conta */}
+                  {!isProfileComplete ? (
+                    <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 text-xs flex items-start gap-2.5 shadow-2xs">
+                      <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                      <div className="space-y-0.5">
+                        <strong className="font-bold">Complete seus dados cadastrais e endereço:</strong>
+                        <p className="text-[11px] text-amber-800 leading-relaxed">
+                          Preencha seu nome e endereço abaixo. Suas informações ficarão salvas automaticamente na sua conta <strong>({user.email})</strong> para você não precisar digitar nas próximas compras!
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 text-xs flex items-center justify-between shadow-2xs">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span className="text-[11px] font-medium truncate">
+                          Dados de entrega salvos e vinculados à conta <strong>{user.email}</strong>
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-emerald-700 font-bold bg-emerald-100 px-2 py-0.5 rounded-full shrink-0">
+                        Salvo
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Row 1: Nome Completo e E-mail da Conta */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Nome Completo *</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="Ex: Ana Clara Silva"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1 flex items-center justify-between">
+                        <span>E-mail da Conta *</span>
+                        <span className="text-[10px] text-zinc-400 font-normal flex items-center gap-1">
+                          <Lock className="w-3 h-3" /> Vinculado
+                        </span>
+                      </label>
+                      <input
+                        disabled
+                        type="email"
+                        value={user.email}
+                        className="w-full bg-zinc-100 border border-zinc-200 rounded-xl px-3 py-2 text-xs text-zinc-600 cursor-not-allowed outline-none select-none"
+                        title="O e-mail é vinculado à sua conta logada"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 2: WhatsApp e CPF */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">WhatsApp / Telefone *</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="(11) 98765-4321"
+                        value={formData.phone}
+                        onChange={(e) => handlePhoneChange(e.target.value)}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">CPF do Titular *</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="000.000.000-00"
+                        value={formData.cpf}
+                        onChange={(e) => handleCpfChange(e.target.value)}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 3: CEP e Bairro */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1 flex items-center justify-between">
+                        <span>CEP *</span>
+                        {isLoadingCep && <span className="text-[10px] text-blue-600 animate-pulse">Buscando CEP...</span>}
+                      </label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="00000-000"
+                        value={formData.cep}
+                        onChange={(e) => handleCepChange(e.target.value)}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none font-mono"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Bairro</label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Centro, Bela Vista"
+                        value={formData.neighborhood}
+                        onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 4: Logradouro e Número */}
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="sm:col-span-3">
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Endereço (Rua, Av.) *</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="Ex: Rua das Flores"
+                        value={formData.street}
+                        onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Número *</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="Ex: 120"
+                        value={formData.number}
+                        onChange={(e) => setFormData({ ...formData, number: e.target.value })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 5: Complemento, Cidade e Estado */}
+                  <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="sm:col-span-2">
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Complemento (Opcional)</label>
+                      <input
+                        type="text"
+                        placeholder="Apto 42, Bloco B, Casa 2"
+                        value={formData.complement}
+                        onChange={(e) => setFormData({ ...formData, complement: e.target.value })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">Cidade *</label>
+                      <input
+                        required
+                        type="text"
+                        placeholder="Cidade"
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-zinc-700 mb-1">UF *</label>
+                      <input
+                        required
+                        type="text"
+                        maxLength={2}
+                        placeholder="SP"
+                        value={formData.state}
+                        onChange={(e) => setFormData({ ...formData, state: e.target.value.toUpperCase() })}
+                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none uppercase font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Order Mini Summary */}
+                  <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
+                    <div className="flex items-center gap-2 text-zinc-600">
+                      <Truck className="w-4 h-4 text-blue-600" />
+                      <span>Envio com seguro e rastreio via Correios / Jadlog</span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-zinc-400 text-[10px] block">Total estimado</span>
+                      <span className="font-bold text-zinc-900 text-sm">
+                        R$ {total.toFixed(2).replace('.', ',')}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-3">
+                    <button
+                      type="button"
+                      onClick={closeCheckout}
+                      className="px-4 py-2.5 rounded-xl text-xs font-medium text-zinc-500 hover:text-zinc-800 cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
+                    >
+                      Ir para Pagamento com Mercado Pago →
+                    </button>
+                  </div>
+                </form>
+              )}
 
           {/* STEP 2: Payment Methods (Mercado Pago Suite: Pix, Card, Boleto) */}
           {step === 'payment' && (
@@ -896,6 +1161,8 @@ export const CheckoutModal: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+          </>
           )}
 
         </div>

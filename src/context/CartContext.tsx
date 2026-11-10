@@ -75,6 +75,19 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // Auto-abrir checkout se veio de redirecionamento de login (?checkout=true)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('checkout') === 'true') {
+        setIsCheckoutOpen(true);
+        const url = new URL(window.location.href);
+        url.searchParams.delete('checkout');
+        window.history.replaceState({}, '', url.pathname + (url.search || ''));
+      }
+    } catch (_) {}
+  }, []);
+
   // 1. Sincronização multi-dispositivo: Ao logar na conta (PC ou Celular), carrega o carrinho salvo no banco
   useEffect(() => {
     if (!user?.email) return;
