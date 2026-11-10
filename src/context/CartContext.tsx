@@ -49,8 +49,9 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'sunlab_cart_v1';
-const FREE_SHIPPING_LIMIT = 199.00;
-const STANDARD_SHIPPING_RATE = 19.90;
+// Promoção: Taxa de entrega grátis para todo o Brasil
+const FREE_SHIPPING_LIMIT = 0;
+const STANDARD_SHIPPING_RATE = 0;
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();

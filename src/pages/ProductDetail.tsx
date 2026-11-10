@@ -81,8 +81,8 @@ export const ProductDetail: React.FC = () => {
     e.preventDefault();
     if (cep.trim().length >= 8) {
       setShippingResult({
-        pac: { price: product.price > 199 ? 0 : 19.90, days: '4 a 6 dias úteis' },
-        sedex: { price: 29.90, days: '1 a 2 dias úteis' }
+        pac: { price: 0, days: '3 a 5 dias úteis' },
+        sedex: { price: 19.90, days: '1 a 2 dias úteis' }
       });
     }
   };

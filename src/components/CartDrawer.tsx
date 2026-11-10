@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Truck, CheckCircle2 } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Truck } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useNavigate } from 'react-router';
 
@@ -12,14 +12,11 @@ export const CartDrawer: React.FC = () => {
     updateQuantity,
     subtotal,
     discount,
-    shipping,
     total,
     appliedCoupon,
     applyCoupon,
     removeCoupon,
     totalItems,
-    freeShippingThreshold,
-    amountNeededForFreeShipping,
     openCheckout
   } = useCart();
 
@@ -41,8 +38,6 @@ export const CartDrawer: React.FC = () => {
       setCouponInput('');
     }
   };
-
-  const progressPercent = Math.min(100, Math.round((subtotal / freeShippingThreshold) * 100));
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -74,28 +69,15 @@ export const CartDrawer: React.FC = () => {
             </button>
           </div>
 
-          {/* Free Shipping Progress */}
-          <div className="p-4 bg-zinc-50 border-b border-zinc-200">
-            <div className="flex items-center gap-2 text-xs font-medium text-blue-800 mb-2">
-              <Truck className="w-4 h-4 text-blue-600" />
-              {amountNeededForFreeShipping > 0 ? (
-                <span>
-                  Adicione mais <strong className="text-blue-950">R$ {amountNeededForFreeShipping.toFixed(2).replace('.', ',')}</strong> para ganhar <strong className="text-blue-900">Frete Grátis</strong>
-                </span>
-              ) : (
-                <span className="text-blue-900 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" /> Parabéns! Você ganhou Frete Grátis
-                </span>
-              )}
+          {/* Free Shipping Highlight Banner */}
+          <div className="p-3.5 bg-blue-50/80 border-b border-blue-200/60 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 font-semibold text-blue-900">
+              <Truck className="w-4 h-4 text-blue-600 shrink-0" />
+              <span>Frete Grátis ativado para todo o Brasil!</span>
             </div>
-            <div className="w-full h-1.5 bg-zinc-200 rounded-full overflow-hidden">
-              <div
-                className={`h-full transition-all duration-500 rounded-full ${
-                  amountNeededForFreeShipping === 0 ? 'bg-blue-600' : 'bg-blue-400'
-                }`}
-                style={{ width: `${progressPercent}%` }}
-              />
-            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold shrink-0">
+              Grátis
+            </span>
           </div>
 
           {/* Cart Items List */}
@@ -245,14 +227,10 @@ export const CartDrawer: React.FC = () => {
                     <span>- R$ {discount.toFixed(2).replace('.', ',')}</span>
                   </div>
                 )}
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span>Frete estimado</span>
-                  <span className="font-medium text-zinc-900">
-                    {shipping === 0 ? (
-                      <span className="text-zinc-700 font-semibold">Grátis</span>
-                    ) : (
-                      `R$ ${shipping.toFixed(2).replace('.', ',')}`
-                    )}
+                  <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md text-xs border border-emerald-200">
+                    Grátis (Promoção)
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-zinc-950 pt-2 border-t border-zinc-200">

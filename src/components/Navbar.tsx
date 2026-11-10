@@ -34,8 +34,8 @@ export const Navbar: React.FC = () => {
       <div className="bg-blue-600 text-white py-2 px-4 text-xs font-medium border-b border-blue-700 shadow-xs">
         <div className="max-w-[1600px] w-full mx-auto flex items-center justify-around gap-4 text-center overflow-x-auto whitespace-nowrap scrollbar-none">
           <div className="flex items-center gap-1.5 shrink-0">
-            <span>📦</span>
-            <span>Envios seguros para todo o Brasil</span>
+            <span>🚚</span>
+            <span>Frete Grátis ativado para todo o Brasil!</span>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 shrink-0">
             <span>🎯</span>
