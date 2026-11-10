@@ -20,10 +20,18 @@ import {
   LogIn,
   UserPlus,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Loader2,
+  Key
 } from 'lucide-react';
 import { useCart, type CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import {
+  generatePixPayload,
+  generatePixQRCode,
+  DEFAULT_PIX_CONFIG,
+  type PixConfig
+} from '../utils/pix';
 
 export const CheckoutModal: React.FC = () => {
   const navigate = useNavigate();
@@ -32,12 +40,19 @@ export const CheckoutModal: React.FC = () => {
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
   const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit' | 'boleto'>('pix');
   const [copiedPix, setCopiedPix] = useState(false);
+  const [copiedPixKey, setCopiedPixKey] = useState(false);
   const [copiedBarcode, setCopiedBarcode] = useState(false);
   const [copiedWhatsAppText, setCopiedWhatsAppText] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
+
+  // Pix Oficial Banco Central (Payload e QR Code real)
+  const [pixConfig, setPixConfig] = useState<PixConfig>(DEFAULT_PIX_CONFIG);
+  const [pixPayload, setPixPayload] = useState('');
+  const [pixQrCodeUrl, setPixQrCodeUrl] = useState('');
+  const [isGeneratingPix, setIsGeneratingPix] = useState(false);
   const [completedOrderData, setCompletedOrderData] = useState<{
     orderNumber: string;
     customerName: string;
@@ -157,10 +172,79 @@ export const CheckoutModal: React.FC = () => {
     return () => clearInterval(timer);
   }, [step, paymentMethod, timeLeft]);
 
+  // Carregar configurações oficiais do Pix e Loja
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.pix_key) {
+            setPixConfig({
+              key: data.pix_key,
+              keyType: data.pix_key_type || 'phone',
+              merchantName: data.pix_merchant_name || 'SunLab 3D',
+              merchantCity: data.pix_merchant_city || 'SANTOS',
+              whatsapp: data.store_whatsapp || '13996061681'
+            });
+          }
+        }
+      } catch (e) {
+        console.warn('Usando configurações padrão para o Pix:', e);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   if (!isCheckoutOpen) return null;
 
   const pixDiscount = paymentMethod === 'pix' ? total * 0.05 : 0;
   const finalPayableTotal = Math.max(0, total - pixDiscount);
+
+  // Gerar dinamicamente o código Pix Copia e Cola e o QR Code real (padrão oficial Banco Central)
+  useEffect(() => {
+    if (finalPayableTotal > 0) {
+      try {
+        setIsGeneratingPix(true);
+        const payload = generatePixPayload({
+          key: pixConfig.key,
+          name: pixConfig.merchantName,
+          city: pixConfig.merchantCity,
+          amount: finalPayableTotal,
+          txid: orderNumber || `SLB${Math.floor(100000 + Math.random() * 900000)}`
+        });
+        setPixPayload(payload);
+        generatePixQRCode(payload)
+          .then(url => {
+            setPixQrCodeUrl(url);
+            setIsGeneratingPix(false);
+          })
+          .catch(() => {
+            setIsGeneratingPix(false);
+          });
+      } catch (err) {
+        console.error('Erro gerando Pix BRCode:', err);
+        setIsGeneratingPix(false);
+      }
+    }
+  }, [finalPayableTotal, pixConfig, orderNumber, step]);
+
+  const formatFriendlyKey = (k: string) => {
+    const raw = k.replace(/\D/g, '');
+    if (raw.length === 13 && raw.startsWith('55')) {
+      const ddd = raw.slice(2, 4);
+      const part1 = raw.slice(4, 9);
+      const part2 = raw.slice(9);
+      return `(${ddd}) ${part1}-${part2}`;
+    }
+    if (raw.length === 11) {
+      const ddd = raw.slice(0, 2);
+      const part1 = raw.slice(2, 7);
+      const part2 = raw.slice(7);
+      return `(${ddd}) ${part1}-${part2}`;
+    }
+    return k;
+  };
 
   // Formatação de CPF com máscara
   const handleCpfChange = (val: string) => {
@@ -447,11 +531,18 @@ export const CheckoutModal: React.FC = () => {
     clearCart();
   };
 
-  const copyPixKey = () => {
-    const fakePixPayload = `00020126580014BR.GOV.BCB.PIX0136mp-pix-${Date.now()}@sunlab.com.br5204000053039865406${finalPayableTotal.toFixed(2)}5802BR5920SunLab Design 3D6009Sao Paulo62070503***6304`;
-    navigator.clipboard.writeText(fakePixPayload);
+  const copyPixCode = () => {
+    if (!pixPayload) return;
+    navigator.clipboard.writeText(pixPayload);
     setCopiedPix(true);
     setTimeout(() => setCopiedPix(false), 2500);
+  };
+
+  const copyDirectPixKey = () => {
+    const rawToCopy = pixConfig.key.startsWith('+55') ? pixConfig.key.slice(3) : pixConfig.key;
+    navigator.clipboard.writeText(rawToCopy);
+    setCopiedPixKey(true);
+    setTimeout(() => setCopiedPixKey(false), 2500);
   };
 
   const copyBoletoBarcode = () => {
@@ -876,9 +967,9 @@ export const CheckoutModal: React.FC = () => {
                 </button>
               </div>
 
-              {/* PIX AREA (MERCADO PAGO) */}
+              {/* PIX AREA (MERCADO PAGO OFICIAL & BANCO CENTRAL BRCODE) */}
               {paymentMethod === 'pix' && (
-                <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center text-center space-y-4">
+                <div className="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center text-center space-y-4">
                   
                   {/* Countdown Timer */}
                   <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-300 text-zinc-700 text-xs font-mono font-semibold">
@@ -886,33 +977,24 @@ export const CheckoutModal: React.FC = () => {
                     <span>Expira em: {formatTimer(timeLeft)}</span>
                   </div>
 
-                  {/* Pix QR Code */}
-                  <div className="w-40 h-40 bg-white p-3 rounded-2xl flex items-center justify-center shadow-xs border-2 border-zinc-200">
-                    <svg viewBox="0 0 100 100" className="w-full h-full">
-                      <rect width="100" height="100" fill="#ffffff" />
-                      <rect x="10" y="10" width="26" height="26" fill="#009EE3" rx="3" />
-                      <rect x="14" y="14" width="18" height="18" fill="#ffffff" rx="2" />
-                      <rect x="18" y="18" width="10" height="10" fill="#009EE3" />
-                      
-                      <rect x="64" y="10" width="26" height="26" fill="#009EE3" rx="3" />
-                      <rect x="68" y="14" width="18" height="18" fill="#ffffff" rx="2" />
-                      <rect x="72" y="18" width="10" height="10" fill="#009EE3" />
-                      
-                      <rect x="10" y="64" width="26" height="26" fill="#009EE3" rx="3" />
-                      <rect x="14" y="68" width="18" height="18" fill="#ffffff" rx="2" />
-                      <rect x="18" y="72" width="10" height="10" fill="#009EE3" />
-                      
-                      <rect x="42" y="14" width="16" height="16" fill="#2563eb" rx="2" />
-                      <rect x="42" y="42" width="16" height="16" fill="#009EE3" rx="2" />
-                      <rect x="14" y="42" width="16" height="16" fill="#1e40af" rx="2" />
-                      <rect x="70" y="42" width="16" height="16" fill="#2563eb" rx="2" />
-                      <rect x="42" y="70" width="16" height="16" fill="#009EE3" rx="2" />
-                      <rect x="70" y="70" width="18" height="18" fill="#1e40af" rx="2" />
-                    </svg>
+                  {/* Real Scannable Pix QR Code */}
+                  <div className="w-48 h-48 bg-white p-3 rounded-2xl flex items-center justify-center shadow-sm border-2 border-emerald-500/30 relative">
+                    {isGeneratingPix || !pixQrCodeUrl ? (
+                      <div className="flex flex-col items-center justify-center gap-2 text-zinc-400">
+                        <Loader2 className="w-7 h-7 animate-spin text-emerald-600" />
+                        <span className="text-[11px] font-medium text-zinc-500">Gerando QR Code Pix...</span>
+                      </div>
+                    ) : (
+                      <img
+                        src={pixQrCodeUrl}
+                        alt="QR Code Pix Oficial SunLab"
+                        className="w-full h-full object-contain rounded-xl select-none"
+                      />
+                    )}
                   </div>
 
                   <div>
-                    <span className="text-xs text-zinc-500">Total com 5% de desconto no Pix Mercado Pago:</span>
+                    <span className="text-xs text-zinc-500">Total com 5% de desconto no Pix:</span>
                     <h4 className="text-3xl font-extrabold text-zinc-900 font-display mt-0.5">
                       R$ {finalPayableTotal.toFixed(2).replace('.', ',')}
                     </h4>
@@ -921,24 +1003,62 @@ export const CheckoutModal: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Copy Pix Button */}
-                  <button
-                    type="button"
-                    onClick={copyPixKey}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-xs"
-                  >
-                    {copiedPix ? (
-                      <>
-                        <Check className="w-4 h-4 text-emerald-600" />
-                        <span>Código Pix Copiado com Sucesso!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-4 h-4 text-zinc-600" />
-                        <span>Copiar Código Pix Copia e Cola</span>
-                      </>
-                    )}
-                  </button>
+                  {/* Informações Oficiais da Chave Pix da Loja */}
+                  <div className="w-full max-w-sm p-3.5 rounded-xl bg-white border border-zinc-200 text-left text-xs space-y-1.5 shadow-xs">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
+                      <span className="text-zinc-500 font-medium">Chave Pix Oficial:</span>
+                      <strong className="text-zinc-900 font-mono font-bold">
+                        {formatFriendlyKey(pixConfig.key)}
+                      </strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-500">Favorecido / Nome:</span>
+                      <span className="text-zinc-800 font-semibold">{pixConfig.merchantName}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-500">Cidade do Titular:</span>
+                      <span className="text-zinc-700">{pixConfig.merchantCity} - SP</span>
+                    </div>
+                  </div>
+
+                  {/* Botões de Cópia: Copia e Cola + Chave Direta */}
+                  <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm">
+                    <button
+                      type="button"
+                      onClick={copyPixCode}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+                    >
+                      {copiedPix ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-300" />
+                          <span>Código Pix Copiado!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-4 h-4" />
+                          <span>Copiar Pix Copia e Cola</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={copyDirectPixKey}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+                    >
+                      {copiedPixKey ? (
+                        <>
+                          <Check className="w-4 h-4 text-emerald-600" />
+                          <span>Chave Copiada!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Key className="w-4 h-4 text-zinc-500" />
+                          <span>Copiar Chave ({formatFriendlyKey(pixConfig.key)})</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               )}
 

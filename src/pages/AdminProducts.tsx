@@ -21,12 +21,19 @@ import {
   Clock,
   Truck,
   MessageCircle,
-  DollarSign
+  DollarSign,
+  QrCode,
+  Key,
+  Copy,
+  Check,
+  ShieldCheck,
+  Smartphone
 } from 'lucide-react';
 import type { Product } from '@/data/products';
 import { useProducts } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
 import SunLabLogo from '@/components/SunLabLogo';
+import { generatePixPayload, generatePixQRCode } from '../utils/pix';
 
 interface OrderItem {
   name: string;
@@ -66,7 +73,7 @@ export const AdminProducts: React.FC = () => {
     return null;
   }
 
-  const [activeTab, setActiveTab] = useState<'products' | 'orders'>('products');
+  const [activeTab, setActiveTab] = useState<'products' | 'orders' | 'settings'>('products');
   const [searchFilter, setSearchFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   
@@ -74,6 +81,90 @@ export const AdminProducts: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
+
+  // Configurações Oficiais Pix & Loja
+  const [pixSettings, setPixSettings] = useState({
+    pix_key: '+5513996061681',
+    pix_key_type: 'phone',
+    pix_merchant_name: 'SunLab 3D',
+    pix_merchant_city: 'SANTOS',
+    store_whatsapp: '13996061681'
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [testQrCodeUrl, setTestQrCodeUrl] = useState('');
+  const [testPixPayload, setTestPixPayload] = useState('');
+  const [copiedTestPix, setCopiedTestPix] = useState(false);
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      if (res.ok) {
+        const data = await res.json();
+        setPixSettings({
+          pix_key: data.pix_key || '+5513996061681',
+          pix_key_type: data.pix_key_type || 'phone',
+          pix_merchant_name: data.pix_merchant_name || 'SunLab 3D',
+          pix_merchant_city: data.pix_merchant_city || 'SANTOS',
+          store_whatsapp: data.store_whatsapp || '13996061681'
+        });
+      }
+    } catch (e) {
+      console.warn('Erro ao carregar configurações:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  // Atualizar preview do QR Code Pix de teste em tempo real
+  useEffect(() => {
+    try {
+      const payload = generatePixPayload({
+        key: pixSettings.pix_key,
+        name: pixSettings.pix_merchant_name,
+        city: pixSettings.pix_merchant_city,
+        amount: 1.00,
+        txid: 'SUNLABTESTE'
+      });
+      setTestPixPayload(payload);
+      generatePixQRCode(payload).then(setTestQrCodeUrl).catch(() => {});
+    } catch (_) {}
+  }, [pixSettings]);
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const token = localStorage.getItem('sunlab_auth_token');
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
+        body: JSON.stringify(pixSettings)
+      });
+      if (res.ok) {
+        setActionFeedback({
+          isError: false,
+          message: 'Chave Pix e configurações salvas com sucesso! O checkout dos clientes já está usando essa chave.'
+        });
+      } else {
+        setActionFeedback({
+          isError: true,
+          message: 'Erro ao salvar configurações no servidor.'
+        });
+      }
+    } catch (err) {
+      setActionFeedback({
+        isError: true,
+        message: 'Erro de conexão ao salvar configurações.'
+      });
+    } finally {
+      setSavingSettings(false);
+    }
+  };
 
   const fetchOrders = async () => {
     setLoadingOrders(true);
@@ -438,6 +529,21 @@ export const AdminProducts: React.FC = () => {
             {totalOrders}
           </span>
         </button>
+
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`flex items-center gap-2 pb-3 px-2 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+            activeTab === 'settings'
+              ? 'border-blue-600 text-blue-900 font-bold'
+              : 'border-transparent text-zinc-500 hover:text-zinc-800'
+          }`}
+        >
+          <QrCode className="w-4 h-4 text-emerald-600" />
+          <span>Chave Pix & Pagamentos</span>
+          <span className="ml-1.5 px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] text-emerald-700 font-bold border border-emerald-200">
+            Ativo
+          </span>
+        </button>
       </div>
 
       {activeTab === 'products' ? (
@@ -663,7 +769,7 @@ export const AdminProducts: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : (
+      ) : activeTab === 'orders' ? (
         /* Orders Management Section (Inspired by E-commerce-Website-2.5) */
         <div className="space-y-6">
           {/* Orders Metrics Row */}
@@ -888,6 +994,206 @@ export const AdminProducts: React.FC = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      ) : (
+        /* Settings Tab: Configurações Oficiais Pix & Loja */
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-white border border-zinc-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-zinc-200 gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold mb-2">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Configuração Oficial de Pagamento Banco Central / EMV</span>
+                </div>
+                <h3 className="text-xl font-bold text-zinc-900 font-display">
+                  Chave Pix & Recebimentos da Loja
+                </h3>
+                <p className="text-xs text-zinc-500 mt-1 max-w-xl">
+                  Configure a chave Pix e os dados do favorecido. Essas informações são usadas para gerar o QR Code dinâmico e o código Pix Copia e Cola no checkout para todos os compradores.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-zinc-500 font-medium">Status:</span>
+                <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-bold text-xs border border-emerald-300">
+                  Pix Ativo (5% OFF)
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pt-6">
+              {/* Formulário de Configuração */}
+              <form onSubmit={handleSaveSettings} className="lg:col-span-7 space-y-5">
+                {/* Chave Pix Principal */}
+                <div>
+                  <label className="block text-xs font-bold text-zinc-800 mb-1.5 flex items-center justify-between">
+                    <span>Chave Pix Oficial *</span>
+                    <span className="text-[11px] text-zinc-500 font-normal">Telefone, CPF, CNPJ, E-mail ou Aleatória</span>
+                  </label>
+                  <div className="relative">
+                    <Key className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ex: 13996061681 ou +5513996061681"
+                      value={pixSettings.pix_key}
+                      onChange={(e) => setPixSettings({ ...pixSettings, pix_key: e.target.value })}
+                      className="w-full bg-zinc-50 focus:bg-white border border-zinc-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 font-mono font-medium focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none transition-all"
+                    />
+                  </div>
+                  <span className="text-[11px] text-zinc-500 mt-1 block">
+                    Para telefone, o sistema formata automaticamente com o código do país (+55) exigido pelo Banco Central.
+                  </span>
+                </div>
+
+                {/* Tipo de Chave & WhatsApp */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-800 mb-1.5">Tipo da Chave Pix</label>
+                    <select
+                      value={pixSettings.pix_key_type}
+                      onChange={(e) => setPixSettings({ ...pixSettings, pix_key_type: e.target.value as any })}
+                      className="w-full bg-zinc-50 focus:bg-white border border-zinc-300 rounded-xl px-3 py-2.5 text-xs text-zinc-900 font-medium focus:border-blue-500 outline-none cursor-pointer"
+                    >
+                      <option value="phone">📱 Telefone Celular (+55)</option>
+                      <option value="cpf">🪪 CPF (11 dígitos)</option>
+                      <option value="cnpj">🏢 CNPJ (14 dígitos)</option>
+                      <option value="email">✉️ E-mail</option>
+                      <option value="random">🔑 Chave Aleatória (EVP)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-800 mb-1.5">WhatsApp de Atendimento</label>
+                    <div className="relative">
+                      <Smartphone className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type="text"
+                        placeholder="13 99606-1681"
+                        value={pixSettings.store_whatsapp}
+                        onChange={(e) => setPixSettings({ ...pixSettings, store_whatsapp: e.target.value })}
+                        className="w-full bg-zinc-50 focus:bg-white border border-zinc-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 font-mono focus:border-blue-500 outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Nome do Favorecido & Cidade */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-800 mb-1.5">
+                      Nome do Titular / Loja (EMV) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={25}
+                      placeholder="Ex: SunLab 3D"
+                      value={pixSettings.pix_merchant_name}
+                      onChange={(e) => setPixSettings({ ...pixSettings, pix_merchant_name: e.target.value })}
+                      className="w-full bg-zinc-50 focus:bg-white border border-zinc-300 rounded-xl px-3 py-2.5 text-xs text-zinc-900 font-medium focus:border-blue-500 outline-none"
+                    />
+                    <span className="text-[10px] text-zinc-400 mt-1 block">Máximo 25 caracteres (padrão EMV BCB)</span>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-zinc-800 mb-1.5">
+                      Cidade do Titular *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength={15}
+                      placeholder="Ex: SANTOS ou SAO PAULO"
+                      value={pixSettings.pix_merchant_city}
+                      onChange={(e) => setPixSettings({ ...pixSettings, pix_merchant_city: e.target.value })}
+                      className="w-full bg-zinc-50 focus:bg-white border border-zinc-300 rounded-xl px-3 py-2.5 text-xs text-zinc-900 font-medium focus:border-blue-500 outline-none uppercase"
+                    />
+                    <span className="text-[10px] text-zinc-400 mt-1 block">Máximo 15 caracteres sem acentos</span>
+                  </div>
+                </div>
+
+                {/* Botão de Salvar */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={savingSettings}
+                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50 active:scale-[0.98]"
+                  >
+                    <Save className="w-4 h-4" />
+                    <span>{savingSettings ? 'Salvando...' : 'Salvar Configurações de Pagamento'}</span>
+                  </button>
+                </div>
+              </form>
+
+              {/* Coluna de Teste & Live Preview */}
+              <div className="lg:col-span-5 bg-zinc-50 border border-zinc-200 rounded-2xl p-5 flex flex-col items-center text-center space-y-4">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-700">
+                  <QrCode className="w-4 h-4 text-emerald-600" />
+                  <span>Preview em Tempo Real (Teste de Leitura)</span>
+                </div>
+                <p className="text-[11px] text-zinc-500 max-w-xs">
+                  Abra o aplicativo de qualquer banco no celular e aponte a câmera para o QR Code abaixo para testar se os dados da sua conta aparecem perfeitamente.
+                </p>
+
+                {/* QR Code Container */}
+                <div className="w-44 h-44 bg-white p-2.5 rounded-2xl shadow-xs border-2 border-emerald-500/30 flex items-center justify-center">
+                  {testQrCodeUrl ? (
+                    <img
+                      src={testQrCodeUrl}
+                      alt="QR Code Pix Teste"
+                      className="w-full h-full object-contain rounded-xl"
+                    />
+                  ) : (
+                    <span className="text-xs text-zinc-400">Gerando QR Code...</span>
+                  )}
+                </div>
+
+                {/* Info Card */}
+                <div className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-left text-xs space-y-1">
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Chave:</span>
+                    <strong className="text-zinc-900 font-mono">{pixSettings.pix_key}</strong>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Beneficiário:</span>
+                    <span className="text-zinc-800 font-medium">{pixSettings.pix_merchant_name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Cidade:</span>
+                    <span className="text-zinc-800 font-medium">{pixSettings.pix_merchant_city}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-zinc-500">Valor de Teste:</span>
+                    <strong className="text-emerald-600 font-bold">R$ 1,00</strong>
+                  </div>
+                </div>
+
+                {/* Botão Copiar Código de Teste */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(testPixPayload);
+                    setCopiedTestPix(true);
+                    setTimeout(() => setCopiedTestPix(false), 2000);
+                  }}
+                  className="w-full flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-zinc-800 text-[11px] font-semibold transition-all cursor-pointer"
+                >
+                  {copiedTestPix ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Código de Teste Copiado!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-zinc-600" />
+                      <span>Copiar Código Pix de Teste</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

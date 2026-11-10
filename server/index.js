@@ -1052,6 +1052,59 @@ app.post('/api/orders', (req, res) => {
   }
 });
 
+// ---------------- PIX BRCODE HELPER (EMV BANCO CENTRAL DO BRASIL) ---------------- //
+
+function normalizeEMV(str, len) {
+  return (str || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Za-z0-9 ]/g, '')
+    .trim()
+    .slice(0, len);
+}
+
+function formatTLV(id, val) {
+  const l = val.length.toString().padStart(2, '0');
+  return `${id}${l}${val}`;
+}
+
+function crc16CCITT(data) {
+  let crc = 0xFFFF;
+  for (let i = 0; i < data.length; i++) {
+    crc ^= data.charCodeAt(i) << 8;
+    for (let j = 0; j < 8; j++) {
+      if ((crc & 0x8000) !== 0) {
+        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+      } else {
+        crc = (crc << 1) & 0xFFFF;
+      }
+    }
+  }
+  return crc.toString(16).toUpperCase().padStart(4, '0');
+}
+
+function generatePixBRCode({ key, name = 'SunLab 3D', city = 'SANTOS', amount, txid = '***' }) {
+  let cleanKey = (key || '+5513996061681').trim();
+  if (!cleanKey.startsWith('+55') && !cleanKey.includes('@') && /^\d{10,11}$/.test(cleanKey)) {
+    cleanKey = '+55' + cleanKey;
+  }
+  const f00 = formatTLV('00', '01');
+  const f01 = formatTLV('01', '12');
+  const s00 = formatTLV('00', 'br.gov.bcb.pix');
+  const s01 = formatTLV('01', cleanKey);
+  const f26 = formatTLV('26', `${s00}${s01}`);
+  const f52 = formatTLV('52', '0000');
+  const f53 = formatTLV('53', '986');
+  const f54 = formatTLV('54', Number(amount).toFixed(2));
+  const f58 = formatTLV('58', 'BR');
+  const f59 = formatTLV('59', normalizeEMV(name, 25) || 'SUNLAB 3D');
+  const f60 = formatTLV('60', normalizeEMV(city, 15) || 'SANTOS');
+  const cleanTxid = (txid || '***').replace(/[^a-zA-Z0-9]/g, '').slice(0, 25) || '***';
+  const f62 = formatTLV('62', formatTLV('05', cleanTxid));
+  const partial = `${f00}${f01}${f26}${f52}${f53}${f54}${f58}${f59}${f60}${f62}6304`;
+  return `${partial}${crc16CCITT(partial)}`;
+}
+
 // ---------------- MERCADO PAGO GATEWAY (Kauanrodrigues01/checkout-mercado-pago) ---------------- //
 
 app.post('/api/payments/mercado-pago/checkout', (req, res) => {
@@ -1082,8 +1135,22 @@ app.post('/api/payments/mercado-pago/checkout', (req, res) => {
     let barcode = null;
 
     if (paymentMethod === 'pix') {
+      const pixKeyRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('pix_key');
+      const pixNameRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('pix_merchant_name');
+      const pixCityRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('pix_merchant_city');
+
+      const realPixKey = pixKeyRow?.value || '+5513996061681';
+      const realPixName = pixNameRow?.value || 'SunLab 3D';
+      const realPixCity = pixCityRow?.value || 'SANTOS';
+
       paymentMethodLabel = 'Mercado Pago (Pix Instantâneo 5% OFF)';
-      qrCode = `00020126580014BR.GOV.BCB.PIX0136mp-pix-${mpPaymentId}@sunlab.com.br5204000053039865406${Number(amount).toFixed(2)}5802BR5920SunLab Design 3D6009Sao Paulo62070503***6304`;
+      qrCode = generatePixBRCode({
+        key: realPixKey,
+        name: realPixName,
+        city: realPixCity,
+        amount: Number(amount),
+        txid: orderNumber.replace(/[^a-zA-Z0-9]/g, '')
+      });
       qrCodeBase64 = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrCode)}`;
       ticketUrl = `https://www.mercadopago.com.br/payments/${mpPaymentId}/ticket`;
     } else if (paymentMethod === 'card') {
@@ -1168,6 +1235,49 @@ app.delete('/api/orders/:id', requireAdmin, (req, res) => {
   } catch (err) {
     console.error('Error deleting order:', err);
     return res.status(500).json({ error: 'Erro ao excluir pedido.' });
+  }
+});
+
+// GET /api/settings - Obter configurações gerais da loja (Pix, WhatsApp, etc.)
+app.get('/api/settings', (req, res) => {
+  try {
+    const rows = db.prepare('SELECT key, value FROM settings').all();
+    const settings = {};
+    for (const r of rows) {
+      settings[r.key] = r.value;
+    }
+    // Valores padrão SunLab
+    if (!settings.pix_key) settings.pix_key = '+5513996061681';
+    if (!settings.pix_key_type) settings.pix_key_type = 'phone';
+    if (!settings.pix_merchant_name) settings.pix_merchant_name = 'SunLab 3D';
+    if (!settings.pix_merchant_city) settings.pix_merchant_city = 'SANTOS';
+    if (!settings.store_whatsapp) settings.store_whatsapp = '13996061681';
+    return res.json(settings);
+  } catch (err) {
+    console.error('Error fetching settings:', err);
+    return res.status(500).json({ error: 'Erro ao carregar configurações.' });
+  }
+});
+
+// POST /api/settings - Atualizar chave Pix e configurações (Requer Admin)
+app.post('/api/settings', requireAdmin, (req, res) => {
+  try {
+    const { pix_key, pix_key_type, pix_merchant_name, pix_merchant_city, store_whatsapp } = req.body;
+    const upsert = db.prepare(`
+      INSERT INTO settings (key, value) VALUES (?, ?)
+      ON CONFLICT(key) DO UPDATE SET value = excluded.value
+    `);
+    
+    if (pix_key !== undefined) upsert.run('pix_key', pix_key.trim());
+    if (pix_key_type !== undefined) upsert.run('pix_key_type', pix_key_type.trim());
+    if (pix_merchant_name !== undefined) upsert.run('pix_merchant_name', pix_merchant_name.trim());
+    if (pix_merchant_city !== undefined) upsert.run('pix_merchant_city', pix_merchant_city.trim());
+    if (store_whatsapp !== undefined) upsert.run('store_whatsapp', store_whatsapp.trim());
+
+    return res.json({ success: true, message: 'Configurações de Pix e Loja atualizadas com sucesso!' });
+  } catch (err) {
+    console.error('Error updating settings:', err);
+    return res.status(500).json({ error: 'Erro ao salvar configurações.' });
   }
 });
 

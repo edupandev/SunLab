@@ -103,7 +103,27 @@ export function initDatabase() {
       items_json TEXT NOT NULL,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
   `);
+
+  // Configurações padrão de pagamento Pix e contato
+  const defaultSettings = [
+    ['pix_key', '+5513996061681'],
+    ['pix_key_type', 'phone'],
+    ['pix_merchant_name', 'SunLab 3D'],
+    ['pix_merchant_city', 'SANTOS'],
+    ['store_whatsapp', '13996061681']
+  ];
+  for (const [sKey, sVal] of defaultSettings) {
+    const existing = db.prepare('SELECT value FROM settings WHERE key = ?').get(sKey);
+    if (!existing) {
+      db.prepare('INSERT INTO settings (key, value) VALUES (?, ?)').run(sKey, sVal);
+    }
+  }
 
   // Ensure default admin user with strong cryptographic hash (PBKDF2-SHA512)
   const existingAdmin = db.prepare('SELECT id, password FROM users WHERE LOWER(email) = ?').get('admin@sunlab.com.br');
