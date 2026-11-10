@@ -19,7 +19,8 @@ import {
   UserCheck,
   LogIn,
   UserPlus,
-  Sparkles
+  Sparkles,
+  AlertCircle
 } from 'lucide-react';
 import { useCart, type CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -36,6 +37,7 @@ export const CheckoutModal: React.FC = () => {
   const [orderNumber, setOrderNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
+  const [cardError, setCardError] = useState<string | null>(null);
   const [completedOrderData, setCompletedOrderData] = useState<{
     orderNumber: string;
     customerName: string;
@@ -120,6 +122,21 @@ export const CheckoutModal: React.FC = () => {
     }
   }, [user, isCheckoutOpen]);
 
+  // Resetar modal para nova compra sempre que for aberto (impede reaparecer compra anterior)
+  useEffect(() => {
+    if (isCheckoutOpen) {
+      setStep('form');
+      setCompletedOrderData(null);
+      setOrderNumber('');
+      setIsProcessing(false);
+      setCardError(null);
+      setTimeLeft(15 * 60);
+      setCopiedPix(false);
+      setCopiedBarcode(false);
+      setCopiedWhatsAppText(false);
+    }
+  }, [isCheckoutOpen]);
+
   // Credit Card States (Mercado Pago Transparent Checkout)
   const [cardData, setCardData] = useState({
     number: '',
@@ -203,11 +220,60 @@ export const CheckoutModal: React.FC = () => {
     }
   };
 
+  // Validação matemática de CPF brasileiro
+  const isValidCPF = (cpf: string): boolean => {
+    const clean = cpf.replace(/\D/g, '');
+    if (clean.length !== 11) return false;
+    if (/^(\d)\1{10}$/.test(clean)) return false;
+    let sum = 0;
+    for (let i = 0; i < 9; i++) sum += parseInt(clean.charAt(i), 10) * (10 - i);
+    let rev = 11 - (sum % 11);
+    if (rev === 10 || rev === 11) rev = 0;
+    if (rev !== parseInt(clean.charAt(9), 10)) return false;
+    sum = 0;
+    for (let i = 0; i < 10; i++) sum += parseInt(clean.charAt(i), 10) * (11 - i);
+    rev = 11 - (sum % 11);
+    if (rev === 10 || rev === 11) rev = 0;
+    return rev === parseInt(clean.charAt(10), 10);
+  };
+
+  // Algoritmo de Luhn oficial para validação de número de cartão de crédito real
+  const isValidLuhn = (num: string): boolean => {
+    const clean = num.replace(/\D/g, '');
+    if (clean.length < 13 || clean.length > 19) return false;
+    let sum = 0;
+    let shouldDouble = false;
+    for (let i = clean.length - 1; i >= 0; i--) {
+      let digit = parseInt(clean.charAt(i), 10);
+      if (shouldDouble) {
+        digit *= 2;
+        if (digit > 9) digit -= 9;
+      }
+      sum += digit;
+      shouldDouble = !shouldDouble;
+    }
+    return sum % 10 === 0;
+  };
+
   // Format Card Number
   const handleCardNumberChange = (val: string) => {
     const raw = val.replace(/\D/g, '').slice(0, 16);
     const formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ');
-    setCardData({ ...cardData, number: formatted });
+    setCardData(prev => ({ ...prev, number: formatted }));
+    if (cardError) setCardError(null);
+  };
+
+  const handleCardExpiryChange = (val: string) => {
+    const raw = val.replace(/\D/g, '').slice(0, 4);
+    const formatted = raw.length > 2 ? `${raw.slice(0, 2)}/${raw.slice(2)}` : raw;
+    setCardData(prev => ({ ...prev, expiry: formatted }));
+    if (cardError) setCardError(null);
+  };
+
+  const handleCardCvvChange = (val: string) => {
+    const raw = val.replace(/\D/g, '').slice(0, 4);
+    setCardData(prev => ({ ...prev, cvv: raw }));
+    if (cardError) setCardError(null);
   };
 
   // Detect Card Brand
@@ -224,12 +290,21 @@ export const CheckoutModal: React.FC = () => {
   const handleNextToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     saveUserProfile(formData);
+    setCardError(null);
     setCardData(prev => ({
       ...prev,
       holder: prev.holder || (formData.name || '').toUpperCase(),
       cpf: prev.cpf || formData.cpf || ''
     }));
     setStep('payment');
+  };
+
+  const handleCloseModal = () => {
+    setStep('form');
+    setCompletedOrderData(null);
+    setOrderNumber('');
+    setCardError(null);
+    closeCheckout();
   };
 
   const isProfileComplete = Boolean(
@@ -244,6 +319,57 @@ export const CheckoutModal: React.FC = () => {
   );
 
   const handleCompleteOrder = async () => {
+    setCardError(null);
+
+    // Validação estrita de Cartão de Crédito (impede aprovar sem cartão válido)
+    if (paymentMethod === 'credit') {
+      const cleanCard = cardData.number.replace(/\D/g, '');
+      if (cleanCard.length < 13 || cleanCard.length > 19) {
+        setCardError('Por favor, informe os 16 dígitos do seu cartão de crédito.');
+        return;
+      }
+      if (!isValidLuhn(cleanCard)) {
+        setCardError('Número de cartão de crédito inválido. Verifique os dígitos e tente novamente.');
+        return;
+      }
+
+      const holderTrim = (cardData.holder || '').trim();
+      if (!holderTrim || holderTrim.split(/\s+/).length < 2) {
+        setCardError('Informe o nome e sobrenome do titular como impresso no cartão.');
+        return;
+      }
+
+      const cleanCpf = (cardData.cpf || formData.cpf || '').replace(/\D/g, '');
+      if (cleanCpf.length !== 11 || !isValidCPF(cleanCpf)) {
+        setCardError('CPF do titular do cartão inválido.');
+        return;
+      }
+
+      const expiryParts = cardData.expiry.split('/');
+      if (expiryParts.length !== 2) {
+        setCardError('Data de validade inválida. Informe no formato MM/AA (ex: 12/28).');
+        return;
+      }
+      const expMonth = parseInt(expiryParts[0], 10);
+      const expYear = parseInt(expiryParts[1], 10);
+      const currentYear = new Date().getFullYear() % 100;
+      const currentMonth = new Date().getMonth() + 1;
+      if (isNaN(expMonth) || isNaN(expYear) || expMonth < 1 || expMonth > 12) {
+        setCardError('Mês de validade inválido (deve ser entre 01 e 12).');
+        return;
+      }
+      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+        setCardError('O cartão informado já está vencido.');
+        return;
+      }
+
+      const cleanCvv = cardData.cvv.replace(/\D/g, '');
+      if (cleanCvv.length < 3 || cleanCvv.length > 4) {
+        setCardError('Código de segurança (CVV) inválido (3 ou 4 dígitos do verso).');
+        return;
+      }
+    }
+
     setIsProcessing(true);
     const itemsPayload = cart.map((item: CartItem) => ({
       name: item.product.name,
@@ -255,27 +381,6 @@ export const CheckoutModal: React.FC = () => {
       unitPrice: item.unitPrice
     }));
 
-    const mpPayload = {
-      paymentMethod,
-      amount: finalPayableTotal,
-      payer: {
-        name: formData.name,
-        email: formData.email,
-        cpf: formData.cpf,
-        phone: formData.phone
-      },
-      shippingAddress: `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`,
-      cardData: paymentMethod === 'credit' ? {
-        number: cardData.number,
-        holder: cardData.holder,
-        cpf: cardData.cpf,
-        expiry: cardData.expiry,
-        cvv: cardData.cvv,
-        installments: cardData.installments
-      } : undefined,
-      items: itemsPayload
-    };
-
     let confirmedOrderNumber = `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
     let finalPaymentMethodLabel =
       paymentMethod === 'pix'
@@ -284,30 +389,38 @@ export const CheckoutModal: React.FC = () => {
         ? `Mercado Pago (Cartão de Crédito ${cardData.installments}x)`
         : 'Mercado Pago (Boleto Bancário)';
 
+    const shippingAddr = `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''}${formData.neighborhood ? ', ' + formData.neighborhood : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`;
+
+    // Sincronizar criação do pedido com a API de pedidos (Vercel e Express)
     try {
-      const res = await fetch('http://localhost:3001/api/payments/mercado-pago/checkout', {
+      const res = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(mpPayload)
+        body: JSON.stringify({
+          customerName: formData.name,
+          customerEmail: formData.email,
+          customerPhone: formData.phone,
+          shippingAddress: shippingAddr,
+          paymentMethod: finalPaymentMethodLabel,
+          items: itemsPayload,
+          totalAmount: finalPayableTotal
+        })
       });
       if (res.ok) {
         const data = await res.json();
         if (data.orderNumber) {
           confirmedOrderNumber = data.orderNumber;
         }
-        if (data.paymentMethod) {
-          finalPaymentMethodLabel = data.paymentMethod;
-        }
       }
     } catch (err) {
-      console.warn('Mercado Pago checkout fallback:', err);
+      console.warn('Erro ao sincronizar pedido com a API:', err);
     }
 
     const fullOrder = {
       customerName: formData.name,
       customerEmail: formData.email,
       customerPhone: formData.phone || '',
-      shippingAddress: `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`,
+      shippingAddress: shippingAddr,
       paymentMethod: finalPaymentMethodLabel,
       items: itemsPayload,
       totalAmount: finalPayableTotal,
@@ -317,6 +430,7 @@ export const CheckoutModal: React.FC = () => {
 
     setCompletedOrderData(fullOrder);
     setOrderNumber(confirmedOrderNumber);
+    saveUserProfile(formData);
     setIsProcessing(false);
     setStep('success');
 
@@ -405,7 +519,7 @@ export const CheckoutModal: React.FC = () => {
       <div
         className="fixed inset-0 bg-zinc-700/30 backdrop-blur-xs transition-opacity"
         onClick={() => {
-          if (step !== 'success' && !isProcessing) closeCheckout();
+          if (step !== 'success' && !isProcessing) handleCloseModal();
         }}
       />
 
@@ -423,7 +537,7 @@ export const CheckoutModal: React.FC = () => {
           </div>
           {step !== 'success' && (
             <button
-              onClick={closeCheckout}
+              onClick={handleCloseModal}
               className="p-1 rounded-lg text-blue-500 hover:text-blue-950 hover:bg-zinc-200 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
@@ -898,23 +1012,23 @@ export const CheckoutModal: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-xs font-medium text-zinc-700 mb-1">Validade (MM/AA)</label>
+                        <label className="block text-xs font-medium text-zinc-700 mb-1">Validade (MM/AA) *</label>
                         <input
                           type="text"
                           maxLength={5}
                           value={cardData.expiry}
-                          onChange={(e) => setCardData({ ...cardData, expiry: e.target.value })}
+                          onChange={(e) => handleCardExpiryChange(e.target.value)}
                           placeholder="12/28"
                           className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none font-mono"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-zinc-700 mb-1">Código CVV</label>
+                        <label className="block text-xs font-medium text-zinc-700 mb-1">Código CVV *</label>
                         <input
                           type="password"
                           maxLength={4}
                           value={cardData.cvv}
-                          onChange={(e) => setCardData({ ...cardData, cvv: e.target.value })}
+                          onChange={(e) => handleCardCvvChange(e.target.value)}
                           placeholder="•••"
                           className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none font-mono"
                         />
@@ -936,6 +1050,14 @@ export const CheckoutModal: React.FC = () => {
                         <option value="12">12x de R$ {(total / 12).toFixed(2).replace('.', ',')} sem juros</option>
                       </select>
                     </div>
+
+                    {/* Mensagem de Erro de Validação do Cartão */}
+                    {cardError && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
+                        <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                        <span>{cardError}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1109,7 +1231,7 @@ export const CheckoutModal: React.FC = () => {
               <div className="space-y-2.5 max-w-lg mx-auto pt-1">
                 {/* Primary: Send Full Order Details to WhatsApp */}
                 <a
-                  href={`https://wa.me/5511999999999?text=${encodeURIComponent(generateFullWhatsAppMessage())}`}
+                  href={`https://wa.me/5513996061681?text=${encodeURIComponent(generateFullWhatsAppMessage())}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md hover:shadow-lg active:scale-[0.99]"
@@ -1131,7 +1253,7 @@ export const CheckoutModal: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      closeCheckout();
+                      handleCloseModal();
                       navigate('/orders');
                     }}
                     className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 font-semibold text-xs transition-colors cursor-pointer border border-blue-200"
@@ -1153,7 +1275,7 @@ export const CheckoutModal: React.FC = () => {
                 <div className="pt-2">
                   <button
                     type="button"
-                    onClick={closeCheckout}
+                    onClick={handleCloseModal}
                     className="text-xs text-zinc-500 hover:text-zinc-800 underline underline-offset-4 cursor-pointer"
                   >
                     Concluir e voltar à loja

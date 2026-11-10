@@ -566,7 +566,7 @@ export const Orders: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-2">
                     {/* WhatsApp Action */}
                     <a
-                      href={`https://wa.me/5511999999999?text=${whatsappMessage}`}
+                      href={`https://wa.me/5513996061681?text=${whatsappMessage}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer active:scale-95"

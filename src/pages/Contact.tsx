@@ -72,12 +72,12 @@ export const Contact: React.FC = () => {
             <h3 className="text-base font-bold text-slate-900">WhatsApp Comercial</h3>
             <p className="text-xs text-slate-500">Atendimento ágil de segunda a sexta, das 9h às 18h.</p>
             <a
-              href="https://wa.me/5511999999999?text=Ol%C3%A1%20SunLab!%20Gostaria%20de%20tirar%20uma%20d%C3%BAvida."
+              href="https://wa.me/5513996061681?text=Ol%C3%A1%20SunLab!%20Gostaria%20de%20tirar%20uma%20d%C3%BAvida."
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-600 hover:text-emerald-700 pt-1"
             >
-              <span>(11) 99999-9999</span>
+              <span>(13) 99606-1681</span>
               <span>→</span>
             </a>
           </div>

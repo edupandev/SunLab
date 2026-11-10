@@ -88,11 +88,11 @@ export const Footer: React.FC = () => {
                 <Instagram className="w-4 h-4" />
               </a>
               <a
-                href="https://wa.me/5511999999999"
+                href="https://wa.me/5513996061681"
                 target="_blank"
                 rel="noreferrer"
                 className="w-9 h-9 rounded-lg bg-white border border-zinc-200 hover:border-blue-400 hover:text-blue-900 flex items-center justify-center text-blue-700 transition-colors shadow-xs"
-                title="WhatsApp"
+                title="WhatsApp (13) 99606-1681"
               >
                 <MessageCircle className="w-4 h-4" />
               </a>

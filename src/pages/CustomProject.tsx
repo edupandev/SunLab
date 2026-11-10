@@ -114,7 +114,7 @@ export const CustomProject: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <a
-              href={`https://wa.me/5511999999999?text=${whatsappMessage}`}
+              href={`https://wa.me/5513996061681?text=${whatsappMessage}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors cursor-pointer shadow-md"
