@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
-import { Search, ShoppingBag, Menu, X, ArrowUpRight, ChevronDown, User, ShieldCheck } from 'lucide-react';
+import { Search, ShoppingBag, Menu, X, ArrowUpRight, ChevronDown, User, ShieldCheck, LogOut } from 'lucide-react';
 import SunLabLogo from './SunLabLogo';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -8,7 +8,7 @@ import { CATEGORIES } from '@/data/products';
 
 export const Navbar: React.FC = () => {
   const { totalItems, openCart, openSearch } = useCart();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
@@ -199,25 +199,39 @@ export const Navbar: React.FC = () => {
               <span className="text-xs text-blue-600 hidden lg:inline font-normal">Buscar no catálogo...</span>
             </button>
 
-            {/* Login / Admin Action - Apenas Admin vê o Painel Admin */}
-            {isAdmin ? (
-              <NavLink
-                to="/admin"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold transition-all shadow-xs cursor-pointer"
-                title="Painel Administrativo SunLab"
-              >
-                <ShieldCheck className="w-4 h-4 text-blue-700" />
-                <span className="hidden sm:inline">Painel Admin</span>
-              </NavLink>
-            ) : user ? (
-              <NavLink
-                to="/orders"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-medium transition-colors"
-                title="Minha Conta e Pedidos"
-              >
-                <User className="w-4 h-4 text-blue-600" />
-                <span className="hidden sm:inline truncate max-w-[100px]">{user.name.split(' ')[0]}</span>
-              </NavLink>
+            {/* Login / Admin Action & Sair */}
+            {user ? (
+              <div className="flex items-center gap-1.5">
+                {isAdmin ? (
+                  <NavLink
+                    to="/admin"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    title="Painel Administrativo SunLab"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-blue-700" />
+                    <span className="hidden sm:inline">Painel Admin</span>
+                  </NavLink>
+                ) : (
+                  <NavLink
+                    to="/orders"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-medium transition-colors"
+                    title="Minha Conta e Pedidos"
+                  >
+                    <User className="w-4 h-4 text-blue-600" />
+                    <span className="hidden sm:inline truncate max-w-[100px]">{user.name.split(' ')[0]}</span>
+                  </NavLink>
+                )}
+
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-zinc-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-zinc-600 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
+                  title="Sair da conta"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Sair</span>
+                </button>
+              </div>
             ) : (
               <NavLink
                 to="/login"
@@ -321,7 +335,32 @@ export const Navbar: React.FC = () => {
                   <ShieldCheck className="w-4 h-4 text-blue-600" />
                 </Link>
               )}
-              {!user && (
+              {user ? (
+                <div className="pt-2 border-t border-zinc-200 space-y-2">
+                  <div className="flex items-center justify-between px-3 py-2 bg-zinc-50 rounded-xl border border-zinc-200 text-xs">
+                    <div className="truncate">
+                      <span className="text-zinc-500 block text-[10px]">Conectado como:</span>
+                      <strong className="text-zinc-900 truncate">{user.name}</strong>
+                    </div>
+                    {isAdmin && (
+                      <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px]">
+                        Admin
+                      </span>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-sm font-semibold transition-colors cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Sair da Conta</span>
+                  </button>
+                </div>
+              ) : (
                 <Link
                   to="/login"
                   className="px-3 py-2.5 rounded-xl text-base font-semibold text-zinc-800 bg-zinc-100 border border-zinc-200 flex items-center justify-between"

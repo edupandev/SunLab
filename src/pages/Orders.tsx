@@ -14,7 +14,8 @@ import {
   MapPin,
   Calendar,
   CreditCard,
-  Sparkles
+  Sparkles,
+  LogOut
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
@@ -46,7 +47,7 @@ interface Order {
 
 export const Orders: React.FC = () => {
   const { addToCart, openCart } = useCart();
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -273,7 +274,7 @@ export const Orders: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0 flex-wrap">
           <Link
             to="/catalog"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-blue-950 border border-zinc-300 text-xs font-semibold transition-all shadow-xs cursor-pointer"
@@ -288,6 +289,16 @@ export const Orders: React.FC = () => {
           >
             <RotateCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
+          {user && (
+            <button
+              onClick={logout}
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold transition-all shadow-xs cursor-pointer"
+              title="Sair desta conta"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Sair ({user.name.split(' ')[0]})</span>
+            </button>
+          )}
         </div>
       </div>
 

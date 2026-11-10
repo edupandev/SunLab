@@ -380,10 +380,11 @@ export const AdminProducts: React.FC = () => {
               logout();
               navigate('/login');
             }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-xs font-semibold text-zinc-700 border border-zinc-200 transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-xs font-bold text-red-700 border border-red-200 transition-colors cursor-pointer shadow-xs"
+            title="Sair do painel e encerrar sessão"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span>Sair ({user?.name || 'Admin'})</span>
+            <span>Sair ({user?.name ? user.name.split(' ')[0] : 'Admin'})</span>
           </button>
         </div>
       </div>
