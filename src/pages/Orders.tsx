@@ -17,6 +17,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 import { PRODUCTS } from '@/data/products';
 
 interface OrderItem {
@@ -45,6 +46,7 @@ interface Order {
 
 export const Orders: React.FC = () => {
   const { addToCart, openCart } = useCart();
+  const { user, isAdmin } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,24 +57,55 @@ export const Orders: React.FC = () => {
   const loadOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:3001/api/orders');
-      let serverOrders: Order[] = [];
-      if (res.ok) {
-        serverOrders = await res.json();
+      // 1. Limpar pedidos mockados antigos do localStorage
+      try {
+        const stored = localStorage.getItem('sunlab_my_orders');
+        if (stored) {
+          const parsed: Order[] = JSON.parse(stored);
+          const valid = parsed.filter(o => 
+            !o.items?.some(i => 
+              i.name?.includes('Waveform') || 
+              i.name?.includes('Voronoi') || 
+              i.name?.includes('MagSafe')
+            ) && o.orderNumber !== 'SLB-942817' && o.orderNumber !== 'SLB-718294'
+          );
+          if (valid.length !== parsed.length) {
+            localStorage.setItem('sunlab_my_orders', JSON.stringify(valid));
+          }
+        }
+      } catch (e) {
+        console.warn('LocalStorage error:', e);
       }
 
-      // Check localStorage for recently placed orders
+      // 2. Buscar pedidos reais da API (ou Vercel)
+      let serverOrders: Order[] = [];
+      try {
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            // Filtrar produtos inexistentes caso algum tenha ficado no banco
+            serverOrders = data.filter((o: Order) => 
+              !o.items?.some(i => 
+                i.name?.includes('Waveform') || 
+                i.name?.includes('Voronoi') || 
+                i.name?.includes('MagSafe')
+              ) && o.orderNumber !== 'SLB-942817' && o.orderNumber !== 'SLB-718294'
+            );
+          }
+        }
+      } catch {}
+
+      // 3. Buscar pedidos salvos no checkout local
       let localOrders: Order[] = [];
       try {
         const stored = localStorage.getItem('sunlab_my_orders');
         if (stored) {
           localOrders = JSON.parse(stored);
         }
-      } catch (e) {
-        console.warn('LocalStorage error:', e);
-      }
+      } catch {}
 
-      // Merge server orders and local orders (avoid duplicates by orderNumber)
+      // Mesclar pedidos reais sem duplicatas
       const mergedMap = new Map<string, Order>();
       serverOrders.forEach(o => mergedMap.set(o.orderNumber, o));
       localOrders.forEach(o => {
@@ -81,13 +114,25 @@ export const Orders: React.FC = () => {
         }
       });
 
-      const combined = Array.from(mergedMap.values());
-      // Sort newest first
+      let combined = Array.from(mergedMap.values());
+
+      // Se for cliente comum (não admin), mostrar apenas os pedidos DELE
+      if (!isAdmin && user?.email) {
+        combined = combined.filter(o => 
+          o.customerEmail.toLowerCase().trim() === user.email.toLowerCase().trim()
+        );
+      } else if (!isAdmin && !user) {
+        // Visitante não logado só vê pedidos feitos pelo próprio navegador
+        combined = localOrders;
+      }
+
+      // Ordenar mais recentes primeiro
       combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
       setOrders(combined);
     } catch (err) {
       console.warn('Error loading orders:', err);
+      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -95,11 +140,15 @@ export const Orders: React.FC = () => {
 
   useEffect(() => {
     loadOrders();
-    const savedEmail = localStorage.getItem('sunlab_customer_email');
-    if (savedEmail) {
-      setCustomerEmailFilter(savedEmail);
+    if (user?.email) {
+      setCustomerEmailFilter(user.email);
+    } else {
+      const savedEmail = localStorage.getItem('sunlab_customer_email');
+      if (savedEmail) {
+        setCustomerEmailFilter(savedEmail);
+      }
     }
-  }, []);
+  }, [user]);
 
   // Filter orders
   const filteredOrders = orders.filter((order) => {

@@ -93,53 +93,14 @@ export function initDatabase() {
   // Initial seed is disabled so the store remains clean until new products are created via /admin
 
 
-  // Check if orders exist; if not, seed initial sample orders (E-commerce 2.5 style)
-  const ordersCount = db.prepare('SELECT COUNT(*) as count FROM orders').get();
-  if (ordersCount.count === 0) {
-    seedInitialOrders();
-  }
+  // Limpar pedidos antigos com produtos inexistentes; banco inicia vazio para todos
+  db.exec(`
+    DELETE FROM orders;
+  `);
 }
 
 export function seedInitialOrders() {
-  const insertOrder = db.prepare(`
-    INSERT INTO orders (
-      id, order_number, customer_name, customer_email, customer_phone,
-      shipping_address, payment_method, items_json, total_amount, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
-
-  insertOrder.run(
-    'ord-101',
-    'SLB-942817',
-    'Lucas Moreira Mendes',
-    'lucas.mendes@email.com',
-    '(11) 98765-4321',
-    'Av. Paulista, 1578, Ap 12B — Bela Vista, São Paulo/SP',
-    'Pix Instantâneo',
-    JSON.stringify([
-      { name: 'Vaso Paramétrico Waveform', color: 'Terracota Basáltico', size: 'Grande (26cm)', quantity: 1, unitPrice: 189.90 },
-      { name: 'Dock Station Modular MagSafe', color: 'Branco Giz Mineral', quantity: 1, unitPrice: 149.90 }
-    ]),
-    339.80,
-    'Em Produção 3D'
-  );
-
-  insertOrder.run(
-    'ord-102',
-    'SLB-718294',
-    'Fernanda Vasconcelos',
-    'fernanda.vasconcelos@design.br',
-    '(21) 99123-8877',
-    'Rua Visconde de Pirajá, 305 — Ipanema, Rio de Janeiro/RJ',
-    'Cartão de Crédito (3x)',
-    JSON.stringify([
-      { name: 'Luminária Pendente Voronoi Shade', color: 'Areia Natural', quantity: 2, unitPrice: 249.90 }
-    ]),
-    499.80,
-    'Pendente'
-  );
-
-  console.log('[DB] Seeded initial customer orders into SQLite orders table.');
+  // Pedidos devem sempre iniciar vazios para novos usuários
 }
 
 export function seedInitialProducts() {

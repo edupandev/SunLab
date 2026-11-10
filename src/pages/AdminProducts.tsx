@@ -67,7 +67,7 @@ export const AdminProducts: React.FC = () => {
   const fetchOrders = async () => {
     setLoadingOrders(true);
     try {
-      const res = await fetch('http://localhost:3001/api/orders');
+      const res = await fetch('/api/orders');
       if (res.ok) {
         const data = await res.json();
         setOrders(data);
@@ -85,7 +85,7 @@ export const AdminProducts: React.FC = () => {
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/orders/${orderId}/status`, {
+      const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -103,7 +103,7 @@ export const AdminProducts: React.FC = () => {
   const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
     if (confirm(`Deseja remover o pedido ${orderNumber} do banco de dados?`)) {
       try {
-        const res = await fetch(`http://localhost:3001/api/orders/${orderId}`, {
+        const res = await fetch(`/api/orders/${orderId}`, {
           method: 'DELETE'
         });
         if (res.ok) {
