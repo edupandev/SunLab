@@ -187,10 +187,11 @@ export const CheckoutModal: React.FC = () => {
         setIsGeneratingPix(true);
         const payload = generatePixPayload({
           key: pixConfig.key,
+          keyType: pixConfig.keyType,
           name: pixConfig.merchantName,
           city: pixConfig.merchantCity,
           amount: finalPayableTotal,
-          txid: orderNumber || `SLB${Math.floor(100000 + Math.random() * 900000)}`
+          txid: '***'
         });
         setPixPayload(payload);
         generatePixQRCode(payload)

@@ -124,10 +124,11 @@ export const AdminProducts: React.FC = () => {
     try {
       const payload = generatePixPayload({
         key: pixSettings.pix_key,
+        keyType: pixSettings.pix_key_type as any,
         name: pixSettings.pix_merchant_name,
         city: pixSettings.pix_merchant_city,
         amount: 1.00,
-        txid: 'SUNLABTESTE'
+        txid: '***'
       });
       setTestPixPayload(payload);
       generatePixQRCode(payload).then(setTestQrCodeUrl).catch(() => {});

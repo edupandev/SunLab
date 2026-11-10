@@ -2,6 +2,7 @@ import QRCode from 'qrcode';
 
 export interface PixPayloadOptions {
   key: string;
+  keyType?: 'phone' | 'cpf' | 'cnpj' | 'email' | 'random';
   name?: string;
   city?: string;
   amount: number | string;
@@ -121,6 +122,7 @@ export function sanitizePixKey(rawKey: string, forcedType?: string): string {
 export function generatePixPayload(options: PixPayloadOptions): string {
   const {
     key,
+    keyType,
     name = DEFAULT_PIX_CONFIG.merchantName,
     city = DEFAULT_PIX_CONFIG.merchantCity,
     amount,
@@ -128,13 +130,15 @@ export function generatePixPayload(options: PixPayloadOptions): string {
     description
   } = options;
 
-  const cleanKey = sanitizePixKey(key);
+  const cleanKey = sanitizePixKey(key, keyType);
 
   // Tag 00: Payload Format Indicator (fixo '01')
   const tag00 = formatTLV('00', '01');
 
-  // Tag 01: Point of Initiation Method ('12' = uso único / dinâmico por pedido)
-  const tag01 = formatTLV('01', '12');
+  // Tag 01: Point of Initiation Method ('11' = QR Code Estático)
+  // O uso de '11' (e não '12') é fundamental para evitar a rejeição "Recusado pelo PSP do recebedor"
+  // que bancos aplicam quando recebem código dinâmico ('12') sem cobrança registrada via API do PSP.
+  const tag01 = formatTLV('01', '11');
 
   // Tag 26: Merchant Account Information - Pix
   const sub00 = formatTLV('00', 'br.gov.bcb.pix');
@@ -165,8 +169,10 @@ export function generatePixPayload(options: PixPayloadOptions): string {
   const tag60 = formatTLV('60', cleanCity);
 
   // Tag 62: Additional Data Field Template (txid / Identificador da Transação)
-  const rawTxid = (txid || '***').replace(/[^a-zA-Z0-9]/g, '').slice(0, 25) || '***';
-  const sub05 = formatTLV('05', rawTxid);
+  // No padrão do Banco Central para QR Code Estático, '***' é o valor universal
+  // aceito por todos os bancos sem exigir cobrança pré-registrada no PSP.
+  const cleanTxid = (txid && txid !== '***') ? txid.replace(/[^a-zA-Z0-9]/g, '').slice(0, 25) : '***';
+  const sub05 = formatTLV('05', cleanTxid || '***');
   const tag62 = formatTLV('62', sub05);
 
   // Tag 63: CRC16 Checksum
