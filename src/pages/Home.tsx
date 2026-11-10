@@ -223,7 +223,7 @@ export const Home: React.FC = () => {
               </div>
 
               {/* Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-zinc-900 tracking-tight leading-[1.1] font-display">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-zinc-900 tracking-tight leading-[1.15] sm:leading-[1.1] font-display">
                 Se dá pra imaginar, <br />
                 <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
                   a gente imprime.
@@ -231,27 +231,27 @@ export const Home: React.FC = () => {
               </h1>
 
               {/* Subtitle */}
-              <p className="text-base sm:text-lg text-zinc-600 max-w-xl font-normal leading-relaxed">
+              <p className="text-sm sm:text-lg text-zinc-600 max-w-xl font-normal leading-relaxed">
                 De chaveiros e colecionáveis a peças personalizadas pra sua marca ou pro seu setup. Sem complicação, com acabamento impecável e direto na sua porta.
               </p>
 
               {/* Interactive Filament Quick Palette on Hero */}
-              <div className="p-3.5 rounded-2xl bg-white border border-zinc-200 shadow-xs max-w-xl space-y-2">
+              <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-zinc-200 shadow-xs max-w-xl space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-zinc-800 flex items-center gap-1.5">
+                  <span className="font-bold text-zinc-800 flex items-center gap-1.5 text-[11px] sm:text-xs">
                     <Sparkles className="w-3.5 h-3.5 text-blue-600" />
                     Experimente o Acabamento Interativo:
                   </span>
-                  <span className="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 truncate max-w-[120px]">
                     {selectedFilament.name}
                   </span>
                 </div>
-                <div className="flex items-center gap-2.5 pt-1">
+                <div className="flex items-center gap-1.5 sm:gap-2.5 pt-1 overflow-x-auto whitespace-nowrap pb-1 scrollbar-none">
                   {FILAMENTS.map(filament => (
                     <button
                       key={filament.id}
                       onClick={() => setSelectedFilament(filament)}
-                      className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
+                      className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer shrink-0 ${
                         selectedFilament.id === filament.id
                           ? 'border-blue-600 bg-blue-50/70 text-blue-900 shadow-xs scale-102'
                           : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700'
@@ -261,17 +261,17 @@ export const Home: React.FC = () => {
                         className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 shadow-xs"
                         style={{ backgroundColor: filament.hex }}
                       />
-                      <span className="text-[11px] hidden sm:inline">{filament.name.split(' ')[0]}</span>
+                      <span className="text-[11px]">{filament.name.split(' ')[0]}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Call to Actions */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pt-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 pt-1">
                 <Link
                   to="/catalog"
-                  className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer group active:scale-98"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer group active:scale-98"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span>Explorar Catálogo 2026</span>
@@ -280,7 +280,7 @@ export const Home: React.FC = () => {
 
                 <Link
                   to="/custom"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-zinc-900 hover:text-white border-2 border-zinc-900 text-zinc-900 font-bold text-sm transition-all cursor-pointer shadow-xs hover:-translate-y-0.5 active:scale-98"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-zinc-900 hover:text-white border-2 border-zinc-900 text-zinc-900 font-bold text-sm transition-all cursor-pointer shadow-xs hover:-translate-y-0.5 active:scale-98"
                 >
                   <Zap className="w-4 h-4 text-amber-500" />
                   <span>Imprimir Meu Arquivo .STL</span>
@@ -288,18 +288,18 @@ export const Home: React.FC = () => {
               </div>
 
               {/* Quick Metrics */}
-              <div className="grid grid-cols-3 gap-6 pt-6 border-t border-zinc-200 max-w-lg">
-                <div className="p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs">
-                  <div className="text-2xl font-bold text-zinc-900 font-display">0.08<span className="text-blue-600 text-sm">mm</span></div>
-                  <div className="text-xs text-zinc-500 mt-0.5">Camadas de precisão</div>
+              <div className="grid grid-cols-3 gap-2 sm:gap-6 pt-4 sm:pt-6 border-t border-zinc-200 max-w-lg">
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
+                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">0.08<span className="text-blue-600 text-xs sm:text-sm">mm</span></div>
+                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Camadas de precisão</div>
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs">
-                  <div className="text-2xl font-bold text-zinc-900 font-display">100<span className="text-blue-600 text-sm">%</span></div>
-                  <div className="text-xs text-zinc-500 mt-0.5">Biopolímeros ecológicos</div>
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
+                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">100<span className="text-blue-600 text-xs sm:text-sm">%</span></div>
+                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Biopolímeros ecológicos</div>
                 </div>
-                <div className="p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs">
-                  <div className="text-2xl font-bold text-zinc-900 font-display">48<span className="text-blue-600 text-sm">h</span></div>
-                  <div className="text-xs text-zinc-500 mt-0.5">Média de fabricação</div>
+                <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
+                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">48<span className="text-blue-600 text-xs sm:text-sm">h</span></div>
+                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Média de fabricação</div>
                 </div>
               </div>
             </motion.div>
@@ -666,20 +666,20 @@ export const Home: React.FC = () => {
           </div>
 
           {/* Filter Tabs in White and Gray with Blue Text */}
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-zinc-100 border border-zinc-200 self-start sm:self-auto shadow-2xs">
+          <div className="flex items-center gap-1 p-1 rounded-2xl bg-zinc-100 border border-zinc-200 overflow-x-auto whitespace-nowrap scrollbar-none max-w-full shadow-2xs">
             <button
               onClick={() => setActiveTab('featured')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                 activeTab === 'featured'
                   ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
                   : 'text-zinc-600 hover:text-zinc-900'
               }`}
             >
-              ⭐ Em Destaque
+              ⭐ Destaques
             </button>
             <button
               onClick={() => setActiveTab('bestsellers')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                 activeTab === 'bestsellers'
                   ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
                   : 'text-zinc-600 hover:text-zinc-900'
@@ -689,7 +689,7 @@ export const Home: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('newArrivals')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                 activeTab === 'newArrivals'
                   ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
                   : 'text-zinc-600 hover:text-zinc-900'
@@ -700,9 +700,9 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Products Grid with Animated Cards */}
+        {/* Products Grid with Animated Cards (2-cols on mobile) */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {filteredProducts.map(product => (
               <ProductCard key={product.id} product={product} />
             ))}

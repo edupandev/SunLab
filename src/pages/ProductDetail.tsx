@@ -125,14 +125,14 @@ export const ProductDetail: React.FC = () => {
 
           {/* Thumbnails */}
           {product.images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-2">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none">
               {product.images.map((img, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`w-24 h-24 rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
+                  className={`w-16 h-16 sm:w-24 sm:h-24 rounded-lg sm:rounded-xl overflow-hidden border-2 transition-all shrink-0 cursor-pointer ${
                     activeImageIndex === idx
-                      ? 'border-zinc-800 ring-2 ring-zinc-400 scale-95'
+                      ? 'border-blue-600 ring-2 ring-blue-300 scale-95'
                       : 'border-zinc-200 opacity-70 hover:opacity-100'
                   }`}
                 >
@@ -143,16 +143,16 @@ export const ProductDetail: React.FC = () => {
           )}
 
           {/* Production Guarantee Banner */}
-          <div className="grid grid-cols-3 gap-3 pt-4 text-xs text-zinc-600">
-            <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-zinc-500 shrink-0" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 pt-2 sm:pt-4 text-xs text-zinc-600">
+            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
+              <Clock className="w-4 h-4 text-blue-600 shrink-0" />
               <span>Produção: {product.leadTime}</span>
             </div>
-            <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-zinc-500 shrink-0" />
+            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>Garantia de 1 ano</span>
             </div>
-            <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
+            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
               <RotateCcw className="w-4 h-4 text-zinc-500 shrink-0" />
               <span>Troca em 7 dias</span>
             </div>
@@ -442,19 +442,47 @@ export const ProductDetail: React.FC = () => {
 
       {/* Related Products Carousel / Grid */}
       {relatedProducts.length > 0 && (
-        <div className="pt-12 border-t border-zinc-200 space-y-6">
+        <div className="pt-12 border-t border-zinc-200 space-y-6 pb-16 md:pb-0">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-zinc-900 font-display">
+            <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 font-display">
               Você também pode gostar
             </h3>
-            <Link to="/catalog" className="text-xs font-semibold text-zinc-600 hover:text-zinc-900">
+            <Link to="/catalog" className="text-xs font-semibold text-blue-600 hover:text-blue-800">
               Ver mais na loja →
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {relatedProducts.map(rel => (
               <ProductCard key={rel.id} product={rel} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Mobile Sticky Buy Bar */}
+      {product.price > 0 && (
+        <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 px-4 py-2.5 flex items-center justify-between gap-3 shadow-2xl safe-area-bottom">
+          <div className="min-w-0">
+            <span className="text-[10px] text-zinc-400 block font-medium">Preço à vista</span>
+            <div className="text-base font-extrabold text-zinc-900 tracking-tight truncate">
+              R$ {(product.price * quantity).toFixed(2).replace('.', ',')}
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleAddToCart}
+              className="p-2.5 rounded-xl border border-zinc-300 bg-zinc-50 active:bg-zinc-100 text-zinc-700 active:scale-95 transition-all shadow-xs"
+              title="Adicionar ao Carrinho"
+            >
+              <ShoppingBag className="w-5 h-5 text-blue-600" />
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="px-5 py-2.5 rounded-xl bg-blue-600 active:bg-blue-700 text-white font-bold text-xs shadow-md active:scale-95 flex items-center gap-1.5 transition-all"
+            >
+              <span>Comprar Agora</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       )}

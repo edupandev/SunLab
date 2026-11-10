@@ -41,14 +41,14 @@ export const QuickViewModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-zinc-700/30 backdrop-blur-xs transition-opacity"
         onClick={closeQuickView}
       />
 
-      <div className="relative w-full max-w-4xl rounded-2xl bg-white border border-zinc-200 shadow-2xl overflow-hidden z-10 my-8">
+      <div className="relative w-full max-w-4xl rounded-2xl bg-white border border-zinc-200 shadow-2xl overflow-hidden z-10 my-auto sm:my-8 max-h-[95vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={closeQuickView}

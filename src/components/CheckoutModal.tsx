@@ -269,7 +269,7 @@ export const CheckoutModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-zinc-700/30 backdrop-blur-xs transition-opacity"
@@ -278,16 +278,16 @@ export const CheckoutModal: React.FC = () => {
         }}
       />
 
-      <div className="relative w-full max-w-2xl rounded-3xl bg-white border border-zinc-200 shadow-2xl overflow-hidden z-10 my-8">
+      <div className="relative w-full max-w-2xl rounded-2xl sm:rounded-3xl bg-white border border-zinc-200 shadow-2xl overflow-hidden z-10 my-auto sm:my-8 max-h-[96vh] flex flex-col">
         
         {/* Modal Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 bg-zinc-50">
-          <div className="flex items-center gap-2.5">
-            <ShieldCheck className="w-5 h-5 text-blue-700" />
-            <h3 className="text-base font-bold text-blue-950">
-              {step === 'form' && 'Finalizar Pedido — Endereço de Envio'}
-              {step === 'payment' && 'Ambiente de Pagamento Seguro (Pix / Cartão)'}
-              {step === 'success' && 'Pedido Confirmado com Sucesso!'}
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-zinc-200 bg-zinc-50 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700 shrink-0" />
+            <h3 className="text-sm sm:text-base font-bold text-blue-950 truncate max-w-[260px] sm:max-w-none">
+              {step === 'form' && 'Finalizar Pedido — Envio'}
+              {step === 'payment' && 'Pagamento Seguro (Pix / Cartão)'}
+              {step === 'success' && 'Pedido Confirmado!'}
             </h3>
           </div>
           {step !== 'success' && (
@@ -301,7 +301,7 @@ export const CheckoutModal: React.FC = () => {
         </div>
 
         {/* Modal Content */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto">
           
           {/* STEP 1: Address Form */}
           {step === 'form' && (

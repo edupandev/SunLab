@@ -135,6 +135,7 @@ export const Login: React.FC = () => {
           });
           const btnEl = document.getElementById('google-btn-rendered');
           if (btnEl) {
+            const calculatedWidth = Math.min(340, Math.max(220, (window.innerWidth || 360) - 64));
             g.accounts.id.renderButton(btnEl, {
               type: 'standard',
               theme: 'outline',
@@ -142,7 +143,7 @@ export const Login: React.FC = () => {
               text: 'signin_with',
               shape: 'rectangular',
               logo_alignment: 'left',
-              width: 340,
+              width: calculatedWidth,
               locale: 'pt-BR'
             });
           }

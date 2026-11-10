@@ -41,26 +41,26 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Top Badges */}
-      <div className="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
+      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 flex flex-wrap gap-1 pointer-events-none">
         {product.bestseller && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/95 text-blue-700 border border-blue-200 shadow-xs backdrop-blur-md">
-            <Sparkles className="w-3 h-3 text-blue-600" /> Mais Vendido
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold bg-white/95 text-blue-700 border border-blue-200 shadow-xs backdrop-blur-md">
+            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-600" /> Mais Vendido
           </span>
         )}
         {product.newArrival && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/95 text-zinc-800 border border-zinc-200 shadow-xs backdrop-blur-md">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold bg-white/95 text-zinc-800 border border-zinc-200 shadow-xs backdrop-blur-md">
             Lançamento
           </span>
         )}
         {product.category === 'custom' && (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-xs backdrop-blur-md">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 shadow-xs backdrop-blur-md">
             Sob Medida
           </span>
         )}
       </div>
 
       {/* Image Container */}
-      <div className="relative aspect-4/3 w-full bg-zinc-100 overflow-hidden">
+      <div className="relative aspect-square sm:aspect-4/3 w-full bg-zinc-100 overflow-hidden">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
           <img
             src={product.images[0]}
@@ -127,24 +127,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Info */}
-      <div className="p-4 sm:p-5 flex flex-col flex-1 justify-between gap-3">
+      <div className="p-3 sm:p-5 flex flex-col flex-1 justify-between gap-2 sm:gap-3">
         <div>
-          <div className="flex items-center justify-between text-xs text-zinc-500 mb-1.5">
-            <span className="uppercase tracking-wider font-bold text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+          <div className="flex items-center justify-between text-xs text-zinc-500 mb-1">
+            <span className="uppercase tracking-wider font-bold text-[9px] sm:text-[10px] text-blue-600 bg-blue-50 px-1.5 sm:px-2 py-0.5 rounded-md truncate max-w-[110px]">
               {product.categoryLabel}
             </span>
-            <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <div className="flex items-center gap-1 text-[11px] sm:text-xs">
+              <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400 shrink-0" />
               <span className="font-bold text-zinc-800">{product.rating.toFixed(1)}</span>
-              <span className="text-zinc-400">({product.reviewsCount})</span>
             </div>
           </div>
 
           <Link to={`/product/${product.slug}`} className="group/title block">
-            <h3 className="font-bold text-base text-zinc-900 group-hover/title:text-blue-600 transition-colors line-clamp-1">
+            <h3 className="font-bold text-xs sm:text-base text-zinc-900 group-hover/title:text-blue-600 transition-colors line-clamp-2 leading-tight">
               {product.name}
             </h3>
-            <p className="text-xs text-zinc-500 line-clamp-2 mt-1 leading-relaxed">
+            <p className="hidden sm:block text-xs text-zinc-500 line-clamp-2 mt-1 leading-relaxed">
               {product.tagline}
             </p>
           </Link>
@@ -152,9 +151,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Color Variants Preview */}
         {product.colors && product.colors.length > 1 && (
-          <div className="flex items-center gap-1.5 pt-1">
-            <span className="text-[11px] text-zinc-400 mr-1">Cor:</span>
-            {product.colors.map(col => (
+          <div className="flex items-center gap-1 sm:gap-1.5 pt-0.5 sm:pt-1">
+            <span className="text-[10px] sm:text-[11px] text-zinc-400 mr-0.5">Cor:</span>
+            {product.colors.slice(0, 4).map(col => (
               <button
                 key={col.name}
                 type="button"
@@ -163,44 +162,44 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                   e.stopPropagation();
                   setSelectedColor(col);
                 }}
-                className={`w-4 h-4 rounded-full border transition-all cursor-pointer ${
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border transition-all cursor-pointer shrink-0 ${
                   selectedColor.name === col.name
-                    ? 'ring-2 ring-blue-600 ring-offset-2 ring-offset-white border-white scale-115'
+                    ? 'ring-2 ring-blue-600 ring-offset-1 sm:ring-offset-2 ring-offset-white border-white scale-110'
                     : 'border-zinc-300 hover:scale-110'
                 }`}
                 style={{ backgroundColor: col.hex }}
                 title={col.name}
               />
             ))}
-            <span className="text-[11px] font-medium text-zinc-600 ml-1 truncate max-w-[110px]">
+            <span className="hidden sm:inline text-[11px] font-medium text-zinc-600 ml-1 truncate max-w-[110px]">
               {selectedColor.name}
             </span>
           </div>
         )}
 
         {/* Price & Action Button */}
-        <div className="flex items-center justify-between pt-3 border-t border-zinc-100 mt-auto gap-2">
+        <div className="flex items-center justify-between pt-2 sm:pt-3 border-t border-zinc-100 mt-auto gap-1.5 sm:gap-2">
           <div>
             {product.price > 0 ? (
               <div>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-base sm:text-lg font-extrabold text-zinc-900 tracking-tight">
+                <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+                  <span className="text-sm sm:text-lg font-extrabold text-zinc-900 tracking-tight">
                     R$ {product.price.toFixed(2).replace('.', ',')}
                   </span>
                   {product.originalPrice && (
-                    <span className="text-[11px] text-zinc-400 line-through">
+                    <span className="text-[10px] sm:text-[11px] text-zinc-400 line-through">
                       R$ {product.originalPrice.toFixed(2).replace('.', ',')}
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-zinc-400">
+                <p className="text-[9px] sm:text-[10px] text-zinc-400 hidden xs:block">
                   Prazo: {product.leadTime}
                 </p>
               </div>
             ) : (
               <div>
                 <span className="text-xs font-semibold text-zinc-700">Sob Orçamento</span>
-                <p className="text-[10px] text-zinc-400">Customizável</p>
+                <p className="text-[9px] sm:text-[10px] text-zinc-400">Customizável</p>
               </div>
             )}
           </div>
@@ -209,7 +208,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <button
               onClick={handleQuickAdd}
               disabled={addedAnimation}
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0 flex items-center gap-1.5 active:scale-95 ${
+              className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0 flex items-center gap-1 active:scale-95 ${
                 addedAnimation
                   ? 'bg-emerald-600 text-white shadow-md'
                   : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md'
@@ -217,20 +216,20 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             >
               {addedAnimation ? (
                 <>
-                  <Check className="w-3.5 h-3.5" />
-                  <span>Adicionado!</span>
+                  <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="hidden sm:inline">Adicionado!</span>
                 </>
               ) : (
                 <>
-                  <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Adicionar</span>
+                  <ShoppingBag className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                  <span className="hidden xs:inline">Comprar</span>
                 </>
               )}
             </button>
           ) : (
             <Link
               to="/custom"
-              className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 transition-colors shrink-0"
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl text-[11px] sm:text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 transition-colors shrink-0"
             >
               Orçar
             </Link>

@@ -157,17 +157,17 @@ export const Catalog: React.FC = () => {
           </div>
         </div>
 
-        {/* Categories Bar */}
-        <div className="pt-2 border-t border-zinc-100 flex flex-wrap items-center gap-2">
-          <span className="text-[11px] uppercase font-bold text-blue-500 mr-1">Categorias:</span>
+        {/* Categories Bar (Mobile Horizontal Swipe) */}
+        <div className="pt-2 border-t border-zinc-100 flex items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap pb-1.5 scrollbar-none">
+          <span className="text-[11px] uppercase font-bold text-blue-500 mr-1 shrink-0">Categorias:</span>
           {CATEGORIES.map(cat => (
             <button
               key={cat.id}
               onClick={() => handleCategoryChange(cat.id)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
                 selectedCategory === cat.id
-                  ? 'bg-blue-100 text-blue-950 font-bold border border-blue-300 shadow-xs'
-                  : 'bg-zinc-100 text-blue-800 hover:text-blue-950 hover:bg-blue-50'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
+                  : 'bg-zinc-100 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-200'
               }`}
             >
               {cat.name}
@@ -177,8 +177,8 @@ export const Catalog: React.FC = () => {
 
         {/* Secondary Filters (Price Range & Reset) */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs text-zinc-600">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] uppercase font-bold text-zinc-400 mr-1">Preço:</span>
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto whitespace-nowrap pb-1 scrollbar-none">
+            <span className="text-[11px] uppercase font-bold text-zinc-400 mr-1 shrink-0">Preço:</span>
             {[
               { id: 'all', label: 'Todos' },
               { id: 'under-150', label: 'Até R$ 150' },
@@ -188,10 +188,10 @@ export const Catalog: React.FC = () => {
               <button
                 key={range.id}
                 onClick={() => setPriceRange(range.id as any)}
-                className={`px-2.5 py-1 rounded-md text-xs transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-xs transition-colors cursor-pointer shrink-0 ${
                   priceRange === range.id
-                    ? 'bg-zinc-200 text-zinc-900 font-bold'
-                    : 'text-zinc-600 hover:text-zinc-900'
+                    ? 'bg-zinc-900 text-white font-bold'
+                    : 'bg-zinc-100 text-zinc-600 hover:text-zinc-900'
                 }`}
               >
                 {range.label}
@@ -202,19 +202,19 @@ export const Catalog: React.FC = () => {
           {hasActiveFilters && (
             <button
               onClick={handleResetFilters}
-              className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 font-medium cursor-pointer"
+              className="flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 font-medium cursor-pointer ml-auto"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Limpar todos os filtros</span>
+              <span>Limpar filtros</span>
             </button>
           )}
         </div>
 
       </div>
 
-      {/* Product Results Grid */}
+      {/* Product Results Grid (2-columns on mobile, up to 4 on desktop) */}
       {filteredProducts.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}

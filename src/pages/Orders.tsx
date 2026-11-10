@@ -394,8 +394,8 @@ export const Orders: React.FC = () => {
                 className="bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-xs transition-all hover:border-zinc-300"
               >
                 {/* Order Top Bar */}
-                <div className="bg-zinc-50/80 border-b border-zinc-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-3">
+                <div className="bg-zinc-50/80 border-b border-zinc-200 px-4 sm:px-6 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <span className="font-mono font-extrabold text-blue-950 text-base">
                       #{order.orderNumber}
                     </span>
@@ -414,7 +414,7 @@ export const Orders: React.FC = () => {
                 </div>
 
                 {/* Progress Stepper for 3D Manufacturing */}
-                <div className="px-6 py-4 border-b border-zinc-100 bg-white">
+                <div className="px-4 sm:px-6 py-4 border-b border-zinc-100 bg-white">
                   <div className="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-3">
                     Etapas da Produção 3D & Envio:
                   </div>
@@ -544,21 +544,21 @@ export const Orders: React.FC = () => {
                 </div>
 
                 {/* Footer with Totals and Actions */}
-                <div className="bg-zinc-50 border-t border-zinc-200 px-6 py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500">Valor Total do Pedido:</span>
+                <div className="bg-zinc-50 border-t border-zinc-200 px-4 sm:px-6 py-3.5 sm:py-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+                  <div className="flex items-center justify-between sm:justify-start gap-2">
+                    <span className="text-xs text-zinc-500">Valor Total:</span>
                     <span className="font-mono font-extrabold text-zinc-900 text-lg">
                       R$ {Number(order.totalAmount).toFixed(2).replace('.', ',')}
                     </span>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2.5">
+                  <div className="flex flex-wrap items-center gap-2">
                     {/* WhatsApp Action */}
                     <a
                       href={`https://wa.me/5511999999999?text=${whatsappMessage}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer"
+                      className="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors shadow-xs cursor-pointer active:scale-95"
                     >
                       <MessageCircle className="w-3.5 h-3.5 fill-white" />
                       <span>Acompanhar no WhatsApp</span>
