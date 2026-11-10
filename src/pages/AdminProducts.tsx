@@ -52,8 +52,19 @@ interface Order {
 
 export const AdminProducts: React.FC = () => {
   const { products, createProduct, updateProduct, deleteProduct, toggleProductField, resetToDefault } = useProducts();
-  const { user, logout } = useAuth();
+  const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Bloqueio rigoroso: apenas o administrador oficial tem permissão
+  useEffect(() => {
+    if (!isAdmin || user?.role !== 'admin') {
+      navigate('/login');
+    }
+  }, [isAdmin, user, navigate]);
+
+  if (!isAdmin || user?.role !== 'admin') {
+    return null;
+  }
 
   const [activeTab, setActiveTab] = useState<'products' | 'orders'>('products');
   const [searchFilter, setSearchFilter] = useState('');
@@ -85,9 +96,13 @@ export const AdminProducts: React.FC = () => {
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
+      const token = localStorage.getItem('sunlab_auth_token');
       const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        },
         body: JSON.stringify({ status: newStatus })
       });
       if (res.ok) {
@@ -103,8 +118,10 @@ export const AdminProducts: React.FC = () => {
   const handleDeleteOrder = async (orderId: string, orderNumber: string) => {
     if (confirm(`Deseja remover o pedido ${orderNumber} do banco de dados?`)) {
       try {
+        const token = localStorage.getItem('sunlab_auth_token');
         const res = await fetch(`/api/orders/${orderId}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {}
         });
         if (res.ok) {
           setOrders(orders.filter(o => o.id !== orderId));

@@ -45,11 +45,20 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     fetchProducts();
   }, [fetchProducts]);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('sunlab_auth_token');
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    return headers;
+  };
+
   const createProduct = async (productData: Partial<Product>) => {
     try {
       const res = await fetch('/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(productData)
       });
       const data = await res.json();
@@ -67,7 +76,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(productData)
       });
       const data = await res.json();
@@ -84,7 +93,8 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const deleteProduct = async (id: string) => {
     try {
       const res = await fetch(`/api/products/${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
+        headers: getAuthHeaders()
       });
       const data = await res.json();
       if (!res.ok) {
@@ -101,7 +111,7 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const res = await fetch(`/api/products/${id}/toggle`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ field })
       });
       const data = await res.json();
@@ -118,7 +128,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const resetToDefault = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/products/reset', { method: 'POST' });
+      const res = await fetch('/api/products/reset', { 
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
       if (res.ok) {
         const data = await res.json();
         setProducts(data);

@@ -199,21 +199,21 @@ export const Navbar: React.FC = () => {
               <span className="text-xs text-blue-600 hidden lg:inline font-normal">Buscar no catálogo...</span>
             </button>
 
-            {/* Login / Admin Action */}
+            {/* Login / Admin Action - Apenas Admin vê o Painel Admin */}
             {isAdmin ? (
               <NavLink
                 to="/admin"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-blue-800 border border-zinc-200 text-xs font-semibold transition-all shadow-xs cursor-pointer"
-                title="Painel Administrativo"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold transition-all shadow-xs cursor-pointer"
+                title="Painel Administrativo SunLab"
               >
-                <ShieldCheck className="w-4 h-4 text-blue-600" />
+                <ShieldCheck className="w-4 h-4 text-blue-700" />
                 <span className="hidden sm:inline">Painel Admin</span>
-                <span className="text-[9px] px-1.5 py-0.5 bg-blue-700 text-white rounded font-mono font-bold">BD</span>
               </NavLink>
             ) : user ? (
               <NavLink
-                to="/admin"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-blue-700 border border-zinc-200 text-xs font-medium transition-colors"
+                to="/orders"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-medium transition-colors"
+                title="Minha Conta e Pedidos"
               >
                 <User className="w-4 h-4 text-blue-600" />
                 <span className="hidden sm:inline truncate max-w-[100px]">{user.name.split(' ')[0]}</span>
@@ -221,11 +221,11 @@ export const Navbar: React.FC = () => {
             ) : (
               <NavLink
                 to="/login"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-blue-800 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
-                title="Área Administrativa"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
+                title="Entrar na Conta"
               >
-                <User className="w-4 h-4 text-blue-600" />
-                <span className="hidden sm:inline">Login</span>
+                <User className="w-4 h-4 text-zinc-600" />
+                <span className="hidden sm:inline">Entrar</span>
               </NavLink>
             )}
 
@@ -312,13 +312,24 @@ export const Navbar: React.FC = () => {
                 <span>Meus Pedidos Comprados</span>
                 <span className="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800">Status 3D</span>
               </Link>
-              <Link
-                to={isAdmin ? "/admin" : "/login"}
-                className="px-3 py-2.5 rounded-xl text-base font-semibold text-zinc-800 bg-zinc-100 border border-zinc-200 flex items-center justify-between"
-              >
-                <span>{isAdmin ? "Painel Admin (SQLite)" : "Acesso / Login"}</span>
-                <ShieldCheck className="w-4 h-4 text-zinc-600" />
-              </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="px-3 py-2.5 rounded-xl text-base font-bold text-blue-900 bg-blue-50 border border-blue-200 flex items-center justify-between"
+                >
+                  <span>Painel Administrativo</span>
+                  <ShieldCheck className="w-4 h-4 text-blue-600" />
+                </Link>
+              )}
+              {!user && (
+                <Link
+                  to="/login"
+                  className="px-3 py-2.5 rounded-xl text-base font-semibold text-zinc-800 bg-zinc-100 border border-zinc-200 flex items-center justify-between"
+                >
+                  <span>Entrar / Cadastrar</span>
+                  <User className="w-4 h-4 text-zinc-600" />
+                </Link>
+              )}
             </nav>
 
             <div className="pt-3 border-t border-zinc-200 flex gap-2">

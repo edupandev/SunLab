@@ -7,8 +7,6 @@ import {
   ShieldCheck,
   ArrowRight,
   AlertCircle,
-  Key,
-  Sparkles,
   LogOut,
   Layers,
   Check,
@@ -104,8 +102,8 @@ export const Login: React.FC = () => {
           name: payload.name || payload.given_name || 'Usuário Google',
           email: payload.email,
           avatar: payload.picture,
-          role: payload.email.includes('admin') ? 'admin' : 'customer',
-          roles: [payload.email.includes('admin') ? 'admin' : 'customer'],
+          role: payload.email.toLowerCase() === 'admin@sunlab.com.br' ? 'admin' : 'customer',
+          roles: [payload.email.toLowerCase() === 'admin@sunlab.com.br' ? 'admin' : 'customer'],
           origin: 'google'
         };
 
@@ -281,13 +279,6 @@ export const Login: React.FC = () => {
     } finally {
       setSocialLoading(null);
     }
-  };
-
-  const handleFillAdminDemo = () => {
-    setActiveTab('login');
-    setEmail('admin@sunlab.com.br');
-    setPassword('sunlab2026');
-    setErrorMessage(null);
   };
 
   const handleLogout = () => {
@@ -540,7 +531,7 @@ export const Login: React.FC = () => {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@sunlab.com.br"
+                  placeholder="seuemail@exemplo.com"
                   className="w-full bg-zinc-50 border border-zinc-300 rounded-xl pl-10 pr-4 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:bg-white focus:border-blue-600 transition-colors shadow-2xs"
                 />
               </div>
@@ -670,28 +661,6 @@ export const Login: React.FC = () => {
             </button>
           </form>
         )}
-
-        {/* ADMIN CREDENTIALS QUICK FILL BANNER */}
-        <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-2 text-xs">
-          <div className="flex items-center justify-between text-zinc-700 font-semibold">
-            <span className="flex items-center gap-1.5 text-blue-700">
-              <Key className="w-3.5 h-3.5" /> Credenciais Oficiais do Administrador:
-            </span>
-            <span className="text-[10px] font-mono text-zinc-500">SQLite</span>
-          </div>
-          <div className="text-[11px] text-zinc-600 bg-white p-2.5 rounded-xl border border-zinc-200 font-mono space-y-0.5">
-            <div>Email: <strong className="text-zinc-900">admin@sunlab.com.br</strong></div>
-            <div>Senha: <strong className="text-zinc-900">sunlab2026</strong></div>
-          </div>
-          <button
-            type="button"
-            onClick={handleFillAdminDemo}
-            className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-xl bg-white hover:bg-zinc-100 text-blue-700 border border-zinc-300 text-xs font-bold transition-colors cursor-pointer shadow-2xs"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-            <span>Preencher Credenciais Admin no Formulário</span>
-          </button>
-        </div>
 
       </div>
 

@@ -1,7 +1,28 @@
 import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+
+// Criptografia Segura com PBKDF2-HMAC-SHA512 (100.000 iterações + Salt Criptográfico)
+export function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, 'sha512').toString('hex');
+  return `pbkdf2$100000$${salt}$${hash}`;
+}
+
+export function verifyPassword(password, storedHash) {
+  if (!storedHash || typeof storedHash !== 'string') return false;
+  if (!storedHash.startsWith('pbkdf2$')) {
+    return password === storedHash;
+  }
+  const parts = storedHash.split('$');
+  if (parts.length !== 4) return false;
+  const [_, iterationsStr, salt, originalHash] = parts;
+  const iterations = parseInt(iterationsStr, 10);
+  const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha512').toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(originalHash, 'hex'));
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,15 +105,19 @@ export function initDatabase() {
     );
   `);
 
-  // Ensure default admin user
-  const adminStmt = db.prepare('SELECT id FROM users WHERE email = ?');
-  const existingAdmin = adminStmt.get('admin@sunlab.com.br');
+  // Ensure default admin user with strong cryptographic hash (PBKDF2-SHA512)
+  const existingAdmin = db.prepare('SELECT id, password FROM users WHERE LOWER(email) = ?').get('admin@sunlab.com.br');
+  const hashedAdminPassword = hashPassword('sunlab2026');
+
   if (!existingAdmin) {
     db.prepare(`
       INSERT INTO users (id, name, email, password, role)
       VALUES (?, ?, ?, ?, ?)
-    `).run('usr-admin-1', 'Administrador SunLab', 'admin@sunlab.com.br', 'sunlab2026', 'admin');
-    console.log('[DB] Created default admin user: admin@sunlab.com.br / sunlab2026');
+    `).run('usr-admin-1', 'Administrador SunLab', 'admin@sunlab.com.br', hashedAdminPassword, 'admin');
+    console.log('[DB] Admin oficial criado com senha criptografada (PBKDF2-SHA512).');
+  } else if (!existingAdmin.password.startsWith('pbkdf2$')) {
+    db.prepare('UPDATE users SET password = ? WHERE id = ?').run(hashedAdminPassword, existingAdmin.id);
+    console.log('[DB] Senha do admin migrada para hash criptográfico seguro PBKDF2.');
   }
 
   // Products table starts completely empty as requested

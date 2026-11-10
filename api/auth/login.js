@@ -1,3 +1,22 @@
+import crypto from 'crypto';
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@sunlab.com.br';
+// PBKDF2-SHA512 hash seguro para proteção contra vazamento e rainbow tables
+const ADMIN_HASH = process.env.ADMIN_HASH || 'pbkdf2$100000$8f4c2e1a9b7d5e3c$cb0b40a4a3fac92a063ef5e5bec63f56fa196547245157df331572c751bfdcefe21939eabf908007145fdb8454ccc862ff8ecaded786ad4f3b73732f09473a29';
+
+function verifyPassword(password, storedHash) {
+  if (!password || !storedHash || typeof storedHash !== 'string') return false;
+  if (!storedHash.startsWith('pbkdf2$')) {
+    return password === storedHash;
+  }
+  const parts = storedHash.split('$');
+  if (parts.length !== 4) return false;
+  const [, iterationsStr, salt, originalHash] = parts;
+  const iterations = parseInt(iterationsStr, 10);
+  const hash = crypto.pbkdf2Sync(password, salt, iterations, 64, 'sha512').toString('hex');
+  return crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(originalHash, 'hex'));
+}
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,8 +41,8 @@ export default async function handler(req, res) {
 
     const cleanEmail = String(email).trim().toLowerCase();
 
-    // Credencial oficial admin
-    if (cleanEmail === 'admin@sunlab.com.br' && password === 'sunlab2026') {
+    // Verificação estrita e segura do Administrador Oficial SunLab
+    if (cleanEmail === ADMIN_EMAIL.toLowerCase() && verifyPassword(password, ADMIN_HASH)) {
       return res.status(200).json({
         success: true,
         service: 'loginsrv',
@@ -32,7 +51,7 @@ export default async function handler(req, res) {
           id: 'usr-admin-01',
           sub: 'usr-admin-01',
           name: 'SunLab Admin',
-          email: 'admin@sunlab.com.br',
+          email: ADMIN_EMAIL,
           role: 'admin',
           roles: ['admin'],
           origin: 'vercel'

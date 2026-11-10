@@ -6,7 +6,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
 import { OAuth2Client } from 'google-auth-library';
-import db, { initDatabase, seedInitialProducts } from './db.js';
+import db, { initDatabase, seedInitialProducts, hashPassword, verifyPassword } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -205,6 +205,27 @@ function verifyLoginsrvJWT(token) {
   }
 }
 
+// Middleware: Restrição rigorosa de Administrador (apenas admin oficial pode alterar o site)
+function requireAdmin(req, res, next) {
+  let token = null;
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.replace('Bearer ', '').trim();
+  }
+
+  if (!token) {
+    return res.status(401).json({ error: 'Acesso negado. Faça login com a conta de administrador.' });
+  }
+
+  const claims = verifyLoginsrvJWT(token);
+  if (!claims || !claims.roles || !claims.roles.includes('admin')) {
+    return res.status(403).json({ error: 'Acesso proibido. Apenas a conta de administrador oficial pode realizar alterações no site.' });
+  }
+
+  req.admin = claims;
+  next();
+}
+
 // loginsrv metadata & status endpoint
 app.get('/api/loginsrv/info', (_req, res) => {
   return res.json({
@@ -234,7 +255,7 @@ function handleLoginsrvLogin(req, res) {
     });
   }
 
-  if (user.password !== passwordInput) {
+  if (!verifyPassword(passwordInput, user.password)) {
     return res.status(401).json({
       error: 'Senha incorreta para esta conta. Verifique sua senha e tente novamente.'
     });
@@ -341,12 +362,13 @@ function handleLoginsrvRegister(req, res) {
     return res.status(409).json({ error: 'Este e-mail já está cadastrado no sistema. Faça login com sua senha.' });
   }
 
-  // Create new user in SQLite
+  // Create new user in SQLite with strong cryptographic hashing
   const newUserId = `usr-${Date.now()}-${Math.round(Math.random() * 1e4)}`;
+  const hashedPassword = hashPassword(password);
   db.prepare(`
     INSERT INTO users (id, name, email, password, role)
     VALUES (?, ?, ?, ?, ?)
-  `).run(newUserId, name.trim(), cleanEmail, password, 'customer');
+  `).run(newUserId, name.trim(), cleanEmail, hashedPassword, 'customer');
 
   const newUser = {
     id: newUserId,
@@ -643,8 +665,8 @@ app.get('/api/products/:idOrSlug', (req, res) => {
   }
 });
 
-// POST create product
-app.post('/api/products', (req, res) => {
+// POST create product (Requer Admin)
+app.post('/api/products', requireAdmin, (req, res) => {
   try {
     const p = req.body;
     if (!p.name || p.price === undefined || !p.category) {
@@ -730,8 +752,8 @@ app.post('/api/products', (req, res) => {
   }
 });
 
-// PUT update product
-app.put('/api/products/:id', (req, res) => {
+// PUT update product (Requer Admin)
+app.put('/api/products/:id', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const p = req.body;
@@ -809,8 +831,8 @@ app.put('/api/products/:id', (req, res) => {
   }
 });
 
-// PATCH toggle status (quick toggle in stock, featured, bestseller)
-app.patch('/api/products/:id/toggle', (req, res) => {
+// PATCH toggle status (quick toggle in stock, featured, bestseller) (Requer Admin)
+app.patch('/api/products/:id/toggle', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const { field } = req.body; // 'in_stock', 'featured', 'bestseller', 'new_arrival'
@@ -836,8 +858,8 @@ app.patch('/api/products/:id/toggle', (req, res) => {
   }
 });
 
-// DELETE product
-app.delete('/api/products/:id', (req, res) => {
+// DELETE product (Requer Admin)
+app.delete('/api/products/:id', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const result = db.prepare('DELETE FROM products WHERE id = ?').run(id);
@@ -851,8 +873,8 @@ app.delete('/api/products/:id', (req, res) => {
   }
 });
 
-// RESET to factory default catalog
-app.post('/api/products/reset', (req, res) => {
+// RESET to factory default catalog (Requer Admin)
+app.post('/api/products/reset', requireAdmin, (req, res) => {
   try {
     db.prepare('DELETE FROM products').run();
     seedInitialProducts();
@@ -1118,8 +1140,8 @@ app.post('/api/payments/mercado-pago/checkout', (req, res) => {
   }
 });
 
-// PATCH update order status
-app.patch('/api/orders/:id/status', (req, res) => {
+// PATCH update order status (Requer Admin)
+app.patch('/api/orders/:id/status', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -1135,8 +1157,8 @@ app.patch('/api/orders/:id/status', (req, res) => {
   }
 });
 
-// DELETE order
-app.delete('/api/orders/:id', (req, res) => {
+// DELETE order (Requer Admin)
+app.delete('/api/orders/:id', requireAdmin, (req, res) => {
   try {
     const { id } = req.params;
     const result = db.prepare('DELETE FROM orders WHERE id = ?').run(id);

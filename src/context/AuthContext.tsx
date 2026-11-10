@@ -83,8 +83,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.warn('Backend indisponível, usando validação Vercel local:', e);
     }
 
-    // Fallback de Autenticação Vercel (Caso o backend Express esteja offline)
-    if (cleanEmail === 'admin@sunlab.com.br' && password === 'sunlab2026') {
+    // Fallback de Autenticação Offline (protegido por SHA-256 criptográfico)
+    const ADMIN_HASH_HEX = 'eafedbfa670e9470b1240ea0123130a547e037d098ab8bed800e9b9624d256be';
+    let inputHash = '';
+    try {
+      const msgBuffer = new TextEncoder().encode(password);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+      inputHash = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch (_) {}
+
+    if (cleanEmail === 'admin@sunlab.com.br' && inputHash === ADMIN_HASH_HEX) {
       const adminUser: User = {
         id: 'usr-admin-01',
         name: 'SunLab Admin',

@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import "./index.css";
-import { AuthProvider } from "@/context/AuthContext";
+import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ProductProvider } from "@/context/ProductContext";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
@@ -22,6 +22,15 @@ import Login from "@/pages/Login";
 import AdminProducts from "@/pages/AdminProducts";
 import Orders from "@/pages/Orders";
 import NoRoutes from "@/pages/NoRoutes";
+
+// Guardião de Rota: Bloqueia qualquer usuário não-administrador
+const AdminGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user, isAdmin } = useAuth();
+  if (!user || !isAdmin || user.role !== 'admin') {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
 
 const root = document.getElementById("root")!;
 
@@ -48,7 +57,7 @@ ReactDOM.createRoot(root).render(
                 <Route path="/minha-conta" element={<Orders />} />
                 <Route path="/conta" element={<Orders />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/admin" element={<AdminProducts />} />
+                <Route path="/admin" element={<AdminGuard><AdminProducts /></AdminGuard>} />
                 <Route path="*" element={<NoRoutes />} />
               </Routes>
             </main>
