@@ -10,6 +10,7 @@ export const CartDrawer: React.FC = () => {
     closeCart,
     removeFromCart,
     updateQuantity,
+    clearCart,
     subtotal,
     discount,
     total,
@@ -22,7 +23,18 @@ export const CartDrawer: React.FC = () => {
 
   const [couponInput, setCouponInput] = useState('');
   const [couponFeedback, setCouponFeedback] = useState<{ message: string; isError: boolean } | null>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
   const navigate = useNavigate();
+
+  const handleClearCart = () => {
+    if (confirmClear) {
+      clearCart();
+      setConfirmClear(false);
+    } else {
+      setConfirmClear(true);
+      setTimeout(() => setConfirmClear(false), 3500);
+    }
+  };
 
   if (!isCartOpen) return null;
 
@@ -61,12 +73,32 @@ export const CartDrawer: React.FC = () => {
                 {totalItems} {totalItems === 1 ? 'item' : 'itens'}
               </span>
             </div>
-            <button
-              onClick={closeCart}
-              className="p-1.5 rounded-lg text-blue-600 hover:text-blue-950 hover:bg-blue-50 transition-colors cursor-pointer"
-            >
-              <X className="w-5 h-5" />
-            </button>
+
+            <div className="flex items-center gap-2">
+              {cart.length > 0 && (
+                <button
+                  type="button"
+                  onClick={handleClearCart}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all cursor-pointer ${
+                    confirmClear
+                      ? 'bg-red-600 text-white font-semibold shadow-xs animate-in fade-in'
+                      : 'text-zinc-500 hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-200'
+                  }`}
+                  title={confirmClear ? "Clique novamente para confirmar" : "Limpar todos os itens do carrinho"}
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>{confirmClear ? 'Confirmar?' : 'Limpar carrinho'}</span>
+                </button>
+              )}
+
+              <button
+                onClick={closeCart}
+                className="p-1.5 rounded-lg text-blue-600 hover:text-blue-950 hover:bg-blue-50 transition-colors cursor-pointer"
+                title="Fechar carrinho"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Free Shipping Highlight Banner */}
