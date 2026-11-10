@@ -8,6 +8,14 @@
       "destination": "/api/auth/google"
     },
     {
+      "source": "/api/products/:path*",
+      "destination": "/api/products/index?path=:path*"
+    },
+    {
+      "source": "/api/products",
+      "destination": "/api/products/index"
+    },
+    {
       "source": "/((?!api/|auth/|uploads/).*)",
       "destination": "/index.html"
     }

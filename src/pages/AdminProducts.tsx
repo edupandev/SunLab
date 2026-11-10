@@ -301,21 +301,21 @@ export const AdminProducts: React.FC = () => {
     try {
       if (editingProduct.id) {
         // Update existing
-        const success = await updateProduct(editingProduct.id, editingProduct);
-        if (success) {
-          setActionFeedback({ message: `Produto "${editingProduct.name}" atualizado no banco de dados!` });
+        const res = await updateProduct(editingProduct.id, editingProduct);
+        if (res.success) {
+          setActionFeedback({ message: `Produto "${editingProduct.name}" atualizado com sucesso!` });
           setIsModalOpen(false);
         } else {
-          setActionFeedback({ message: 'Erro ao atualizar produto.', isError: true });
+          setActionFeedback({ message: res.error || 'Erro ao atualizar produto.', isError: true });
         }
       } else {
         // Create new
-        const success = await createProduct(editingProduct as any);
-        if (success) {
-          setActionFeedback({ message: `Novo produto "${editingProduct.name}" inserido com sucesso no SQLite!` });
+        const res = await createProduct(editingProduct as any);
+        if (res.success) {
+          setActionFeedback({ message: `Novo produto "${editingProduct.name}" inserido com sucesso!` });
           setIsModalOpen(false);
         } else {
-          setActionFeedback({ message: 'Erro ao cadastrar produto.', isError: true });
+          setActionFeedback({ message: res.error || 'Erro ao cadastrar produto.', isError: true });
         }
       }
     } catch {
@@ -328,11 +328,11 @@ export const AdminProducts: React.FC = () => {
 
   const handleDelete = async (id: string, name: string) => {
     if (confirm(`Tem certeza que deseja remover o produto "${name}" do banco de dados?`)) {
-      const ok = await deleteProduct(id);
-      if (ok) {
+      const res = await deleteProduct(id);
+      if (res.success) {
         setActionFeedback({ message: `Produto "${name}" removido com sucesso!` });
       } else {
-        setActionFeedback({ message: 'Erro ao excluir produto.', isError: true });
+        setActionFeedback({ message: res.error || 'Erro ao excluir produto.', isError: true });
       }
       setTimeout(() => setActionFeedback(null), 3500);
     }
