@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Product } from '@/data/products';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://uxzzsdrwhucbivzufpzv.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV4enpzZHJ3aHVjYml2enVmcHp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQyNzIxNzEsImV4cCI6MjEwOTg0ODE3MX0.JbkIw5mSmpDo7pikH1xaIZYS83cTrR8TbVKOoF7EA88';
 
 // Nomes das tabelas isoladas para o SunLab (evita conflito com outros projetos)
 export const PRODUCTS_TABLE = 'produtos1';
