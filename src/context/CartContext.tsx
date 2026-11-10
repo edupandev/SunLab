@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { Product, ProductColor } from '@/data/products';
+import { useAuth } from '@/context/AuthContext';
 
 export interface CartItem {
   id: string; // unique item id (productId + color + size)
@@ -52,6 +53,10 @@ const FREE_SHIPPING_LIMIT = 199.00;
 const STANDARD_SHIPPING_RATE = 19.90;
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
+  const isInitialLoad = useRef(true);
+  const syncTimer = useRef<any>(null);
+
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const stored = localStorage.getItem(CART_STORAGE_KEY);
@@ -70,13 +75,62 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  // 1. Sincronização multi-dispositivo: Ao logar na conta (PC ou Celular), carrega o carrinho salvo no banco
+  useEffect(() => {
+    if (!user?.email) return;
+
+    const fetchUserCart = async () => {
+      try {
+        const res = await fetch(`/api/cart?email=${encodeURIComponent(user.email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.items) && data.items.length > 0) {
+            setCart(prev => {
+              const map = new Map<string, CartItem>();
+              data.items.forEach((it: CartItem) => map.set(it.id, it));
+              prev.forEach(it => {
+                if (!map.has(it.id)) map.set(it.id, it);
+              });
+              return Array.from(map.values());
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar carrinho da conta:', err);
+      } finally {
+        isInitialLoad.current = false;
+      }
+    };
+
+    fetchUserCart();
+  }, [user?.email]);
+
+  // 2. Salva localmente e sincroniza na nuvem/banco da conta do usuário
   useEffect(() => {
     try {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
     } catch (e) {
       console.error('Error saving cart:', e);
     }
-  }, [cart]);
+
+    if (user?.email && !isInitialLoad.current) {
+      if (syncTimer.current) clearTimeout(syncTimer.current);
+      syncTimer.current = setTimeout(async () => {
+        try {
+          await fetch('/api/cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: user.email,
+              items: cart
+            })
+          });
+        } catch (err) {
+          console.warn('Falha ao salvar carrinho no banco de dados:', err);
+        }
+      }, 500);
+    }
+  }, [cart, user?.email]);
 
   const addToCart = (
     product: Product,

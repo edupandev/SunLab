@@ -936,6 +936,50 @@ app.get('/api/orders', (req, res) => {
   }
 });
 
+// GET cart for user email
+app.get('/api/cart', (req, res) => {
+  try {
+    const email = req.query.email || req.headers['x-user-email'];
+    if (!email) {
+      return res.json({ items: [] });
+    }
+    const cleanEmail = String(email).trim().toLowerCase();
+    const row = db.prepare('SELECT items_json FROM carts WHERE LOWER(user_email) = ?').get(cleanEmail);
+    if (!row) {
+      return res.json({ items: [] });
+    }
+    return res.json({ items: JSON.parse(row.items_json || '[]') });
+  } catch (err) {
+    console.error('Error fetching cart:', err);
+    return res.status(500).json({ error: 'Erro ao carregar carrinho' });
+  }
+});
+
+// POST save cart for user email
+app.post('/api/cart', (req, res) => {
+  try {
+    const { email, items } = req.body || {};
+    if (!email) {
+      return res.status(400).json({ error: 'E-mail do usuário obrigatório' });
+    }
+    const cleanEmail = String(email).trim().toLowerCase();
+    const itemsJson = JSON.stringify(items || []);
+
+    db.prepare(`
+      INSERT INTO carts (user_email, items_json, updated_at)
+      VALUES (?, ?, CURRENT_TIMESTAMP)
+      ON CONFLICT(user_email) DO UPDATE SET
+        items_json = excluded.items_json,
+        updated_at = CURRENT_TIMESTAMP
+    `).run(cleanEmail, itemsJson);
+
+    return res.json({ success: true, count: (items || []).length });
+  } catch (err) {
+    console.error('Error saving cart:', err);
+    return res.status(500).json({ error: 'Erro ao salvar carrinho' });
+  }
+});
+
 // POST create new order
 app.post('/api/orders', (req, res) => {
   try {

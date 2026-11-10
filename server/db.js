@@ -76,6 +76,12 @@ export function initDatabase() {
       status TEXT NOT NULL DEFAULT 'Pendente',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    CREATE TABLE IF NOT EXISTS carts (
+      user_email TEXT PRIMARY KEY,
+      items_json TEXT NOT NULL,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
   `);
 
   // Ensure default admin user
