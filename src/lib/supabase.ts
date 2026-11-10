@@ -4,6 +4,11 @@ import type { Product } from '@/data/products';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+// Nomes das tabelas isoladas para o SunLab (evita conflito com outros projetos)
+export const PRODUCTS_TABLE = 'produtos1';
+export const ORDERS_TABLE = 'pedidos1';
+export const SETTINGS_TABLE = 'configuracoes1';
+
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(
     supabaseUrl && 
@@ -29,7 +34,7 @@ export const fetchSupabaseProducts = async (): Promise<Product[] | null> => {
   if (!supabase) return null;
   try {
     const { data, error } = await supabase
-      .from('products')
+      .from(PRODUCTS_TABLE)
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -106,7 +111,7 @@ export const upsertSupabaseProduct = async (p: Partial<Product>): Promise<boolea
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase.from('products').upsert(record, { onConflict: 'id' });
+    const { error } = await supabase.from(PRODUCTS_TABLE).upsert(record, { onConflict: 'id' });
     if (error) {
       console.warn('[Supabase] Erro ao salvar produto:', error);
       return false;
@@ -121,7 +126,7 @@ export const upsertSupabaseProduct = async (p: Partial<Product>): Promise<boolea
 export const deleteSupabaseProduct = async (id: string): Promise<boolean> => {
   if (!supabase) return false;
   try {
-    const { error } = await supabase.from('products').delete().eq('id', id);
+    const { error } = await supabase.from(PRODUCTS_TABLE).delete().eq('id', id);
     if (error) {
       console.warn('[Supabase] Erro ao deletar produto:', error);
       return false;
@@ -152,7 +157,7 @@ export interface SupabaseOrder {
 export const fetchSupabaseOrders = async (email?: string): Promise<SupabaseOrder[] | null> => {
   if (!supabase) return null;
   try {
-    let query = supabase.from('orders').select('*').order('created_at', { ascending: false });
+    let query = supabase.from(ORDERS_TABLE).select('*').order('created_at', { ascending: false });
     if (email) {
       query = query.ilike('customer_email', email.trim());
     }
@@ -199,7 +204,7 @@ export const upsertSupabaseOrder = async (order: Partial<SupabaseOrder>): Promis
       updated_at: new Date().toISOString()
     };
 
-    const { error } = await supabase.from('orders').upsert(record, { onConflict: 'order_number' });
+    const { error } = await supabase.from(ORDERS_TABLE).upsert(record, { onConflict: 'order_number' });
     if (error) {
       console.warn('[Supabase] Erro ao salvar pedido:', error);
       return false;
@@ -215,7 +220,7 @@ export const deleteSupabaseOrder = async (orderIdOrNumber: string): Promise<bool
   if (!supabase) return false;
   try {
     const { error } = await supabase
-      .from('orders')
+      .from(ORDERS_TABLE)
       .delete()
       .or(`id.eq.${orderIdOrNumber},order_number.eq.${orderIdOrNumber}`);
     if (error) {
@@ -234,7 +239,7 @@ export const deleteSupabaseOrder = async (orderIdOrNumber: string): Promise<bool
 export const fetchSupabaseSettings = async (): Promise<Record<string, string> | null> => {
   if (!supabase) return null;
   try {
-    const { data, error } = await supabase.from('settings').select('*');
+    const { data, error } = await supabase.from(SETTINGS_TABLE).select('*');
     if (error) return null;
     if (data && Array.isArray(data)) {
       const settingsMap: Record<string, string> = {};
@@ -253,7 +258,7 @@ export const saveSupabaseSetting = async (key: string, value: string): Promise<b
   if (!supabase) return false;
   try {
     const { error } = await supabase
-      .from('settings')
+      .from(SETTINGS_TABLE)
       .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
     return !error;
   } catch {
