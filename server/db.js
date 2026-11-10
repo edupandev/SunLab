@@ -26,9 +26,16 @@ export function initDatabase() {
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL,
       role TEXT NOT NULL DEFAULT 'customer',
+      google_id TEXT,
+      avatar TEXT,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+  `);
 
+  try { db.exec('ALTER TABLE users ADD COLUMN google_id TEXT;'); } catch (_) {}
+  try { db.exec('ALTER TABLE users ADD COLUMN avatar TEXT;'); } catch (_) {}
+
+  db.exec(`
     CREATE TABLE IF NOT EXISTS products (
       id TEXT PRIMARY KEY,
       slug TEXT UNIQUE NOT NULL,

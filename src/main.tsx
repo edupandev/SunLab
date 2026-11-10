@@ -45,6 +45,8 @@ ReactDOM.createRoot(root).render(
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/pedidos" element={<Orders />} />
                 <Route path="/meus-pedidos" element={<Orders />} />
+                <Route path="/minha-conta" element={<Orders />} />
+                <Route path="/conta" element={<Orders />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/admin" element={<AdminProducts />} />
                 <Route path="*" element={<NoRoutes />} />

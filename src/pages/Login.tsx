@@ -45,6 +45,38 @@ export const Login: React.FC = () => {
 
   // Inicializar Google Identity Services com o Client ID oficial
   React.useEffect(() => {
+    const handleCredentialResponse = async (response: any) => {
+      if (!response?.credential) return;
+      try {
+        setLoading(true);
+        setErrorMessage(null);
+        const res = await fetch('/auth/google', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ credential: response.credential })
+        });
+        const data = await res.json();
+        if (res.ok && (data.ok || data.success)) {
+          setSuccessMessage('Autenticado com sucesso via Google!');
+          if (data.user) {
+            localStorage.setItem('sunlab_auth_user', JSON.stringify(data.user));
+            if (data.token) localStorage.setItem('sunlab_auth_token', data.token);
+          }
+          setTimeout(() => {
+            window.location.href = '/minha-conta';
+          }, 500);
+        } else {
+          setErrorMessage(data.error || 'Token Google inválido.');
+        }
+      } catch (err) {
+        setErrorMessage('Não foi possível conectar ao provedor GOOGLE.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    (window as any).handleCredentialResponse = handleCredentialResponse;
+
     const googleClientId = '350538431992-ah75gv2bda5bj86knpf40e27273khplh.apps.googleusercontent.com';
     const initGoogle = () => {
       const g = (window as any).google;
@@ -52,28 +84,20 @@ export const Login: React.FC = () => {
         try {
           g.accounts.id.initialize({
             client_id: googleClientId,
-            callback: async (response: any) => {
-              if (response.credential) {
-                setLoading(true);
-                const res = await loginWith('google', { credential: response.credential });
-                if (res.success) {
-                  setSuccessMessage('Autenticado com sucesso via Google!');
-                  setTimeout(() => {
-                    navigate(res.user?.role === 'admin' ? '/admin' : '/orders');
-                  }, 500);
-                }
-                setLoading(false);
-              }
-            }
+            callback: handleCredentialResponse,
+            auto_prompt: false
           });
           const btnEl = document.getElementById('google-btn-rendered');
           if (btnEl) {
             g.accounts.id.renderButton(btnEl, {
+              type: 'standard',
               theme: 'outline',
-              size: 'medium',
+              size: 'large',
               text: 'signin_with',
               shape: 'rectangular',
-              width: 170
+              logo_alignment: 'left',
+              width: 340,
+              locale: 'pt-BR'
             });
           }
         } catch (e) {
@@ -83,9 +107,12 @@ export const Login: React.FC = () => {
     };
 
     initGoogle();
-    const timer = setTimeout(initGoogle, 800);
-    return () => clearTimeout(timer);
-  }, [navigate, loginWith]);
+    const timer = setTimeout(initGoogle, 600);
+    return () => {
+      clearTimeout(timer);
+      delete (window as any).handleCredentialResponse;
+    };
+  }, []);
 
   // Submissão do formulário de Login com validação real
   const handleLoginSubmit = async (e: React.FormEvent) => {
@@ -377,30 +404,43 @@ export const Login: React.FC = () => {
         )}
 
         {/* 1. SOCIAL LOGIN BUTTONS */}
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-500 text-center">
             Login com 1 clique (OAuth)
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
-            <div id="google-btn-rendered" className="hidden" />
-            {/* Google */}
-            <button
-              type="button"
-              disabled={socialLoading !== null}
-              onClick={() => handleOpenSocialChooser('google')}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-300 text-xs font-semibold transition-all shadow-xs hover:border-zinc-400 cursor-pointer active:scale-98 disabled:opacity-50"
-            >
-              {providerConfig.google.icon}
-              <span>Google</span>
-            </button>
+          {/* Google Identity Services (Oficial) */}
+          <div
+            id="g_id_onload"
+            data-client_id="350538431992-ah75gv2bda5bj86knpf40e27273khplh.apps.googleusercontent.com"
+            data-callback="handleCredentialResponse"
+            data-auto_prompt="false"
+          ></div>
 
+          {/* Container do Botão Oficial do Google */}
+          <div className="flex justify-center w-full min-h-[44px]">
+            <div
+              id="google-btn-rendered"
+              className="g_id_signin flex justify-center w-full"
+              data-type="standard"
+              data-shape="rectangular"
+              data-theme="outline"
+              data-text="signin_with"
+              data-size="large"
+              data-logo_alignment="left"
+              data-locale="pt-BR"
+              data-width="100%"
+            ></div>
+          </div>
+
+          {/* Outros Provedores (GitHub, Apple, X) */}
+          <div className="grid grid-cols-3 gap-2">
             {/* GitHub */}
             <button
               type="button"
               disabled={socialLoading !== null}
               onClick={() => handleOpenSocialChooser('github')}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-black text-white border border-zinc-900 text-xs font-semibold transition-all shadow-xs cursor-pointer active:scale-98 disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-zinc-900 hover:bg-black text-white text-xs font-semibold transition-all shadow-xs cursor-pointer active:scale-98 disabled:opacity-50"
             >
               {providerConfig.github.icon}
               <span>GitHub</span>
@@ -411,10 +451,10 @@ export const Login: React.FC = () => {
               type="button"
               disabled={socialLoading !== null}
               onClick={() => handleOpenSocialChooser('apple')}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-all shadow-xs hover:border-zinc-400 cursor-pointer active:scale-98 disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-all shadow-xs hover:border-zinc-400 cursor-pointer active:scale-98 disabled:opacity-50"
             >
               {providerConfig.apple.icon}
-              <span>Apple ID</span>
+              <span>Apple</span>
             </button>
 
             {/* Twitter / X */}
@@ -422,10 +462,10 @@ export const Login: React.FC = () => {
               type="button"
               disabled={socialLoading !== null}
               onClick={() => handleOpenSocialChooser('twitter')}
-              className="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-all shadow-xs hover:border-zinc-400 cursor-pointer active:scale-98 disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-all shadow-xs hover:border-zinc-400 cursor-pointer active:scale-98 disabled:opacity-50"
             >
               {providerConfig.twitter.icon}
-              <span>X / Twitter</span>
+              <span>X</span>
             </button>
           </div>
         </div>

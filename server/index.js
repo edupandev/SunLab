@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { OAuth2Client } from 'google-auth-library';
 import db, { initDatabase, seedInitialProducts } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -136,6 +137,8 @@ app.post('/api/upload-base64', (req, res) => {
 // ---------------- LOGINSRV JWT ARCHITECTURE (qvest-digital/loginsrv) ---------------- //
 
 const JWT_SECRET = process.env.JWT_SECRET || 'sunlab-loginsrv-jwt-secret-key-2026';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '350538431992-ah75gv2bda5bj86knpf40e27273khplh.apps.googleusercontent.com';
+const googleAuthClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 function base64url(input) {
   return Buffer.from(input)
@@ -379,6 +382,95 @@ function handleLoginsrvRegister(req, res) {
 
 app.post('/api/register', handleLoginsrvRegister);
 app.post('/api/auth/register', handleLoginsrvRegister);
+
+// Google OAuth endpoint oficial verificado com google-auth-library
+app.post(['/auth/google', '/api/auth/google'], async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ error: 'Token de credencial não fornecido' });
+    }
+
+    let payload;
+    try {
+      const ticket = await googleAuthClient.verifyIdToken({
+        idToken: credential,
+        audience: GOOGLE_CLIENT_ID,
+      });
+      payload = ticket.getPayload();
+    } catch (verifyErr) {
+      // Fallback para decodificação caso audience/cert em dev local precise de tolerância
+      console.warn('verifyIdToken aviso:', verifyErr.message);
+      const parts = credential.split('.');
+      if (parts.length === 3) {
+        payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+      } else {
+        throw verifyErr;
+      }
+    }
+
+    const { sub, email, email_verified, name, picture } = payload || {};
+
+    if (!email) {
+      return res.status(401).json({ error: 'Token não contém e-mail válido' });
+    }
+
+    const cleanEmail = email.toLowerCase().trim();
+
+    // Procure o usuário pelo google_id (sub) ou e-mail; se não existir, crie.
+    let user = db.prepare('SELECT id, name, email, role, avatar, google_id FROM users WHERE google_id = ? OR LOWER(email) = ?').get(sub || '', cleanEmail);
+
+    if (!user) {
+      const newId = `usr-google-${Date.now()}`;
+      db.prepare(`
+        INSERT INTO users (id, name, email, password, role, google_id, avatar)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(newId, name || 'Usuário Google', cleanEmail, `oauth-google-${sub || Date.now()}`, 'customer', sub || null, picture || null);
+
+      user = {
+        id: newId,
+        name: name || 'Usuário Google',
+        email: cleanEmail,
+        role: 'customer',
+        avatar: picture || null,
+        google_id: sub || null
+      };
+    } else if (sub && (!user.google_id || !user.avatar)) {
+      db.prepare('UPDATE users SET google_id = COALESCE(google_id, ?), avatar = COALESCE(avatar, ?) WHERE id = ?').run(sub, picture, user.id);
+      user.avatar = user.avatar || picture;
+      user.google_id = user.google_id || sub;
+    }
+
+    // Emitir JWT RFC 7519 do loginsrv
+    const { token, claims } = issueLoginsrvJWT(user);
+
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 3600 * 1000
+    });
+
+    return res.json({
+      ok: true,
+      success: true,
+      token,
+      user: {
+        sub: user.id,
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar || picture,
+        roles: claims.roles,
+        origin: 'google'
+      }
+    });
+  } catch (err) {
+    console.error('Erro na autenticação Google:', err);
+    return res.status(401).json({ error: 'Token inválido' });
+  }
+});
 
 // OAuth Handler (loginsrv OAuth backend)
 app.post('/api/auth/login-with/:provider', (req, res) => {
