@@ -384,11 +384,32 @@ app.post('/api/auth/register', handleLoginsrvRegister);
 app.post('/api/auth/login-with/:provider', (req, res) => {
   try {
     const { provider } = req.params;
-    const { email, name, avatar } = req.body || {};
+    const { email, name, avatar, credential } = req.body || {};
 
     const validProviders = ['google', 'github', 'apple', 'twitter'];
     if (!validProviders.includes(provider.toLowerCase())) {
       return res.status(400).json({ error: `Provedor '${provider}' não suportado.` });
+    }
+
+    let chosenProfile = null;
+
+    // Decode real Google ID Token if present (from Google One Tap or GIS)
+    if (provider.toLowerCase() === 'google' && credential) {
+      try {
+        const parts = credential.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf8'));
+          if (payload && payload.email) {
+            chosenProfile = {
+              name: payload.name || payload.given_name || 'Usuário Google',
+              email: payload.email,
+              avatar: payload.picture || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
+            };
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to parse Google credential token:', e);
+      }
     }
 
     // Default profiles if not explicitly passed by client
@@ -415,11 +436,13 @@ app.post('/api/auth/login-with/:provider', (req, res) => {
       }
     };
 
-    const chosenProfile = defaultProfiles[provider.toLowerCase()] || {
-      name: name || `Usuário ${provider}`,
-      email: email || `${provider}.user@sunlab.com.br`,
-      avatar: avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
-    };
+    if (!chosenProfile) {
+      chosenProfile = defaultProfiles[provider.toLowerCase()] || {
+        name: name || `Usuário ${provider}`,
+        email: email || `${provider}.user@sunlab.com.br`,
+        avatar: avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=200&q=80'
+      };
+    }
 
     const cleanEmail = chosenProfile.email.trim().toLowerCase();
 

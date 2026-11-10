@@ -43,6 +43,50 @@ export const Login: React.FC = () => {
   const { login, register, loginWith, logout, user } = useAuth();
   const navigate = useNavigate();
 
+  // Inicializar Google Identity Services com o Client ID oficial
+  React.useEffect(() => {
+    const googleClientId = '350538431992-ah75gv2bda5bj86knpf40e27273khplh.apps.googleusercontent.com';
+    const initGoogle = () => {
+      const g = (window as any).google;
+      if (g?.accounts?.id) {
+        try {
+          g.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: async (response: any) => {
+              if (response.credential) {
+                setLoading(true);
+                const res = await loginWith('google', { credential: response.credential });
+                if (res.success) {
+                  setSuccessMessage('Autenticado com sucesso via Google!');
+                  setTimeout(() => {
+                    navigate(res.user?.role === 'admin' ? '/admin' : '/orders');
+                  }, 500);
+                }
+                setLoading(false);
+              }
+            }
+          });
+          const btnEl = document.getElementById('google-btn-rendered');
+          if (btnEl) {
+            g.accounts.id.renderButton(btnEl, {
+              theme: 'outline',
+              size: 'medium',
+              text: 'signin_with',
+              shape: 'rectangular',
+              width: 170
+            });
+          }
+        } catch (e) {
+          console.warn('Google SDK init:', e);
+        }
+      }
+    };
+
+    initGoogle();
+    const timer = setTimeout(initGoogle, 800);
+    return () => clearTimeout(timer);
+  }, [navigate, loginWith]);
+
   // Submissão do formulário de Login com validação real
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

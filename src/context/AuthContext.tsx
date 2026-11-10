@@ -17,7 +17,7 @@ interface AuthContextType {
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; message?: string }>;
-  loginWith: (provider: LoginWithProvider, profile?: { name?: string; email?: string }) => Promise<{ success: boolean; message?: string; user?: User }>;
+  loginWith: (provider: LoginWithProvider, profile?: { name?: string; email?: string; credential?: string }) => Promise<{ success: boolean; message?: string; user?: User }>;
   logout: () => void;
 }
 
@@ -105,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // loginsrv OAuth integration (Google, GitHub, Apple, Twitter)
-  const loginWith = async (provider: LoginWithProvider, profile?: { name?: string; email?: string }) => {
+  const loginWith = async (provider: LoginWithProvider, profile?: { name?: string; email?: string; credential?: string }) => {
     try {
       const response = await fetch(`/api/auth/login-with/${provider}`, {
         method: 'POST',
