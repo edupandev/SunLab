@@ -34,6 +34,7 @@ import { useProducts } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
 import SunLabLogo from '@/components/SunLabLogo';
 import { generatePixPayload, generatePixQRCode } from '../utils/pix';
+import { isSupabaseConfigured, fetchSupabaseOrders, upsertSupabaseOrder, deleteSupabaseOrder, upsertSupabaseProduct } from '@/lib/supabase';
 
 interface OrderItem {
   name: string;
@@ -189,6 +190,19 @@ export const AdminProducts: React.FC = () => {
 
       // Mapear por orderNumber para evitar duplicatas, mesclando dados
       const ordersMap = new Map<string, Order>();
+
+      // Se o Supabase estiver configurado, carregar dados permanentes da nuvem
+      if (isSupabaseConfigured()) {
+        try {
+          const supaOrders = await fetchSupabaseOrders();
+          if (supaOrders && supaOrders.length > 0) {
+            for (const o of supaOrders) {
+              if (o.orderNumber) ordersMap.set(o.orderNumber.toUpperCase(), o as Order);
+            }
+          }
+        } catch (_) {}
+      }
+
       for (const o of apiOrders) {
         if (o.orderNumber) ordersMap.set(o.orderNumber.toUpperCase(), o);
       }
@@ -244,7 +258,15 @@ export const AdminProducts: React.FC = () => {
     setActionFeedback({ message: `Status do pedido atualizado para: ${newStatus}` });
     setTimeout(() => setActionFeedback(null), 3500);
 
-    // 3. Sincronizar com o backend
+    // 3. Sincronizar com Supabase se configurado
+    if (isSupabaseConfigured()) {
+      const match = orders.find(o => o.id === orderId || o.orderNumber === orderId);
+      if (match) {
+        upsertSupabaseOrder({ ...match, status: newStatus }).catch(() => {});
+      }
+    }
+
+    // 4. Sincronizar com o backend local / Vercel
     try {
       const token = localStorage.getItem('sunlab_auth_token') || 'jwt-admin-session';
       await fetch(`/api/orders/${orderId}/status`, {
@@ -278,7 +300,12 @@ export const AdminProducts: React.FC = () => {
       setActionFeedback({ message: `Pedido ${orderNumber} removido com sucesso!` });
       setTimeout(() => setActionFeedback(null), 3500);
 
-      // 3. Sincronizar com o backend
+      // 3. Sincronizar com Supabase se configurado
+      if (isSupabaseConfigured()) {
+        deleteSupabaseOrder(orderId || orderNumber).catch(() => {});
+      }
+
+      // 4. Sincronizar com o backend
       try {
         const token = localStorage.getItem('sunlab_auth_token') || 'jwt-admin-session';
         await fetch(`/api/orders/${orderId}`, {
@@ -321,7 +348,12 @@ export const AdminProducts: React.FC = () => {
     setActionFeedback({ message: `Pedido ${editingOrder.orderNumber} atualizado com sucesso!` });
     setTimeout(() => setActionFeedback(null), 3500);
 
-    // 3. Salvar no backend
+    // 3. Salvar no Supabase se configurado
+    if (isSupabaseConfigured()) {
+      upsertSupabaseOrder(editingOrder).catch(() => {});
+    }
+
+    // 4. Salvar no backend local / Vercel
     try {
       const token = localStorage.getItem('sunlab_auth_token') || 'jwt-admin-session';
       await fetch(`/api/orders/${editingOrder.id}`, {
@@ -334,6 +366,31 @@ export const AdminProducts: React.FC = () => {
       });
     } catch (err) {
       console.warn('Erro ao sincronizar pedido atualizado no servidor:', err);
+    }
+  };
+
+  const [isSyncingSupabase, setIsSyncingSupabase] = useState(false);
+  const handleSyncToSupabase = async () => {
+    if (!isSupabaseConfigured()) {
+      alert('Para sincronizar, primeiro adicione o VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env ou nas variáveis da Vercel.');
+      return;
+    }
+    setIsSyncingSupabase(true);
+    let count = 0;
+    try {
+      for (const p of products) {
+        await upsertSupabaseProduct(p);
+        count++;
+      }
+      for (const o of orders) {
+        await upsertSupabaseOrder(o);
+      }
+      setActionFeedback({ message: `Sucesso! ${count} produtos e todos os pedidos foram salvos no Supabase na nuvem!` });
+    } catch (e) {
+      setActionFeedback({ message: 'Erro ao enviar dados para o Supabase.', isError: true });
+    } finally {
+      setIsSyncingSupabase(false);
+      setTimeout(() => setActionFeedback(null), 4000);
     }
   };
   
@@ -1385,6 +1442,87 @@ export const AdminProducts: React.FC = () => {
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+
+          {/* Card Supabase: Banco de Dados em Nuvem Permanente */}
+          <div className="p-6 rounded-3xl bg-white border border-zinc-200 shadow-xs">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-zinc-200 gap-4">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-lg shadow-xs ${
+                  isSupabaseConfigured()
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    : 'bg-zinc-100 text-zinc-600 border border-zinc-300'
+                }`}>
+                  ⚡
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xl font-bold text-zinc-900 font-display">
+                      Supabase Cloud Database
+                    </h3>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                      isSupabaseConfigured()
+                        ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                        : 'bg-amber-50 text-amber-800 border-amber-300'
+                    }`}>
+                      {isSupabaseConfigured() ? '🟢 Conectado na Nuvem' : '⚪ Aguardando Chaves de Conexão'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-500 mt-1 max-w-xl">
+                    Armazenamento permanente 24h na nuvem para nunca perder produtos, pedidos e configurações em atualizações da Vercel.
+                  </p>
+                </div>
+              </div>
+
+              {isSupabaseConfigured() && (
+                <button
+                  type="button"
+                  onClick={handleSyncToSupabase}
+                  disabled={isSyncingSupabase}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-all shadow-xs cursor-pointer disabled:opacity-50 shrink-0"
+                >
+                  <UploadCloud className="w-4 h-4" />
+                  <span>{isSyncingSupabase ? 'Sincronizando...' : 'Sincronizar Catálogo Agora'}</span>
+                </button>
+              )}
+            </div>
+
+            <div className="pt-6 text-xs text-zinc-600 space-y-4">
+              {isSupabaseConfigured() ? (
+                <div className="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-2">
+                  <div className="flex items-center gap-2 font-bold text-emerald-900 text-sm">
+                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                    <span>Conexão ativa com o Supabase!</span>
+                  </div>
+                  <p className="text-emerald-800 text-xs leading-relaxed">
+                    Todos os novos produtos criados, pedidos de clientes e alterações de status são gravados diretamente no seu banco de dados Supabase na nuvem. Mesmo quando a Vercel atualiza o site, seus dados permanecem 100% seguros e intactos.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-200 space-y-3">
+                    <div className="font-bold text-zinc-900 text-sm">
+                      Como ativar o Supabase no seu site em 3 passos:
+                    </div>
+                    <ol className="list-decimal list-inside space-y-2 text-zinc-700">
+                      <li>
+                        Acesse seu projeto no <strong>Supabase</strong> e vá na aba <strong>SQL Editor</strong>.
+                      </li>
+                      <li>
+                        Execute o script de criação das tabelas (<code className="bg-zinc-200 px-1 py-0.5 rounded text-[11px] font-mono font-bold">supabase_schema.sql</code> já criado no projeto).
+                      </li>
+                      <li>
+                        Adicione as duas variáveis nas configurações da Vercel (ou no arquivo <code className="bg-zinc-200 px-1 py-0.5 rounded text-[11px] font-mono">.env</code>):
+                        <div className="mt-2 bg-zinc-900 text-zinc-100 p-3 rounded-xl font-mono text-[11px] space-y-1">
+                          <div>VITE_SUPABASE_URL=https://sua-url.supabase.co</div>
+                          <div>VITE_SUPABASE_ANON_KEY=sua-chave-anonima-aqui</div>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

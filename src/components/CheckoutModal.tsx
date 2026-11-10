@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useCart, type CartItem } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
+import { isSupabaseConfigured, upsertSupabaseOrder } from '@/lib/supabase';
 
 export const CheckoutModal: React.FC = () => {
   const navigate = useNavigate();
@@ -313,6 +314,22 @@ export const CheckoutModal: React.FC = () => {
     setCompletedOrderData(fullOrder);
     setOrderNumber(confirmedOrderNumber);
     saveUserProfile(formData);
+
+    // Salvar permanentemente no Supabase (Nuvem) se configurado
+    if (isSupabaseConfigured()) {
+      upsertSupabaseOrder({
+        id: `ord-${confirmedOrderNumber}`,
+        orderNumber: confirmedOrderNumber,
+        customerName: formData.name,
+        customerEmail: formData.email,
+        customerPhone: formData.phone || '',
+        shippingAddress: shippingAddr,
+        paymentMethod: finalPaymentMethodLabel,
+        items: itemsPayload,
+        totalAmount: payableTotal,
+        status: 'Pendente'
+      }).catch(err => console.warn('[Supabase] Falha ao enviar pedido:', err));
+    }
 
     // Salvar localmente para visualização instantânea na página "Meus Pedidos"
     try {

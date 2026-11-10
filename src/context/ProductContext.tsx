@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { Product } from '@/data/products';
 import { PRODUCTS as FALLBACK_PRODUCTS } from '@/data/products';
+import { isSupabaseConfigured, fetchSupabaseProducts, upsertSupabaseProduct, deleteSupabaseProduct } from '@/lib/supabase';
 
 interface ProductContextType {
   products: Product[];
@@ -105,6 +106,19 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const fetchProducts = useCallback(async () => {
     try {
       setLoading(true);
+
+      // 1. Prioridade Máxima: Supabase (Nuvem Permanente)
+      if (isSupabaseConfigured()) {
+        const supaProducts = await fetchSupabaseProducts();
+        if (supaProducts && supaProducts.length > 0) {
+          persistProducts(supaProducts);
+          setError(null);
+          setLoading(false);
+          return;
+        }
+      }
+
+      // 2. Fallback: API local / Express / Vercel
       const res = await fetch('/api/products');
       if (res.ok) {
         const serverData: Product[] = await res.json();
@@ -195,7 +209,12 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return updated;
     });
 
-    // 3. Sincronizar com o backend
+    // 3. Sincronizar com Supabase se configurado
+    if (isSupabaseConfigured()) {
+      upsertSupabaseProduct(fullProduct).catch(() => {});
+    }
+
+    // 4. Sincronizar com o backend local / Vercel
     try {
       const res = await fetch('/api/products', {
         method: 'POST',
@@ -213,6 +232,10 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateProduct = async (id: string, productData: Partial<Product>) => {
+    // 1. Salvar no Supabase se configurado
+    if (isSupabaseConfigured()) {
+      upsertSupabaseProduct({ ...productData, id }).catch(() => {});
+    }
     // Salvar edição persistente
     try {
       const edits = getStoredEdits();
@@ -283,6 +306,11 @@ export const ProductProvider: React.FC<{ children: React.ReactNode }> = ({ child
       } catch (_) {}
       return updated;
     });
+
+    // 4. Remover do Supabase se configurado
+    if (isSupabaseConfigured()) {
+      deleteSupabaseProduct(id).catch(() => {});
+    }
 
     try {
       await fetch(`/api/products/${id}`, {
