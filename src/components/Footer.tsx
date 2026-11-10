@@ -188,10 +188,8 @@ export const Footer: React.FC = () => {
 
         {/* Payment badges */}
         <div className="flex items-center gap-2 text-zinc-600">
-          <span className="text-[10px] uppercase font-semibold text-zinc-400">Pagamento:</span>
-          <span className="px-2 py-0.5 rounded bg-white border border-zinc-300 text-[10px] font-mono text-zinc-800 font-bold shadow-xs">PIX 5% OFF</span>
-          <span className="px-2 py-0.5 rounded bg-white border border-zinc-300 text-[10px] font-semibold text-zinc-700 shadow-xs">Cartão até 12x</span>
-          <span className="px-2 py-0.5 rounded bg-white border border-zinc-300 text-[10px] font-semibold text-zinc-700 shadow-xs">Boleto</span>
+          <span className="text-[10px] uppercase font-semibold text-zinc-400">Pagamento Exclusivo:</span>
+          <span className="px-2 py-0.5 rounded bg-white border border-emerald-300 text-[10px] font-mono text-emerald-800 font-bold shadow-xs">PIX INSTANTÂNEO 5% OFF</span>
         </div>
       </div>
     </footer>

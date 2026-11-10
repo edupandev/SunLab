@@ -6,7 +6,6 @@ import {
   CheckCircle2,
   ShieldCheck,
   QrCode,
-  CreditCard,
   Copy,
   Check,
   MessageCircle,
@@ -15,12 +14,10 @@ import {
   Clock,
   Printer,
   Package,
-  FileText,
   UserCheck,
   LogIn,
   UserPlus,
   Sparkles,
-  AlertCircle,
   Loader2,
   Key
 } from 'lucide-react';
@@ -38,15 +35,13 @@ export const CheckoutModal: React.FC = () => {
   const { user } = useAuth();
   const { isCheckoutOpen, closeCheckout, total, clearCart, cart } = useCart();
   const [step, setStep] = useState<'form' | 'payment' | 'success'>('form');
-  const [paymentMethod, setPaymentMethod] = useState<'pix' | 'credit' | 'boleto'>('pix');
+  const paymentMethod = 'pix';
   const [copiedPix, setCopiedPix] = useState(false);
   const [copiedPixKey, setCopiedPixKey] = useState(false);
-  const [copiedBarcode, setCopiedBarcode] = useState(false);
   const [copiedWhatsAppText, setCopiedWhatsAppText] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingCep, setIsLoadingCep] = useState(false);
-  const [cardError, setCardError] = useState<string | null>(null);
 
   // Pix Oficial Banco Central (Payload e QR Code real)
   const [pixConfig, setPixConfig] = useState<PixConfig>(DEFAULT_PIX_CONFIG);
@@ -144,33 +139,19 @@ export const CheckoutModal: React.FC = () => {
       setCompletedOrderData(null);
       setOrderNumber('');
       setIsProcessing(false);
-      setCardError(null);
       setTimeLeft(15 * 60);
       setCopiedPix(false);
-      setCopiedBarcode(false);
       setCopiedWhatsAppText(false);
     }
   }, [isCheckoutOpen]);
 
-  // Credit Card States (Mercado Pago Transparent Checkout)
-  const [cardData, setCardData] = useState({
-    number: '',
-    holder: '',
-    cpf: '',
-    expiry: '',
-    cvv: '',
-    installments: '1'
-  });
-
-  const boletoBarcode = '23793.38128 60083.013528 56006.333306 8 94820000012000';
-
   useEffect(() => {
     let timer: any;
-    if (step === 'payment' && paymentMethod === 'pix' && timeLeft > 0) {
+    if (step === 'payment' && timeLeft > 0) {
       timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     }
     return () => clearInterval(timer);
-  }, [step, paymentMethod, timeLeft]);
+  }, [step, timeLeft]);
 
   // Carregar configurações oficiais do Pix e Loja
   useEffect(() => {
@@ -321,65 +302,9 @@ export const CheckoutModal: React.FC = () => {
     return rev === parseInt(clean.charAt(10), 10);
   };
 
-  // Algoritmo de Luhn oficial para validação de número de cartão de crédito real
-  const isValidLuhn = (num: string): boolean => {
-    const clean = num.replace(/\D/g, '');
-    if (clean.length < 13 || clean.length > 19) return false;
-    let sum = 0;
-    let shouldDouble = false;
-    for (let i = clean.length - 1; i >= 0; i--) {
-      let digit = parseInt(clean.charAt(i), 10);
-      if (shouldDouble) {
-        digit *= 2;
-        if (digit > 9) digit -= 9;
-      }
-      sum += digit;
-      shouldDouble = !shouldDouble;
-    }
-    return sum % 10 === 0;
-  };
-
-  // Format Card Number
-  const handleCardNumberChange = (val: string) => {
-    const raw = val.replace(/\D/g, '').slice(0, 16);
-    const formatted = raw.replace(/(\d{4})(?=\d)/g, '$1 ');
-    setCardData(prev => ({ ...prev, number: formatted }));
-    if (cardError) setCardError(null);
-  };
-
-  const handleCardExpiryChange = (val: string) => {
-    const raw = val.replace(/\D/g, '').slice(0, 4);
-    const formatted = raw.length > 2 ? `${raw.slice(0, 2)}/${raw.slice(2)}` : raw;
-    setCardData(prev => ({ ...prev, expiry: formatted }));
-    if (cardError) setCardError(null);
-  };
-
-  const handleCardCvvChange = (val: string) => {
-    const raw = val.replace(/\D/g, '').slice(0, 4);
-    setCardData(prev => ({ ...prev, cvv: raw }));
-    if (cardError) setCardError(null);
-  };
-
-  // Detect Card Brand
-  const getCardBrand = () => {
-    const clean = cardData.number.replace(/\s/g, '');
-    if (clean.startsWith('4')) return { name: 'Visa', color: 'from-zinc-600 to-zinc-800' };
-    if (clean.startsWith('5')) return { name: 'Mastercard', color: 'from-zinc-500 to-zinc-700' };
-    if (clean.startsWith('6')) return { name: 'Elo', color: 'from-zinc-600 to-zinc-800' };
-    return { name: 'SunLab Card', color: 'from-zinc-700 to-zinc-900' };
-  };
-
-  const cardBrand = getCardBrand();
-
   const handleNextToPayment = (e: React.FormEvent) => {
     e.preventDefault();
     saveUserProfile(formData);
-    setCardError(null);
-    setCardData(prev => ({
-      ...prev,
-      holder: prev.holder || (formData.name || '').toUpperCase(),
-      cpf: prev.cpf || formData.cpf || ''
-    }));
     setStep('payment');
   };
 
@@ -387,7 +312,6 @@ export const CheckoutModal: React.FC = () => {
     setStep('form');
     setCompletedOrderData(null);
     setOrderNumber('');
-    setCardError(null);
     closeCheckout();
   };
 
@@ -395,6 +319,7 @@ export const CheckoutModal: React.FC = () => {
     formData.name.trim() &&
     formData.phone.trim() &&
     formData.cpf.trim() &&
+    isValidCPF(formData.cpf) &&
     formData.cep.trim() &&
     formData.street.trim() &&
     formData.number.trim() &&
@@ -403,57 +328,6 @@ export const CheckoutModal: React.FC = () => {
   );
 
   const handleCompleteOrder = async () => {
-    setCardError(null);
-
-    // Validação estrita de Cartão de Crédito (impede aprovar sem cartão válido)
-    if (paymentMethod === 'credit') {
-      const cleanCard = cardData.number.replace(/\D/g, '');
-      if (cleanCard.length < 13 || cleanCard.length > 19) {
-        setCardError('Por favor, informe os 16 dígitos do seu cartão de crédito.');
-        return;
-      }
-      if (!isValidLuhn(cleanCard)) {
-        setCardError('Número de cartão de crédito inválido. Verifique os dígitos e tente novamente.');
-        return;
-      }
-
-      const holderTrim = (cardData.holder || '').trim();
-      if (!holderTrim || holderTrim.split(/\s+/).length < 2) {
-        setCardError('Informe o nome e sobrenome do titular como impresso no cartão.');
-        return;
-      }
-
-      const cleanCpf = (cardData.cpf || formData.cpf || '').replace(/\D/g, '');
-      if (cleanCpf.length !== 11 || !isValidCPF(cleanCpf)) {
-        setCardError('CPF do titular do cartão inválido.');
-        return;
-      }
-
-      const expiryParts = cardData.expiry.split('/');
-      if (expiryParts.length !== 2) {
-        setCardError('Data de validade inválida. Informe no formato MM/AA (ex: 12/28).');
-        return;
-      }
-      const expMonth = parseInt(expiryParts[0], 10);
-      const expYear = parseInt(expiryParts[1], 10);
-      const currentYear = new Date().getFullYear() % 100;
-      const currentMonth = new Date().getMonth() + 1;
-      if (isNaN(expMonth) || isNaN(expYear) || expMonth < 1 || expMonth > 12) {
-        setCardError('Mês de validade inválido (deve ser entre 01 e 12).');
-        return;
-      }
-      if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
-        setCardError('O cartão informado já está vencido.');
-        return;
-      }
-
-      const cleanCvv = cardData.cvv.replace(/\D/g, '');
-      if (cleanCvv.length < 3 || cleanCvv.length > 4) {
-        setCardError('Código de segurança (CVV) inválido (3 ou 4 dígitos do verso).');
-        return;
-      }
-    }
-
     setIsProcessing(true);
     const itemsPayload = cart.map((item: CartItem) => ({
       name: item.product.name,
@@ -466,12 +340,7 @@ export const CheckoutModal: React.FC = () => {
     }));
 
     let confirmedOrderNumber = `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
-    let finalPaymentMethodLabel =
-      paymentMethod === 'pix'
-        ? 'Mercado Pago (Pix Instantâneo 5% OFF)'
-        : paymentMethod === 'credit'
-        ? `Mercado Pago (Cartão de Crédito ${cardData.installments}x)`
-        : 'Mercado Pago (Boleto Bancário)';
+    const finalPaymentMethodLabel = 'Pix Instantâneo (5% OFF)';
 
     const shippingAddr = `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''}${formData.neighborhood ? ', ' + formData.neighborhood : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`;
 
@@ -545,12 +414,6 @@ export const CheckoutModal: React.FC = () => {
     setTimeout(() => setCopiedPixKey(false), 2500);
   };
 
-  const copyBoletoBarcode = () => {
-    navigator.clipboard.writeText(boletoBarcode);
-    setCopiedBarcode(true);
-    setTimeout(() => setCopiedBarcode(false), 2500);
-  };
-
   const formatTimer = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -622,7 +485,7 @@ export const CheckoutModal: React.FC = () => {
             <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700 shrink-0" />
             <h3 className="text-sm sm:text-base font-bold text-blue-950 truncate max-w-[260px] sm:max-w-none">
               {step === 'form' && 'Finalizar Pedido — Envio'}
-              {step === 'payment' && 'Pagamento Seguro (Pix / Cartão)'}
+              {step === 'payment' && 'Pagamento Seguro via Pix (5% OFF)'}
               {step === 'success' && 'Pedido Confirmado!'}
             </h3>
           </div>
@@ -895,340 +758,128 @@ export const CheckoutModal: React.FC = () => {
                       type="submit"
                       className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all cursor-pointer shadow-md"
                     >
-                      Ir para Pagamento com Mercado Pago →
+                      Ir para Pagamento com Pix (5% OFF) →
                     </button>
                   </div>
                 </form>
               )}
 
-          {/* STEP 2: Payment Methods (Mercado Pago Suite: Pix, Card, Boleto) */}
+          {/* STEP 2: Pagamento Exclusivo via Pix (5% OFF & QR Code Oficial) */}
           {step === 'payment' && (
             <div className="space-y-6">
               
-              {/* Mercado Pago Official Trust Badge */}
-              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-sky-50 border border-sky-200 text-xs text-sky-950">
+              {/* Trust Badge do Pix */}
+              <div className="flex items-center justify-between p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-[#009EE3] text-white flex items-center justify-center font-extrabold text-xs shadow-xs">
-                    MP
+                  <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+                    <QrCode className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="font-bold flex items-center gap-1.5 text-zinc-900">
-                      <span>Mercado Pago</span>
-                      <span className="px-1.5 py-0.2 rounded bg-[#009EE3] text-white text-[9px] font-semibold">OFICIAL</span>
+                      <span>Pix Oficial Instantâneo</span>
+                      <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">5% OFF</span>
                     </div>
-                    <p className="text-[10px] text-zinc-500">Checkout Transparente Protegido • Compra 100% Segura</p>
+                    <p className="text-[10px] text-zinc-500">Aprovação imediata • Sem taxas • Pedido entra na fila 3D na hora</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1 text-[11px] text-sky-700 font-medium">
-                  <Lock className="w-3.5 h-3.5 text-[#009EE3]" />
-                  <span className="hidden sm:inline">Criptografia 256-bit</span>
+                <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="hidden sm:inline">Criptografia BCB</span>
                 </div>
               </div>
 
-              {/* Selector Tabs (Mercado Pago: Pix, Cartão, Boleto) */}
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('pix')}
-                  className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
-                    paymentMethod === 'pix'
-                      ? 'bg-blue-50 border-blue-600 text-blue-950 ring-2 ring-blue-300 shadow-xs'
-                      : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
-                  }`}
-                >
-                  <QrCode className="w-4 h-4 text-emerald-600" />
-                  <span className="truncate">PIX (5% OFF)</span>
-                </button>
+              {/* PIX AREA (BANCO CENTRAL BRCODE & QR CODE OFICIAL) */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center text-center space-y-4">
+                
+                {/* Countdown Timer */}
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-300 text-zinc-700 text-xs font-mono font-semibold">
+                  <Clock className="w-3.5 h-3.5 text-blue-600" />
+                  <span>Expira em: {formatTimer(timeLeft)}</span>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('credit')}
-                  className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
-                    paymentMethod === 'credit'
-                      ? 'bg-blue-50 border-blue-600 text-blue-950 ring-2 ring-blue-300 shadow-xs'
-                      : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
-                  }`}
-                >
-                  <CreditCard className="w-4 h-4 text-blue-600" />
-                  <span className="truncate">Cartão de Crédito</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('boleto')}
-                  className={`flex items-center justify-center gap-1.5 p-3 rounded-2xl border text-xs font-bold transition-all cursor-pointer ${
-                    paymentMethod === 'boleto'
-                      ? 'bg-blue-50 border-blue-600 text-blue-950 ring-2 ring-blue-300 shadow-xs'
-                      : 'bg-zinc-50 border-zinc-200 text-zinc-600 hover:bg-zinc-100'
-                  }`}
-                >
-                  <FileText className="w-4 h-4 text-amber-600" />
-                  <span className="truncate">Boleto Bancário</span>
-                </button>
-              </div>
-
-              {/* PIX AREA (MERCADO PAGO OFICIAL & BANCO CENTRAL BRCODE) */}
-              {paymentMethod === 'pix' && (
-                <div className="p-5 sm:p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center text-center space-y-4">
-                  
-                  {/* Countdown Timer */}
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-zinc-300 text-zinc-700 text-xs font-mono font-semibold">
-                    <Clock className="w-3.5 h-3.5 text-blue-600" />
-                    <span>Expira em: {formatTimer(timeLeft)}</span>
-                  </div>
-
-                  {/* Real Scannable Pix QR Code */}
-                  <div className="w-48 h-48 bg-white p-3 rounded-2xl flex items-center justify-center shadow-sm border-2 border-emerald-500/30 relative">
-                    {isGeneratingPix || !pixQrCodeUrl ? (
-                      <div className="flex flex-col items-center justify-center gap-2 text-zinc-400">
-                        <Loader2 className="w-7 h-7 animate-spin text-emerald-600" />
-                        <span className="text-[11px] font-medium text-zinc-500">Gerando QR Code Pix...</span>
-                      </div>
-                    ) : (
-                      <img
-                        src={pixQrCodeUrl}
-                        alt="QR Code Pix Oficial SunLab"
-                        className="w-full h-full object-contain rounded-xl select-none"
-                      />
-                    )}
-                  </div>
-
-                  <div>
-                    <span className="text-xs text-zinc-500">Total com 5% de desconto no Pix:</span>
-                    <h4 className="text-3xl font-extrabold text-zinc-900 font-display mt-0.5">
-                      R$ {finalPayableTotal.toFixed(2).replace('.', ',')}
-                    </h4>
-                    <span className="text-[11px] text-zinc-500 mt-1 block">
-                      Aprovação instantânea • Liberação imediata para a fila de impressão 3D
-                    </span>
-                  </div>
-
-                  {/* Informações Oficiais da Chave Pix da Loja */}
-                  <div className="w-full max-w-sm p-3.5 rounded-xl bg-white border border-zinc-200 text-left text-xs space-y-1.5 shadow-xs">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
-                      <span className="text-zinc-500 font-medium">Chave Pix Oficial:</span>
-                      <strong className="text-zinc-900 font-mono font-bold">
-                        {formatFriendlyKey(pixConfig.key)}
-                      </strong>
+                {/* Real Scannable Pix QR Code */}
+                <div className="w-48 h-48 bg-white p-3 rounded-2xl flex items-center justify-center shadow-sm border-2 border-emerald-500/30 relative">
+                  {isGeneratingPix || !pixQrCodeUrl ? (
+                    <div className="flex flex-col items-center justify-center gap-2 text-zinc-400">
+                      <Loader2 className="w-7 h-7 animate-spin text-emerald-600" />
+                      <span className="text-[11px] font-medium text-zinc-500">Gerando QR Code Pix...</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-zinc-500">Favorecido / Nome:</span>
-                      <span className="text-zinc-800 font-semibold">{pixConfig.merchantName}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-zinc-500">Cidade do Titular:</span>
-                      <span className="text-zinc-700">{pixConfig.merchantCity} - SP</span>
-                    </div>
+                  ) : (
+                    <img
+                      src={pixQrCodeUrl}
+                      alt="QR Code Pix Oficial SunLab"
+                      className="w-full h-full object-contain rounded-xl select-none"
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <span className="text-xs text-zinc-500">Total com 5% de desconto no Pix:</span>
+                  <h4 className="text-3xl font-extrabold text-zinc-900 font-display mt-0.5">
+                    R$ {finalPayableTotal.toFixed(2).replace('.', ',')}
+                  </h4>
+                  <span className="text-[11px] text-zinc-500 mt-1 block">
+                    Aprovação instantânea • Liberação imediata para a fila de impressão 3D
+                  </span>
+                </div>
+
+                {/* Informações Oficiais da Chave Pix da Loja */}
+                <div className="w-full max-w-sm p-3.5 rounded-xl bg-white border border-zinc-200 text-left text-xs space-y-1.5 shadow-xs">
+                  <div className="flex items-center justify-between pb-1.5 border-b border-zinc-100">
+                    <span className="text-zinc-500 font-medium">Chave Pix Oficial:</span>
+                    <strong className="text-zinc-900 font-mono font-bold">
+                      {formatFriendlyKey(pixConfig.key)}
+                    </strong>
                   </div>
-
-                  {/* Botões de Cópia: Copia e Cola + Chave Direta */}
-                  <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm">
-                    <button
-                      type="button"
-                      onClick={copyPixCode}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-                    >
-                      {copiedPix ? (
-                        <>
-                          <Check className="w-4 h-4 text-emerald-300" />
-                          <span>Código Pix Copiado!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" />
-                          <span>Copiar Pix Copia e Cola</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={copyDirectPixKey}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-                    >
-                      {copiedPixKey ? (
-                        <>
-                          <Check className="w-4 h-4 text-emerald-600" />
-                          <span>Chave Copiada!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Key className="w-4 h-4 text-zinc-500" />
-                          <span>Copiar Chave ({formatFriendlyKey(pixConfig.key)})</span>
-                        </>
-                      )}
-                    </button>
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-500">Favorecido / Nome:</span>
+                    <span className="text-zinc-800 font-semibold">{pixConfig.merchantName}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-zinc-500">Cidade do Titular:</span>
+                    <span className="text-zinc-700">{pixConfig.merchantCity} - SP</span>
                   </div>
                 </div>
-              )}
 
-              {/* CREDIT CARD AREA (MERCADO PAGO) */}
-              {paymentMethod === 'credit' && (
-                <div className="space-y-5">
-                  {/* Interactive Card Mockup Preview */}
-                  <div className={`relative w-full max-w-sm mx-auto aspect-8/5 rounded-2xl bg-gradient-to-tr ${cardBrand.color} p-5 text-white shadow-lg border border-white/20 flex flex-col justify-between overflow-hidden`}>
-                    <div className="flex items-center justify-between">
-                      <div className="w-10 h-7 rounded-md bg-gradient-to-tr from-zinc-300 to-zinc-400 border border-zinc-200/50 shadow-inner" />
-                      <span className="text-xs font-bold tracking-widest uppercase font-mono bg-white/20 text-white px-2 py-0.5 rounded">
-                        {cardBrand.name}
-                      </span>
-                    </div>
-
-                    <div className="font-mono text-base sm:text-lg tracking-widest font-semibold text-center drop-shadow">
-                      {cardData.number || '•••• •••• •••• ••••'}
-                    </div>
-
-                    <div className="flex items-end justify-between text-xs">
-                      <div>
-                        <span className="text-[9px] uppercase tracking-wider text-zinc-300 block">Titular</span>
-                        <span className="font-semibold uppercase tracking-wider truncate max-w-[150px] block">
-                          {cardData.holder || 'NOME NO CARTÃO'}
-                        </span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[9px] uppercase tracking-wider text-zinc-300 block">Validade</span>
-                        <span className="font-semibold font-mono">
-                          {cardData.expiry || 'MM/AA'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Form */}
-                  <div className="space-y-3 p-4 rounded-2xl bg-zinc-50 border border-zinc-200">
-                    <div>
-                      <label className="block text-xs font-medium text-zinc-700 mb-1">Número do Cartão</label>
-                      <input
-                        type="text"
-                        value={cardData.number}
-                        onChange={(e) => handleCardNumberChange(e.target.value)}
-                        placeholder="0000 0000 0000 0000"
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none font-mono tracking-wider"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-zinc-700 mb-1">Nome Impresso no Cartão</label>
-                        <input
-                          type="text"
-                          value={cardData.holder}
-                          onChange={(e) => setCardData({ ...cardData, holder: e.target.value.toUpperCase() })}
-                          placeholder="COMO ESTÁ NO CARTÃO"
-                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none uppercase font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-zinc-700 mb-1">CPF do Titular</label>
-                        <input
-                          type="text"
-                          value={cardData.cpf}
-                          onChange={(e) => setCardData({ ...cardData, cpf: e.target.value })}
-                          placeholder="000.000.000-00"
-                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none font-mono"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-xs font-medium text-zinc-700 mb-1">Validade (MM/AA) *</label>
-                        <input
-                          type="text"
-                          maxLength={5}
-                          value={cardData.expiry}
-                          onChange={(e) => handleCardExpiryChange(e.target.value)}
-                          placeholder="12/28"
-                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none font-mono"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-zinc-700 mb-1">Código CVV *</label>
-                        <input
-                          type="password"
-                          maxLength={4}
-                          value={cardData.cvv}
-                          onChange={(e) => handleCardCvvChange(e.target.value)}
-                          placeholder="•••"
-                          className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none font-mono"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-medium text-zinc-700 mb-1">Parcelamento Mercado Pago</label>
-                      <select
-                        value={cardData.installments}
-                        onChange={(e) => setCardData({ ...cardData, installments: e.target.value })}
-                        className="w-full bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs text-zinc-900 focus:border-zinc-500 outline-none cursor-pointer"
-                      >
-                        <option value="1">1x de R$ {total.toFixed(2).replace('.', ',')} sem juros</option>
-                        <option value="2">2x de R$ {(total / 2).toFixed(2).replace('.', ',')} sem juros</option>
-                        <option value="3">3x de R$ {(total / 3).toFixed(2).replace('.', ',')} sem juros</option>
-                        <option value="6">6x de R$ {(total / 6).toFixed(2).replace('.', ',')} sem juros</option>
-                        <option value="10">10x de R$ {(total / 10).toFixed(2).replace('.', ',')} sem juros</option>
-                        <option value="12">12x de R$ {(total / 12).toFixed(2).replace('.', ',')} sem juros</option>
-                      </select>
-                    </div>
-
-                    {/* Mensagem de Erro de Validação do Cartão */}
-                    {cardError && (
-                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-                        <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
-                        <span>{cardError}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* BOLETO BANCARIO AREA (MERCADO PAGO) */}
-              {paymentMethod === 'boleto' && (
-                <div className="p-6 rounded-2xl bg-zinc-50 border border-zinc-200 flex flex-col items-center text-center space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-200">
-                    <FileText className="w-6 h-6" />
-                  </div>
-
-                  <div>
-                    <span className="text-xs text-zinc-500">Valor do Boleto Mercado Pago:</span>
-                    <h4 className="text-3xl font-extrabold text-zinc-900 font-display mt-0.5">
-                      R$ {finalPayableTotal.toFixed(2).replace('.', ',')}
-                    </h4>
-                    <span className="text-[11px] text-zinc-500 mt-1 block">
-                      Vencimento: em 3 dias úteis • Compensação rápida via Mercado Pago
-                    </span>
-                  </div>
-
-                  {/* Visual Barcode Box */}
-                  <div className="w-full max-w-md bg-white p-4 rounded-xl border border-zinc-200 text-left space-y-2 shadow-xs">
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 block tracking-wider">Linha Digitável do Boleto:</span>
-                    <div className="font-mono text-xs text-zinc-900 font-bold bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 break-all select-all">
-                      {boletoBarcode}
-                    </div>
-                    <p className="text-[10px] text-zinc-500">
-                      Pague no app do seu banco, internet banking ou agências lotéricas.
-                    </p>
-                  </div>
-
+                {/* Botões de Cópia: Copia e Cola + Chave Direta */}
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full max-w-sm">
                   <button
                     type="button"
-                    onClick={copyBoletoBarcode}
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+                    onClick={copyPixCode}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
                   >
-                    {copiedBarcode ? (
+                    {copiedPix ? (
                       <>
-                        <Check className="w-4 h-4 text-emerald-600" />
-                        <span>Código do Boleto Copiado!</span>
+                        <Check className="w-4 h-4 text-emerald-300" />
+                        <span>Código Pix Copiado!</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4 text-zinc-600" />
-                        <span>Copiar Linha Digitável</span>
+                        <Copy className="w-4 h-4" />
+                        <span>Copiar Pix Copia e Cola</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={copyDirectPixKey}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-300 text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-[0.98]"
+                  >
+                    {copiedPixKey ? (
+                      <>
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span>Chave Copiada!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Key className="w-4 h-4 text-zinc-500" />
+                        <span>Copiar Chave ({formatFriendlyKey(pixConfig.key)})</span>
                       </>
                     )}
                   </button>
                 </div>
-              )}
+              </div>
 
               {/* Bottom Payment Actions */}
               <div className="flex justify-between items-center pt-2">
@@ -1248,13 +899,7 @@ export const CheckoutModal: React.FC = () => {
                 >
                   <Lock className="w-3.5 h-3.5" />
                   <span>
-                    {isProcessing
-                      ? 'Processando com Mercado Pago...'
-                      : paymentMethod === 'pix'
-                        ? 'Confirmar Pagamento Pix Realizado'
-                        : paymentMethod === 'credit'
-                        ? `Pagar R$ ${total.toFixed(2).replace('.', ',')} com Cartão`
-                        : 'Emitir Boleto Mercado Pago'}
+                    {isProcessing ? 'Confirmando Pedido...' : 'Confirmar Pagamento Pix Realizado'}
                   </span>
                 </button>
               </div>
@@ -1269,9 +914,9 @@ export const CheckoutModal: React.FC = () => {
               </div>
 
               <div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-50 border border-sky-200 text-sky-900 text-xs font-semibold mb-2 shadow-xs">
-                  <span className="px-1.5 py-0.2 rounded bg-[#009EE3] text-white text-[9px] font-extrabold">MP</span>
-                  <span>Pagamento Processado com Sucesso via Mercado Pago</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-900 text-xs font-semibold mb-2 shadow-xs">
+                  <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-extrabold">PIX</span>
+                  <span>Pagamento Registrado via Pix Instantâneo (5% OFF)</span>
                 </div>
                 <div className="block mt-1">
                   <span className="text-xs font-mono font-bold px-3 py-1 rounded-full bg-zinc-100 border border-zinc-300 text-zinc-700 uppercase tracking-widest">
@@ -1282,7 +927,7 @@ export const CheckoutModal: React.FC = () => {
                   Compra Confirmada!
                 </h4>
                 <p className="text-xs text-zinc-500 max-w-md mx-auto mt-1 leading-relaxed">
-                  Seu pagamento foi confirmado pelo Mercado Pago e seu pedido já entrou na fila de manufatura 3D.
+                  Seu pagamento Pix foi confirmado com sucesso e seu pedido já entrou na fila de manufatura 3D.
                 </p>
               </div>
 
@@ -1291,8 +936,8 @@ export const CheckoutModal: React.FC = () => {
                 <div className="flex justify-between pb-2 border-b border-zinc-200">
                   <span className="text-zinc-500">Forma de Pagamento:</span>
                   <span className="text-zinc-900 font-semibold flex items-center gap-1.5">
-                    <span className="px-1.5 py-0.2 rounded bg-[#009EE3] text-white text-[9px] font-bold">MP</span>
-                    <span>{completedOrderData?.paymentMethod || 'Mercado Pago'}</span>
+                    <span className="px-1.5 py-0.2 rounded bg-emerald-600 text-white text-[9px] font-bold">PIX</span>
+                    <span>{completedOrderData?.paymentMethod || 'Pix Instantâneo (5% OFF)'}</span>
                   </span>
                 </div>
                 <div className="flex justify-between">

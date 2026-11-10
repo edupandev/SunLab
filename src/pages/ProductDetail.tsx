@@ -199,8 +199,8 @@ export const ProductDetail: React.FC = () => {
                     5% OFF no Pix
                   </span>
                 </div>
-                <p className="text-xs text-zinc-500">
-                  ou até <strong>6x de R$ {(product.price / 6).toFixed(2).replace('.', ',')}</strong> sem juros no cartão
+                <p className="text-xs text-emerald-700 font-medium">
+                  Aprovação instantânea e liberação imediata para a fila de produção 3D
                 </p>
               </>
             ) : (
