@@ -30,9 +30,9 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Notification Announcement Bar (Inspirado no visual do eComerce-3Dprints) */}
+      {/* Top Notification Announcement Bar */}
       <div className="bg-blue-600 text-white py-2 px-4 text-xs font-medium border-b border-blue-700 shadow-xs">
-        <div className="max-w-7xl mx-auto flex items-center justify-around gap-4 text-center overflow-x-auto whitespace-nowrap scrollbar-none">
+        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-around gap-4 text-center overflow-x-auto whitespace-nowrap scrollbar-none">
           <div className="flex items-center gap-1.5 shrink-0">
             <span>📦</span>
             <span>Envios seguros para todo o Brasil</span>
@@ -60,23 +60,23 @@ export const Navbar: React.FC = () => {
             : 'bg-white/85 backdrop-blur-md border-b border-zinc-200/80'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+        <div className="max-w-[1600px] w-full mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 h-16 sm:h-20 flex items-center justify-between gap-4">
           
           {/* SunLab Logo */}
           <Link
             to="/"
-            className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-[1.02]"
+            className="flex items-center gap-3 group cursor-pointer transition-transform hover:scale-[1.02] shrink-0"
           >
             <SunLabLogo size="md" variant="light" />
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2.5 whitespace-nowrap">
             <NavLink
               to="/"
               end
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -89,7 +89,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/catalog"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -100,12 +100,12 @@ export const Navbar: React.FC = () => {
             </NavLink>
 
             {/* Categorias Popover Dropdown */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <button
                 type="button"
                 onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                 onMouseEnter={() => setIsCategoryDropdownOpen(true)}
-                className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-blue-700 hover:text-blue-950 hover:bg-blue-50/60 transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs xl:text-sm font-medium text-blue-700 hover:text-blue-950 hover:bg-blue-50/60 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>Categorias</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isCategoryDropdownOpen ? 'rotate-180 text-blue-900' : 'text-blue-500'}`} />
@@ -136,7 +136,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/custom"
               className={({ isActive }) =>
-                `flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 border border-blue-200 font-semibold shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -150,7 +150,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/aboutus"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -163,7 +163,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/contact"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -176,7 +176,7 @@ export const Navbar: React.FC = () => {
             <NavLink
               to="/orders"
               className={({ isActive }) =>
-                `px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                `px-3 py-2 rounded-xl text-xs xl:text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
                     ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
                     : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
@@ -188,69 +188,69 @@ export const Navbar: React.FC = () => {
           </nav>
 
           {/* Right Action Icons (Search, Cart, Mobile Menu) */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 whitespace-nowrap">
             {/* Search Trigger */}
             <button
               onClick={openSearch}
-              className="p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200 text-blue-700 transition-colors cursor-pointer flex items-center gap-2"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200 text-blue-700 transition-colors cursor-pointer flex items-center gap-2 shrink-0 whitespace-nowrap"
               title="Buscar produtos"
             >
-              <Search className="w-4 h-4 text-blue-500" />
-              <span className="text-xs text-blue-600 hidden lg:inline font-normal">Buscar no catálogo...</span>
+              <Search className="w-4 h-4 text-blue-500 shrink-0" />
+              <span className="text-xs text-blue-600 hidden 2xl:inline font-normal whitespace-nowrap">Buscar no catálogo...</span>
             </button>
 
             {/* Login / Admin Action & Sair */}
             {user ? (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 shrink-0 whitespace-nowrap">
                 {isAdmin ? (
                   <NavLink
                     to="/admin"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold transition-all shadow-xs cursor-pointer shrink-0 whitespace-nowrap"
                     title="Painel Administrativo SunLab"
                   >
-                    <ShieldCheck className="w-4 h-4 text-blue-700" />
-                    <span className="hidden sm:inline">Painel Admin</span>
+                    <ShieldCheck className="w-4 h-4 text-blue-700 shrink-0" />
+                    <span className="hidden sm:inline whitespace-nowrap">Painel Admin</span>
                   </NavLink>
                 ) : (
                   <NavLink
                     to="/orders"
-                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-medium transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-medium transition-colors shrink-0 whitespace-nowrap"
                     title="Minha Conta e Pedidos"
                   >
-                    <User className="w-4 h-4 text-blue-600" />
-                    <span className="hidden sm:inline truncate max-w-[100px]">{user.name.split(' ')[0]}</span>
+                    <User className="w-4 h-4 text-blue-600 shrink-0" />
+                    <span className="hidden sm:inline truncate max-w-[100px] whitespace-nowrap">{user.name.split(' ')[0]}</span>
                   </NavLink>
                 )}
 
                 <button
                   type="button"
                   onClick={logout}
-                  className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-zinc-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-zinc-600 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
+                  className="flex items-center gap-1 px-2.5 py-2 rounded-xl bg-zinc-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200 text-zinc-600 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                   title="Sair da conta"
                 >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span className="hidden md:inline">Sair</span>
+                  <LogOut className="w-3.5 h-3.5 shrink-0" />
+                  <span className="hidden md:inline whitespace-nowrap">Sair</span>
                 </button>
               </div>
             ) : (
               <NavLink
                 to="/login"
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-zinc-100 hover:bg-zinc-200 text-zinc-800 border border-zinc-200 text-xs font-semibold transition-colors cursor-pointer shrink-0 whitespace-nowrap"
                 title="Entrar na Conta"
               >
-                <User className="w-4 h-4 text-zinc-600" />
-                <span className="hidden sm:inline">Entrar</span>
+                <User className="w-4 h-4 text-zinc-600 shrink-0" />
+                <span className="hidden sm:inline whitespace-nowrap">Entrar</span>
               </NavLink>
             )}
 
             {/* Cart Trigger - Clean Gray Button with Blue Text */}
             <button
               onClick={openCart}
-              className="relative p-2.5 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-blue-900 border border-zinc-300 transition-all cursor-pointer flex items-center gap-2 shadow-xs"
+              className="relative p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-blue-900 border border-zinc-300 transition-all cursor-pointer flex items-center gap-2 shadow-xs shrink-0 whitespace-nowrap"
               title="Abrir carrinho"
             >
-              <ShoppingBag className="w-4 h-4 text-blue-700" />
-              <span className="text-xs font-semibold text-blue-900 hidden sm:inline">
+              <ShoppingBag className="w-4 h-4 text-blue-700 shrink-0" />
+              <span className="text-xs font-semibold text-blue-900 hidden sm:inline whitespace-nowrap">
                 Carrinho
               </span>
               {totalItems > 0 && (
@@ -263,7 +263,7 @@ export const Navbar: React.FC = () => {
             {/* Mobile Hamburger Button */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 transition-colors cursor-pointer"
+              className="lg:hidden p-2 sm:p-2.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 border border-zinc-200 text-zinc-700 transition-colors cursor-pointer shrink-0"
               title="Menu de navegação"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
