@@ -47,18 +47,18 @@ export const Footer: React.FC = () => {
               <RefreshCw className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-blue-950 uppercase tracking-wider">Troca Descomplicada</h4>
-              <p className="text-[11px] text-blue-600 mt-0.5">7 dias de garantia incondicional</p>
+              <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">Troca Descomplicada</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">7 dias de garantia incondicional</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3.5 p-4 rounded-xl bg-white border border-zinc-200 shadow-xs">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-blue-950 uppercase tracking-wider">100% Polímeros Bio</h4>
-              <p className="text-[11px] text-blue-600 mt-0.5">Matéria-prima renovável de origem vegetal</p>
+              <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">100% Polímeros Bio</h4>
+              <p className="text-[11px] text-amber-700 mt-0.5">Matéria-prima renovável de origem vegetal</p>
             </div>
           </div>
         </div>
@@ -73,7 +73,7 @@ export const Footer: React.FC = () => {
             <Link to="/" className="inline-block group">
               <SunLabLogo size="lg" variant="light" />
             </Link>
-            <p className="text-xs text-blue-800/85 leading-relaxed max-w-sm">
+            <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
               Não somos uma gráfica 3D comum. A SunLab é um estúdio de design e manufatura aditiva focado em objetos contemporâneos, utilitários ergonômicos e projetos autorais sob demanda.
             </p>
             
@@ -82,7 +82,7 @@ export const Footer: React.FC = () => {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-lg bg-white border border-zinc-200 hover:border-blue-400 hover:text-blue-900 flex items-center justify-center text-blue-700 transition-colors shadow-xs"
+                className="w-9 h-9 rounded-lg bg-white border border-zinc-200 hover:border-amber-400 hover:text-amber-600 flex items-center justify-center text-[#0a2540] transition-colors shadow-xs"
                 title="Instagram"
               >
                 <Instagram className="w-4 h-4" />
@@ -91,7 +91,7 @@ export const Footer: React.FC = () => {
                 href="https://wa.me/5513996061681"
                 target="_blank"
                 rel="noreferrer"
-                className="w-9 h-9 rounded-lg bg-white border border-zinc-200 hover:border-blue-400 hover:text-blue-900 flex items-center justify-center text-blue-700 transition-colors shadow-xs"
+                className="w-9 h-9 rounded-lg bg-white border border-zinc-200 hover:border-amber-400 hover:text-amber-600 flex items-center justify-center text-[#0a2540] transition-colors shadow-xs"
                 title="WhatsApp (13) 99606-1681"
               >
                 <MessageCircle className="w-4 h-4" />
@@ -101,40 +101,40 @@ export const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-blue-950 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">
               Navegação
             </h4>
-            <ul className="space-y-2 text-xs text-blue-800">
+            <ul className="space-y-2 text-xs text-slate-600">
               <li>
-                <Link to="/" className="hover:text-blue-950 transition-colors">Início</Link>
+                <Link to="/" className="hover:text-amber-600 transition-colors">Início</Link>
               </li>
               <li>
-                <Link to="/catalog" className="hover:text-blue-950 transition-colors">Loja / Catálogo</Link>
+                <Link to="/catalog" className="hover:text-amber-600 transition-colors">Loja / Catálogo</Link>
               </li>
               <li>
-                <Link to="/custom" className="hover:text-blue-950 transition-colors">Projetos Sob Medida</Link>
+                <Link to="/custom" className="hover:text-amber-600 transition-colors">Projetos Sob Medida</Link>
               </li>
               <li>
-                <Link to="/aboutus" className="hover:text-blue-950 transition-colors">Sobre a SunLab</Link>
+                <Link to="/aboutus" className="hover:text-amber-600 transition-colors">Sobre a SunLab</Link>
               </li>
               <li>
-                <Link to="/contact" className="hover:text-blue-950 transition-colors">Contato & FAQ</Link>
+                <Link to="/contact" className="hover:text-amber-600 transition-colors">Contato & FAQ</Link>
               </li>
               <li>
-                <Link to="/orders" className="hover:text-blue-950 transition-colors font-medium">Meus Pedidos Comprados</Link>
+                <Link to="/orders" className="hover:text-amber-600 transition-colors font-medium">Meus Pedidos Comprados</Link>
               </li>
             </ul>
           </div>
 
           {/* Categories Links */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-blue-950 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">
               Coleções 3D
             </h4>
-            <ul className="space-y-2 text-xs text-blue-800">
+            <ul className="space-y-2 text-xs text-slate-600">
               {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
                 <li key={cat.id}>
-                  <Link to={`/catalog?cat=${cat.id}`} className="hover:text-blue-950 transition-colors">
+                  <Link to={`/catalog?cat=${cat.id}`} className="hover:text-amber-600 transition-colors">
                     {cat.name}
                   </Link>
                 </li>
@@ -144,11 +144,11 @@ export const Footer: React.FC = () => {
 
           {/* Newsletter Box */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-blue-950 uppercase tracking-wider">
+            <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">
               Novidades & 10% OFF
             </h4>
-            <p className="text-xs text-blue-800/85 leading-relaxed">
-              Assine nosso boletim e receba o cupom <strong className="text-blue-950 font-mono">SUNLAB10</strong> no seu e-mail.
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Assine nosso boletim e receba novidades e cupons exclusivos no seu e-mail.
             </p>
 
             <form onSubmit={handleSubscribe} className="space-y-2">
@@ -159,11 +159,11 @@ export const Footer: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Seu melhor e-mail"
-                  className="w-full bg-white border border-zinc-300 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-500 shadow-xs"
+                  className="w-full bg-white border border-zinc-300 rounded-xl px-3.5 py-2.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-amber-500 shadow-xs"
                 />
                 <button
                   type="submit"
-                  className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-zinc-200 hover:bg-zinc-300 text-zinc-900 border border-zinc-300 text-xs font-semibold transition-colors flex items-center justify-center cursor-pointer shadow-xs"
+                  className="absolute right-1.5 top-1.5 bottom-1.5 px-3 rounded-lg bg-[#0a2540] hover:bg-[#0f3a66] text-amber-400 text-xs font-semibold transition-colors flex items-center justify-center cursor-pointer shadow-xs"
                 >
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>

@@ -30,28 +30,6 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Top Notification Announcement Bar */}
-      <div className="bg-blue-600 text-white py-2 px-4 text-xs font-medium border-b border-blue-700 shadow-xs">
-        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-around gap-4 text-center overflow-x-auto whitespace-nowrap scrollbar-none">
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span>🚚</span>
-            <span>Frete Grátis ativado para todo o Brasil!</span>
-          </div>
-          <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-            <span>🎯</span>
-            <span>Impressão 3D de alta precisão (0.08mm)</span>
-          </div>
-          <div className="hidden md:flex items-center gap-1.5 shrink-0">
-            <span>✅</span>
-            <span>Garantia de qualidade e acabamento</span>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0 bg-blue-700 px-2.5 py-0.5 rounded-full text-[11px] shadow-xs">
-            <span>🏷️</span>
-            <span>Cupom: <strong className="font-mono text-white">SUNLAB10</strong> (10% OFF)</span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Header Bar */}
       <header
         className={`sticky top-0 z-40 w-full transition-all duration-300 ${
@@ -78,8 +56,8 @@ export const Navbar: React.FC = () => {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
-                    : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                    ? 'text-[#0a2540] bg-amber-50 font-bold border border-amber-200/80 shadow-xs'
+                    : 'text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70'
                 }`
               }
             >
@@ -91,8 +69,8 @@ export const Navbar: React.FC = () => {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
-                    : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                    ? 'text-[#0a2540] bg-amber-50 font-bold border border-amber-200/80 shadow-xs'
+                    : 'text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70'
                 }`
               }
             >
@@ -105,10 +83,10 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
                 onMouseEnter={() => setIsCategoryDropdownOpen(true)}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium text-blue-700 hover:text-blue-950 hover:bg-blue-50/60 transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                className="flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70 transition-colors cursor-pointer whitespace-nowrap shrink-0"
               >
                 <span>Categorias</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isCategoryDropdownOpen ? 'rotate-180 text-blue-900' : 'text-blue-500'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isCategoryDropdownOpen ? 'rotate-180 text-[#0a2540]' : 'text-slate-400'}`} />
               </button>
 
               {isCategoryDropdownOpen && (
@@ -116,17 +94,17 @@ export const Navbar: React.FC = () => {
                   onMouseLeave={() => setIsCategoryDropdownOpen(false)}
                   className="absolute top-full left-0 mt-1 w-64 rounded-xl bg-white border border-zinc-200 shadow-lg p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
-                  <div className="text-[10px] uppercase font-bold text-blue-600 px-3 py-1.5 tracking-wider">
+                  <div className="text-[10px] uppercase font-bold text-amber-600 px-3 py-1.5 tracking-wider">
                     Linhas de Fabricação 3D
                   </div>
                   {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
                     <Link
                       key={cat.id}
                       to={`/catalog?cat=${cat.id}`}
-                      className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-blue-800 hover:text-blue-950 hover:bg-blue-50 transition-colors"
+                      className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-800 hover:text-[#0a2540] hover:bg-amber-50/70 transition-colors"
                     >
                       <span>{cat.name}</span>
-                      <span className="text-[10px] text-blue-400 font-normal">{cat.label}</span>
+                      <span className="text-[10px] text-amber-600 font-normal">{cat.label}</span>
                     </Link>
                   ))}
                 </div>
@@ -138,13 +116,13 @@ export const Navbar: React.FC = () => {
               className={({ isActive }) =>
                 `flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'text-blue-900 bg-blue-50 border border-blue-200 font-semibold shadow-xs'
-                    : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                    ? 'text-[#0a2540] bg-amber-50 border border-amber-200/80 font-bold shadow-xs'
+                    : 'text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70'
                 }`
               }
             >
               <span>Personalizados</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
             </NavLink>
 
             <NavLink
@@ -152,8 +130,8 @@ export const Navbar: React.FC = () => {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
-                    : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                    ? 'text-[#0a2540] bg-amber-50 font-bold border border-amber-200/80 shadow-xs'
+                    : 'text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70'
                 }`
               }
             >
@@ -165,8 +143,8 @@ export const Navbar: React.FC = () => {
               className={({ isActive }) =>
                 `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                   isActive
-                    ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
-                    : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                    ? 'text-[#0a2540] bg-amber-50 font-bold border border-amber-200/80 shadow-xs'
+                    : 'text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70'
                 }`
               }
             >
@@ -179,8 +157,8 @@ export const Navbar: React.FC = () => {
                 className={({ isActive }) =>
                   `px-3 py-2 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shrink-0 ${
                     isActive
-                      ? 'text-blue-900 bg-blue-50 font-semibold border border-blue-200 shadow-xs'
-                      : 'text-blue-700 hover:text-blue-950 hover:bg-blue-50/60'
+                      ? 'text-[#0a2540] bg-amber-50 font-bold border border-amber-200/80 shadow-xs'
+                      : 'text-slate-700 hover:text-[#0a2540] hover:bg-slate-100/70'
                   }`
                 }
               >
@@ -245,18 +223,18 @@ export const Navbar: React.FC = () => {
               </NavLink>
             )}
 
-            {/* Cart Trigger - Clean Gray Button with Blue Text */}
+            {/* Cart Trigger - SunLab Ocean Navy & Solar Amber */}
             <button
               onClick={openCart}
-              className="relative p-2 sm:px-3 sm:py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-blue-900 border border-zinc-300 transition-all cursor-pointer flex items-center gap-2 shadow-xs shrink-0 whitespace-nowrap"
+              className="relative p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100 hover:bg-amber-50 text-[#0a2540] border border-slate-200 hover:border-amber-300 transition-all cursor-pointer flex items-center gap-2 shadow-xs shrink-0 whitespace-nowrap"
               title="Abrir carrinho"
             >
-              <ShoppingBag className="w-4 h-4 text-blue-700 shrink-0" />
-              <span className="text-xs font-semibold text-blue-900 hidden sm:inline whitespace-nowrap">
+              <ShoppingBag className="w-4 h-4 text-[#0a2540] shrink-0" />
+              <span className="text-xs font-semibold text-[#0a2540] hidden sm:inline whitespace-nowrap">
                 Carrinho
               </span>
               {totalItems > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-blue-600 text-white text-[11px] font-bold flex items-center justify-center border-2 border-white shadow-xs animate-bounce">
+                <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-[11px] font-bold flex items-center justify-center border-2 border-white shadow-xs animate-bounce">
                   {totalItems}
                 </span>
               )}

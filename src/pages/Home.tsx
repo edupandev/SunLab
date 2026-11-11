@@ -16,7 +16,6 @@ import {
   Box,
   Eye,
   RefreshCw,
-  Zap,
   ShoppingBag
 } from 'lucide-react';
 import { REVIEWS } from '@/data/products';
@@ -79,9 +78,8 @@ export const Home: React.FC = () => {
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
   // Creative 3D Studio States
-  const [selectedFilament, setSelectedFilament] = useState(FILAMENTS[0]);
+  const [selectedFilament] = useState(FILAMENTS[0]);
   const [slicerMode, setSlicerMode] = useState(false);
-  const [layerHeight, setLayerHeight] = useState<'0.08' | '0.12' | '0.16'>('0.08');
   const [rotationAngle, setRotationAngle] = useState(0);
 
   // Interactive Manufacturing Steps State
@@ -150,43 +148,43 @@ export const Home: React.FC = () => {
     <div className="w-full flex flex-col space-y-16 sm:space-y-24 pb-20 overflow-hidden">
       
       {/* 🚀 TICKER ANIMADO DINÂMICO (Marquee Infinito com estilo 3D Studio) */}
-      <div className="w-full bg-zinc-900 text-white py-2.5 overflow-hidden border-b border-zinc-800 text-[11px] font-medium tracking-wide shadow-xs select-none">
+      <div className="w-full bg-[#0A2540] text-white py-2.5 overflow-hidden border-b border-slate-800 text-[11px] font-medium tracking-wide shadow-xs select-none">
         <div className="animate-marquee whitespace-nowrap flex items-center gap-8">
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <strong className="text-blue-400">ATELIER ATIVO:</strong> 12 Impressoras em Operação 24/7
+            <strong className="text-amber-400">ATELIER ATIVO:</strong> 12 Impressoras em Operação 24/7
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Atendimento e Pagamento Direto no <strong>WhatsApp</strong>
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            <Box className="w-3.5 h-3.5 text-blue-400" /> Biopolímeros 100% Biodegradáveis
+            <Box className="w-3.5 h-3.5 text-sky-400" /> Biopolímeros 100% Biodegradáveis
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
             💬 Rastreamento e Pedidos em Tempo Real no <strong>WhatsApp</strong>
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
             ⭐ <strong>4.9/5</strong> em mais de 850 encomendas entregues no Brasil
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           {/* Loop repeat for seamless marquee */}
           <span className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <strong className="text-blue-400">ATELIER ATIVO:</strong> 12 Impressoras em Operação 24/7
+            <strong className="text-amber-400">ATELIER ATIVO:</strong> 12 Impressoras em Operação 24/7
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-blue-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
           </span>
-          <span className="text-zinc-500">•</span>
+          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Atendimento e Pagamento Direto no <strong>WhatsApp</strong>
           </span>
@@ -194,14 +192,14 @@ export const Home: React.FC = () => {
       </div>
 
       {/* 1. HERO SECTION CRIATIVO & ANIMADO */}
-      <section className="relative w-full pt-6 pb-16 overflow-hidden bg-gradient-to-b from-blue-50/40 via-white to-zinc-50/50 border-b border-zinc-200">
+      <section className="relative w-full pt-6 pb-16 overflow-hidden bg-gradient-to-b from-amber-50/30 via-white to-slate-50/50 border-b border-zinc-200">
         
         {/* Subtle CAD Background Grid */}
         <div className="absolute inset-0 bg-grid-tech opacity-60 pointer-events-none" />
 
         {/* Ambient Subtle Glow Orbs */}
-        <div className="absolute -top-24 -left-24 w-96 h-96 bg-blue-100/50 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-indigo-50/60 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-1/2 -right-24 w-96 h-96 bg-sky-100/50 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -213,19 +211,10 @@ export const Home: React.FC = () => {
               transition={{ duration: 0.6 }}
               className="lg:col-span-7 space-y-6 text-left"
             >
-              {/* Status Badge with Live Pulse */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-blue-200 text-xs font-bold text-blue-700 shadow-xs backdrop-blur-md">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600" />
-                </span>
-                <span className="uppercase tracking-wider">LABORATÓRIO DE IMPRESSÃO 3D DE ALTA PRECISÃO</span>
-              </div>
-
               {/* Main Headline */}
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-zinc-900 tracking-tight leading-[1.15] sm:leading-[1.1] font-display">
                 Se dá pra imaginar, <br />
-                <span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-600 bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-[#0A2540] via-[#0284C7] to-[#F59E0B] bg-clip-text text-transparent">
                   a gente imprime.
                 </span>
               </h1>
@@ -235,70 +224,30 @@ export const Home: React.FC = () => {
                 De chaveiros e colecionáveis a peças personalizadas pra sua marca ou pro seu setup. Sem complicação, com acabamento impecável e direto na sua porta.
               </p>
 
-              {/* Interactive Filament Quick Palette on Hero */}
-              <div className="p-3 sm:p-3.5 rounded-2xl bg-white border border-zinc-200 shadow-xs max-w-xl space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-zinc-800 flex items-center gap-1.5 text-[11px] sm:text-xs">
-                    <Sparkles className="w-3.5 h-3.5 text-blue-600" />
-                    Experimente o Acabamento Interativo:
-                  </span>
-                  <span className="text-[10px] sm:text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100 truncate max-w-[120px]">
-                    {selectedFilament.name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 sm:gap-2.5 pt-1 overflow-x-auto whitespace-nowrap pb-1 scrollbar-none">
-                  {FILAMENTS.map(filament => (
-                    <button
-                      key={filament.id}
-                      onClick={() => setSelectedFilament(filament)}
-                      className={`relative flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-xs font-medium transition-all cursor-pointer shrink-0 ${
-                        selectedFilament.id === filament.id
-                          ? 'border-blue-600 bg-blue-50/70 text-blue-900 shadow-xs scale-102'
-                          : 'border-zinc-200 bg-white hover:border-zinc-300 text-zinc-700'
-                      }`}
-                    >
-                      <span
-                        className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 shadow-xs"
-                        style={{ backgroundColor: filament.hex }}
-                      />
-                      <span className="text-[11px]">{filament.name.split(' ')[0]}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Call to Actions */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3.5 pt-1">
-                <Link
-                  to="/catalog"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer group active:scale-98"
+                <a
+                  href="#produtos"
+                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#0A2540] hover:bg-[#0F3A66] text-white font-bold text-sm transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 cursor-pointer group active:scale-98"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Explorar Catálogo 2026</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Link>
-
-                <Link
-                  to="/custom"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-white hover:bg-zinc-900 hover:text-white border-2 border-zinc-900 text-zinc-900 font-bold text-sm transition-all cursor-pointer shadow-xs hover:-translate-y-0.5 active:scale-98"
-                >
-                  <Zap className="w-4 h-4 text-amber-500" />
-                  <span>Imprimir Meu Arquivo .STL</span>
-                </Link>
+                  <ShoppingBag className="w-4 h-4 text-amber-400" />
+                  <span>Explorar Catálogo</span>
+                  <ArrowRight className="w-4 h-4 text-amber-400 group-hover:translate-x-1 transition-transform" />
+                </a>
               </div>
 
               {/* Quick Metrics */}
               <div className="grid grid-cols-3 gap-2 sm:gap-6 pt-4 sm:pt-6 border-t border-zinc-200 max-w-lg">
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
-                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">0.08<span className="text-blue-600 text-xs sm:text-sm">mm</span></div>
+                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">0.08<span className="text-amber-500 text-xs sm:text-sm font-semibold">mm</span></div>
                   <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Camadas de precisão</div>
                 </div>
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
-                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">100<span className="text-blue-600 text-xs sm:text-sm">%</span></div>
+                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">100<span className="text-amber-500 text-xs sm:text-sm font-semibold">%</span></div>
                   <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Biopolímeros ecológicos</div>
                 </div>
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
-                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">48<span className="text-blue-600 text-xs sm:text-sm">h</span></div>
+                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">48<span className="text-amber-500 text-xs sm:text-sm font-semibold">h</span></div>
                   <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Média de fabricação</div>
                 </div>
               </div>
@@ -383,146 +332,113 @@ export const Home: React.FC = () => {
                       <Sparkles className="w-3 h-3 text-blue-600" />
                       Coleção 2026
                     </span>
-                    <span className="backdrop-blur-md bg-zinc-900/80 border border-zinc-700 px-2.5 py-1 rounded-full text-[10px] font-mono text-zinc-200 shadow-xs flex items-center gap-1">
-                      <Flame className="w-3 h-3 text-amber-400" />
-                      {selectedFilament.temp}
-                    </span>
                   </div>
 
-                  {/* Bottom Interactive HUD Overlay */}
-                  <div className="absolute bottom-3 inset-x-3 backdrop-blur-xl bg-white/95 border border-zinc-200 p-3.5 rounded-2xl text-left shadow-lg z-20">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-[10px] uppercase font-bold text-blue-600 tracking-wider">
-                            Atelier SunLab 3D
-                          </span>
-                          <span className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono font-medium">
-                            {selectedFilament.material}
-                          </span>
-                        </div>
-                        <h3 className="text-sm font-bold text-zinc-900 mt-0.5">
-                          Projetos & Peças Sob Medida
-                        </h3>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-[10px] text-zinc-500 block">Orçamento</span>
-                        <span className="text-sm font-bold text-blue-600">Sob Consulta</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-2.5 pt-2 border-t border-zinc-100 flex items-center justify-between text-[11px]">
-                      <div className="flex items-center gap-2">
-                        <span className="text-zinc-500 font-mono text-[10px]">Resolução:</span>
-                        {(['0.08', '0.12', '0.16'] as const).map(res => (
-                          <button
-                            key={res}
-                            onClick={() => setLayerHeight(res)}
-                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold transition-colors cursor-pointer ${
-                              layerHeight === res
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-                            }`}
-                          >
-                            {res}mm
-                          </button>
-                        ))}
-                      </div>
-                      <Link
-                        to="/custom"
-                        className="text-blue-600 hover:text-blue-800 font-bold inline-flex items-center gap-1"
-                      >
-                        Personalizar Projeto →
-                      </Link>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* 3D Telemetry Strip */}
-                <div className="grid grid-cols-4 gap-2 mt-3 text-center text-[10px] font-mono text-zinc-600 pt-2 border-t border-zinc-100">
-                  <div className="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
-                    <span className="text-zinc-400 block text-[9px]">BOCAL</span>
-                    <strong className="text-zinc-800">{selectedFilament.temp}</strong>
-                  </div>
-                  <div className="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
-                    <span className="text-zinc-400 block text-[9px]">MESA</span>
-                    <strong className="text-zinc-800">60°C</strong>
-                  </div>
-                  <div className="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
-                    <span className="text-zinc-400 block text-[9px]">VELOCIDADE</span>
-                    <strong className="text-zinc-800">220 mm/s</strong>
-                  </div>
-                  <div className="p-1.5 rounded-lg bg-zinc-50 border border-zinc-200">
-                    <span className="text-zinc-400 block text-[9px]">PRECISÃO</span>
-                    <strong className="text-blue-600">{layerHeight}mm</strong>
-                  </div>
                 </div>
 
               </div>
             </motion.div>
 
           </div>
-
-          {/* 4 Hero Features Strip com Efeito Hover Dinâmico */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-12 pt-6">
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all group cursor-default"
-            >
-              <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
-                📏
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">Precisão Milimétrica</h3>
-                <p className="text-[11px] text-zinc-500 mt-0.5">Camadas de 0.08 a 0.16mm sem rebarbas</p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all group cursor-default"
-            >
-              <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
-                🌿
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors">Polímeros Sustentáveis</h3>
-                <p className="text-[11px] text-zinc-500 mt-0.5">PLA Mineral ecológico, PETG e resinas</p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-purple-300 hover:shadow-md transition-all group cursor-default"
-            >
-              <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
-                ⚙️
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-zinc-900 group-hover:text-purple-700 transition-colors">Encaixe & Ergonomia</h3>
-                <p className="text-[11px] text-zinc-500 mt-0.5">Ajuste perfeito para sua mesa e setup</p>
-              </div>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ y: -4 }}
-              className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all group cursor-default"
-            >
-              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
-                🛡️
-              </div>
-              <div>
-                <h3 className="text-xs font-bold text-zinc-900 group-hover:text-amber-700 transition-colors">Garantia & Mercado Pago</h3>
-                <p className="text-[11px] text-zinc-500 mt-0.5">100% inspecionado e compra protegida</p>
-              </div>
-            </motion.div>
-          </div>
-
         </div>
       </section>
 
-      {/* 2. CATEGORIAS DE PRODUTOS CRIATIVAS (Cards Pastel com Micro-interações) */}
+      {/* 2. PRODUTOS EM DESTAQUE COM FILTROS INTERATIVOS (Aparece logo após o Hero/Texto) */}
+      <section id="produtos" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full scroll-mt-24">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> Catálogo Selecionado
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight font-display">
+              Peças Prontas para Fabricação
+            </h2>
+          </div>
+
+          {/* Filter Tabs in White and Gray with Blue Text */}
+          <div className="flex items-center gap-1 p-1 rounded-2xl bg-zinc-100 border border-zinc-200 overflow-x-auto whitespace-nowrap scrollbar-none max-w-full shadow-2xs">
+            <button
+              onClick={() => setActiveTab('featured')}
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                activeTab === 'featured'
+                  ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              ⭐ Destaques
+            </button>
+            <button
+              onClick={() => setActiveTab('bestsellers')}
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                activeTab === 'bestsellers'
+                  ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              🔥 Mais Vendidos
+            </button>
+            <button
+              onClick={() => setActiveTab('newArrivals')}
+              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
+                activeTab === 'newArrivals'
+                  ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
+                  : 'text-zinc-600 hover:text-zinc-900'
+              }`}
+            >
+              ✨ Lançamentos
+            </button>
+          </div>
+        </div>
+
+        {/* Products Grid with Animated Cards (2-cols on mobile) */}
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            {filteredProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-16 px-6 text-center rounded-3xl bg-white border border-zinc-200 shadow-xs space-y-4 max-w-xl mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-2xl text-blue-600 shadow-2xs">
+              📦
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-zinc-900">Catálogo Vazio</h3>
+              <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto leading-relaxed">
+                Nenhum produto cadastrado no momento. Você pode cadastrar novas peças com fotos e detalhes através do painel de administração ou solicitar um orçamento sob medida.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+              <Link
+                to="/admin"
+                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-xs"
+              >
+                + Cadastrar Novo Produto
+              </Link>
+              <Link
+                to="/custom"
+                className="px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-300 text-zinc-800 font-bold text-xs transition-colors"
+              >
+                Orçar Peça Personalizada (.STL)
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {products.length > 0 && (
+          <div className="text-center pt-10">
+            <Link
+              to="/catalog"
+              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-white hover:bg-zinc-50 border-2 border-zinc-300 hover:border-blue-500 text-blue-800 font-bold text-sm transition-all cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5"
+            >
+              <span>Ver Todos os {products.length} Produtos do Catálogo</span>
+              <ArrowRight className="w-4 h-4 text-blue-600" />
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* 3. CATEGORIAS DE PRODUTOS CRIATIVAS (Cards Pastel com Micro-interações) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
           <div>
@@ -653,99 +569,61 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. PRODUTOS EM DESTAQUE COM FILTROS INTERATIVOS */}
+      {/* 4. BENEFÍCIOS & GARANTIAS DO ATELIER (Hover Strip) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Catálogo Selecionado
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight font-display">
-              Peças Prontas para Fabricação
-            </h2>
-          </div>
-
-          {/* Filter Tabs in White and Gray with Blue Text */}
-          <div className="flex items-center gap-1 p-1 rounded-2xl bg-zinc-100 border border-zinc-200 overflow-x-auto whitespace-nowrap scrollbar-none max-w-full shadow-2xs">
-            <button
-              onClick={() => setActiveTab('featured')}
-              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                activeTab === 'featured'
-                  ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
-            >
-              ⭐ Destaques
-            </button>
-            <button
-              onClick={() => setActiveTab('bestsellers')}
-              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                activeTab === 'bestsellers'
-                  ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
-            >
-              🔥 Mais Vendidos
-            </button>
-            <button
-              onClick={() => setActiveTab('newArrivals')}
-              className={`px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer shrink-0 ${
-                activeTab === 'newArrivals'
-                  ? 'bg-white text-blue-700 shadow-xs border border-zinc-200 font-bold'
-                  : 'text-zinc-600 hover:text-zinc-900'
-              }`}
-            >
-              ✨ Lançamentos
-            </button>
-          </div>
-        </div>
-
-        {/* Products Grid with Animated Cards (2-cols on mobile) */}
-        {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
-            {filteredProducts.map(product => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="py-16 px-6 text-center rounded-3xl bg-white border border-zinc-200 shadow-xs space-y-4 max-w-xl mx-auto">
-            <div className="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center mx-auto text-2xl text-blue-600 shadow-2xs">
-              📦
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all group cursor-default"
+          >
+            <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+              📏
             </div>
             <div>
-              <h3 className="text-base font-bold text-zinc-900">Catálogo Vazio</h3>
-              <p className="text-xs text-zinc-500 mt-1 max-w-md mx-auto leading-relaxed">
-                Nenhum produto cadastrado no momento. Você pode cadastrar novas peças com fotos e detalhes através do painel de administração ou solicitar um orçamento sob medida.
-              </p>
+              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">Precisão Milimétrica</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5">Camadas de 0.08 a 0.16mm sem rebarbas</p>
             </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-              <Link
-                to="/admin"
-                className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-xs"
-              >
-                + Cadastrar Novo Produto
-              </Link>
-              <Link
-                to="/custom"
-                className="px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-300 text-zinc-800 font-bold text-xs transition-colors"
-              >
-                Orçar Peça Personalizada (.STL)
-              </Link>
-            </div>
-          </div>
-        )}
+          </motion.div>
 
-        {products.length > 0 && (
-          <div className="text-center pt-10">
-            <Link
-              to="/catalog"
-              className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-2xl bg-white hover:bg-zinc-50 border-2 border-zinc-300 hover:border-blue-500 text-blue-800 font-bold text-sm transition-all cursor-pointer shadow-xs hover:shadow-md hover:-translate-y-0.5"
-            >
-              <span>Ver Todos os {products.length} Produtos do Catálogo</span>
-              <ArrowRight className="w-4 h-4 text-blue-600" />
-            </Link>
-          </div>
-        )}
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-emerald-300 hover:shadow-md transition-all group cursor-default"
+          >
+            <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+              🌿
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors">Polímeros Sustentáveis</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5">PLA Mineral ecológico, PETG e resinas</p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-purple-300 hover:shadow-md transition-all group cursor-default"
+          >
+            <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+              ⚙️
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-purple-700 transition-colors">Encaixe & Ergonomia</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5">Ajuste perfeito para sua mesa e setup</p>
+            </div>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all group cursor-default"
+          >
+            <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition-transform">
+              🛡️
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-amber-700 transition-colors">Garantia & Mercado Pago</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5">100% inspecionado e compra protegida</p>
+            </div>
+          </motion.div>
+        </div>
       </section>
 
       {/* 4. SEÇÃO CRIATIVA INTERATIVA: EXPLORADOR DO PROCESSO DE ENGENHARIA 3D */}

@@ -36,15 +36,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       viewport={{ once: true, margin: '-40px' }}
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
-      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200 hover:border-blue-400 hover:shadow-xl transition-all duration-300 overflow-hidden"
+      className="group relative flex flex-col rounded-3xl bg-white border border-zinc-200 hover:border-amber-400 hover:shadow-xl transition-all duration-300 overflow-hidden"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Top Badges */}
       <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-10 flex flex-wrap gap-1 pointer-events-none">
         {product.bestseller && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold bg-white/95 text-blue-700 border border-blue-200 shadow-xs backdrop-blur-md">
-            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-blue-600" /> Mais Vendido
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[9px] sm:text-[11px] font-bold bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-xs">
+            <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-white" /> Mais Vendido
           </span>
         )}
         {product.newArrival && (
@@ -130,7 +130,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-3 sm:p-5 flex flex-col flex-1 justify-between gap-2 sm:gap-3">
         <div>
           <div className="flex items-center justify-between text-xs text-zinc-500 mb-1">
-            <span className="uppercase tracking-wider font-bold text-[9px] sm:text-[10px] text-blue-600 bg-blue-50 px-1.5 sm:px-2 py-0.5 rounded-md truncate max-w-[110px]">
+            <span className="uppercase tracking-wider font-bold text-[9px] sm:text-[10px] text-amber-800 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-md truncate max-w-[110px]">
               {product.categoryLabel}
             </span>
             <div className="flex items-center gap-1 text-[11px] sm:text-xs">
@@ -140,7 +140,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
 
           <Link to={`/product/${product.slug}`} className="group/title block">
-            <h3 className="font-bold text-xs sm:text-base text-zinc-900 group-hover/title:text-blue-600 transition-colors line-clamp-2 leading-tight">
+            <h3 className="font-bold text-xs sm:text-base text-zinc-900 group-hover/title:text-amber-600 transition-colors line-clamp-2 leading-tight">
               {product.name}
             </h3>
             <p className="hidden sm:block text-xs text-zinc-500 line-clamp-2 mt-1 leading-relaxed">
@@ -211,7 +211,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               className={`px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer shadow-xs shrink-0 flex items-center gap-1 active:scale-95 ${
                 addedAnimation
                   ? 'bg-emerald-600 text-white shadow-md'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white hover:shadow-md'
+                  : 'bg-[#0A2540] hover:bg-[#0F3A66] text-white hover:shadow-md'
               }`}
             >
               {addedAnimation ? (
