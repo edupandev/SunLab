@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Sparkles,
@@ -8,9 +8,6 @@ import {
   ChevronRight,
   Mail,
   Check,
-  Flame,
-  Sliders,
-  Cpu,
   ShieldCheck,
   Box,
   ShoppingBag
@@ -57,9 +54,6 @@ export const Home: React.FC = () => {
   // Featured Showcase State
   const [selectedShowcase] = useState(SHOWCASE_ITEMS[0]);
 
-  // Interactive Manufacturing Steps State
-  const [activeStep, setActiveStep] = useState(0);
-
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newsletterEmail) {
@@ -76,45 +70,6 @@ export const Home: React.FC = () => {
     if (activeTab === 'newArrivals') return p.newArrival;
     return p.featured;
   }).slice(0, 8);
-
-  const stepsData = [
-    {
-      num: '01',
-      title: 'Design & Modelagem 3D',
-      subtitle: 'Projetos autorais e exclusivos',
-      desc: 'Desenvolvemos geometrias sofisticadas e produtos exclusivos para decoração, organização e presentes personalizados.',
-      icon: Cpu,
-      badge: 'Design Autoral',
-      stat: '100% Exclusivo'
-    },
-    {
-      num: '02',
-      title: 'Planejamento & Otimização',
-      subtitle: 'Cuidado minucioso em cada detalhe',
-      desc: 'Planejamos a fabricação para garantir uma superfície uniforme, suave ao toque e sem imperfeições visíveis.',
-      icon: Sliders,
-      badge: 'Alta Resolução',
-      stat: 'Sem Marcas'
-    },
-    {
-      num: '03',
-      title: 'Fabricação 3D de Alta Fidelidade',
-      subtitle: 'Equipamentos modernos e matérias-primas premium',
-      desc: 'Produção sob demanda utilizando materiais de alta qualidade com máxima fidelidade e durabilidade.',
-      icon: Flame,
-      badge: 'Máxima Fidelidade',
-      stat: 'Material de Qualidade'
-    },
-    {
-      num: '04',
-      title: 'Acabamento Artesanal & Inspeção',
-      subtitle: 'Acabamento manual e controle rigoroso',
-      desc: 'Cada peça é desmoldada, limpa e inspecionada visualmente com atenção minuciosa aos detalhes para um acabamento impecável.',
-      icon: ShieldCheck,
-      badge: 'Inspeção 1 a 1',
-      stat: 'Acabamento Premium'
-    }
-  ];
 
   return (
     <div className="w-full flex flex-col space-y-16 sm:space-y-24 pb-20 overflow-hidden">
@@ -548,114 +503,6 @@ export const Home: React.FC = () => {
               <p className="text-[11px] text-zinc-500 mt-0.5">100% inspecionado e compra protegida</p>
             </div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* 4. SEÇÃO CRIATIVA INTERATIVA: EXPLORADOR DO PROCESSO DE ENGENHARIA 3D */}
-      <section className="relative w-full py-16 bg-gradient-to-b from-zinc-50 via-white to-blue-50/30 border-y border-zinc-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center max-w-2xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center justify-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-amber-500" /> Qualidade & Fabricação SunLab
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight font-display mt-1">
-              Como fabricamos cada peça SunLab
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-600 mt-2 leading-relaxed">
-              Conheça as etapas de cuidado, precisão e acabamento que tornam cada peça especial.
-            </p>
-          </div>
-
-          {/* Interactive Stepper Navigation */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-            {stepsData.map((step, idx) => {
-              const Icon = step.icon;
-              const isActive = activeStep === idx;
-              return (
-                <button
-                  key={step.num}
-                  onClick={() => setActiveStep(idx)}
-                  className={`p-4 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
-                    isActive
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-md scale-102'
-                      : 'bg-white text-zinc-700 border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <span className={`text-xs font-mono font-bold ${isActive ? 'text-blue-200' : 'text-zinc-400'}`}>
-                      ETAPA {step.num}
-                    </span>
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-zinc-400'}`} />
-                  </div>
-                  <h4 className={`text-xs sm:text-sm font-bold leading-tight ${isActive ? 'text-white' : 'text-zinc-900'}`}>
-                    {step.title}
-                  </h4>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Active Step Detailed Card with Animation */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStep}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35 }}
-              className="bg-white rounded-3xl border border-zinc-200 shadow-md p-6 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center"
-            >
-              <div className="lg:col-span-8 space-y-4 text-left">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
-                    Etapa {stepsData[activeStep].num} de 04
-                  </span>
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-100">
-                    {stepsData[activeStep].badge}
-                  </span>
-                  <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-700">
-                    {stepsData[activeStep].stat}
-                  </span>
-                </div>
-
-                <h3 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-display">
-                  {stepsData[activeStep].title}
-                </h3>
-                <p className="text-sm font-semibold text-blue-600">
-                  {stepsData[activeStep].subtitle}
-                </p>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed max-w-2xl font-normal">
-                  {stepsData[activeStep].desc}
-                </p>
-
-                <div className="pt-2 flex items-center gap-3">
-                  <Link
-                    to="/custom"
-                    className="inline-flex items-center gap-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl transition-colors shadow-xs"
-                  >
-                    <span>Solicitar Produção com Esta Tecnologia</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-              </div>
-
-              {/* Graphic / Visual Box for Active Step */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-zinc-100 to-zinc-50 border border-zinc-200 rounded-2xl p-6 flex flex-col justify-center items-center text-center space-y-4">
-                <div className="w-20 h-20 rounded-3xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center text-blue-600">
-                  {React.createElement(stepsData[activeStep].icon, { className: 'w-10 h-10' })}
-                </div>
-                <div>
-                  <div className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">Padrão SunLab</div>
-                  <div className="text-lg font-bold text-zinc-900 mt-0.5">{stepsData[activeStep].badge}</div>
-                </div>
-                <div className="text-[11px] text-zinc-500 bg-white px-3 py-1.5 rounded-xl border border-zinc-200 w-full">
-                  Acabamento refinado e inspeção cuidadosa em cada peça
-                </div>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
         </div>
       </section>
 
