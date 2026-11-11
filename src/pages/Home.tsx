@@ -14,7 +14,6 @@ import {
   Cpu,
   ShieldCheck,
   Box,
-  Eye,
   RefreshCw,
   ShoppingBag
 } from 'lucide-react';
@@ -85,9 +84,6 @@ export const Home: React.FC = () => {
   // Interactive Manufacturing Steps State
   const [activeStep, setActiveStep] = useState(0);
 
-  // Interactive Desk Hotspots State
-  const [activeHotspot, setActiveHotspot] = useState<number | null>(null);
-
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newsletterEmail) {
@@ -135,12 +131,12 @@ export const Home: React.FC = () => {
     },
     {
       num: '04',
-      title: 'Pós-Processamento Artesanal & Envio',
-      subtitle: 'Acabamento manual, curadoria e despacho seguro',
-      desc: 'Cada peça é desmoldada, limpa e inspecionada visualmente sob luz tangencial. Embalada em papel kraft reciclado com selo de garantia e enviada com rastreio no seu WhatsApp.',
+      title: 'Pós-Processamento Artesanal & Acabamento',
+      subtitle: 'Acabamento manual e controle de qualidade rigoroso',
+      desc: 'Cada peça é desmoldada, limpa e inspecionada visualmente sob luz tangencial. Finalizada com atenção minuciosa aos detalhes e selo de garantia de acabamento.',
       icon: ShieldCheck,
       badge: 'Inspeção Manual 1 a 1',
-      stat: 'Despacho Seguro'
+      stat: 'Acabamento Premium'
     }
   ];
 
@@ -168,11 +164,11 @@ export const Home: React.FC = () => {
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            💬 Rastreamento e Pedidos em Tempo Real no <strong>WhatsApp</strong>
+            💬 Atendimento e Pedidos Direto no <strong>WhatsApp</strong>
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            ⭐ <strong>4.9/5</strong> em mais de 850 encomendas entregues no Brasil
+            ⭐ <strong>4.9/5</strong> Avaliação de Excelência e Satisfação
           </span>
           <span className="text-slate-500">•</span>
           {/* Loop repeat for seamless marquee */}
@@ -730,83 +726,6 @@ export const Home: React.FC = () => {
               </div>
             </motion.div>
           </AnimatePresence>
-
-        </div>
-      </section>
-
-      {/* 5. HOTSPOT INTERATIVO: SETUP SUNLAB INSPIRATION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="bg-gradient-to-br from-zinc-900 via-zinc-950 to-blue-950 text-white rounded-3xl p-8 sm:p-12 shadow-xl relative overflow-hidden">
-          
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="relative max-w-2xl mb-8">
-            <span className="text-xs font-mono font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Eye className="w-4 h-4" /> Inspiração para seu Espaço
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-extrabold font-display mt-1">
-              Monte seu Setup Minimalista
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-400 mt-2 leading-relaxed">
-              Todos os acessórios de mesa são impressos sob medida para organizar cabos, acomodar fones de ouvido e elevar a estética do seu ambiente de trabalho.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div
-              onMouseEnter={() => setActiveHotspot(1)}
-              onMouseLeave={() => setActiveHotspot(null)}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-                activeHotspot === 1
-                  ? 'bg-zinc-800/90 border-blue-400 shadow-lg'
-                  : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
-              }`}
-            >
-              <div className="text-2xl mb-2">🎧</div>
-              <h3 className="text-sm font-bold text-white">Suporte Headset Gyroid</h3>
-              <p className="text-xs text-zinc-400 mt-1">Estrutura interna inspirada em favos de abelha. Resistente e ultraleve.</p>
-              <div className="mt-3 flex items-center justify-between text-xs font-bold text-blue-400">
-                <span>R$ 119,00</span>
-                <Link to="/catalog?cat=tech" className="hover:underline">Ver no catálogo →</Link>
-              </div>
-            </div>
-
-            <div
-              onMouseEnter={() => setActiveHotspot(2)}
-              onMouseLeave={() => setActiveHotspot(null)}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-                activeHotspot === 2
-                  ? 'bg-zinc-800/90 border-blue-400 shadow-lg'
-                  : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
-              }`}
-            >
-              <div className="text-2xl mb-2">⚡</div>
-              <h3 className="text-sm font-bold text-white">Dock Modular MagSafe</h3>
-              <p className="text-xs text-zinc-400 mt-1">Encaixe magnético com peso balanceado para retirada do iPhone com uma mão.</p>
-              <div className="mt-3 flex items-center justify-between text-xs font-bold text-blue-400">
-                <span>R$ 89,00</span>
-                <Link to="/catalog?cat=utility" className="hover:underline">Ver no catálogo →</Link>
-              </div>
-            </div>
-
-            <div
-              onMouseEnter={() => setActiveHotspot(3)}
-              onMouseLeave={() => setActiveHotspot(null)}
-              className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-                activeHotspot === 3
-                  ? 'bg-zinc-800/90 border-blue-400 shadow-lg'
-                  : 'bg-zinc-900/60 border-zinc-800 hover:border-zinc-700'
-              }`}
-            >
-              <div className="text-2xl mb-2">🏺</div>
-              <h3 className="text-sm font-bold text-white">Vaso Paramétrico Waveform</h3>
-              <p className="text-xs text-zinc-400 mt-1">Acabamento fosco cerâmico para dar um toque orgânico à escrivaninha.</p>
-              <div className="mt-3 flex items-center justify-between text-xs font-bold text-blue-400">
-                <span>R$ 149,00</span>
-                <Link to="/catalog?cat=decor" className="hover:underline">Ver no catálogo →</Link>
-              </div>
-            </div>
-          </div>
 
         </div>
       </section>

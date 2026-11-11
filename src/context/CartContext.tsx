@@ -49,7 +49,6 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const CART_STORAGE_KEY = 'sunlab_cart_v1';
-// Promoção: Taxa de entrega grátis para todo o Brasil
 const FREE_SHIPPING_LIMIT = 0;
 const STANDARD_SHIPPING_RATE = 0;
 
@@ -233,7 +232,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (cleanCode === 'FRETEGRATIS') {
       setAppliedCoupon('FRETEGRATIS');
       setIsFreeShippingCoupon(true);
-      return { success: true, message: 'Frete grátis aplicado para seu pedido!' };
+      return { success: true, message: 'Cupom aplicado com sucesso!' };
     }
     return { success: false, message: 'Cupom inválido ou expirado. Tente SUNLAB10' };
   };

@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 import {
   Package,
   ShoppingBag,
-  Truck,
   Clock,
   CheckCircle2,
   Search,
@@ -226,17 +225,18 @@ export const Orders: React.FC = () => {
           </span>
         );
       case 'Enviado':
+      case 'Pronto':
         return (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-800 border border-purple-200">
-            <Truck className="w-3.5 h-3.5 text-purple-600" />
-            <span>Enviado ao Destinatário</span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-sky-50 text-sky-800 border border-sky-200">
+            <CheckCircle2 className="w-3.5 h-3.5 text-sky-600" />
+            <span>Peça Finalizada</span>
           </span>
         );
       case 'Concluído':
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Pedido Entregue</span>
+            <span>Pedido Concluído</span>
           </span>
         );
       case 'Cancelado':
@@ -326,7 +326,7 @@ export const Orders: React.FC = () => {
             Produtos Comprados & Meus Pedidos
           </h1>
           <p className="text-xs sm:text-sm text-zinc-600 mt-1 max-w-2xl leading-relaxed">
-            Consulte abaixo os produtos adquiridos, status de impressão na matriz, envio e comprovantes detalhados com suporte direto via WhatsApp.
+            Consulte abaixo os produtos adquiridos, status de impressão na matriz e comprovantes detalhados com suporte direto via WhatsApp.
           </p>
         </div>
 
@@ -379,8 +379,8 @@ export const Orders: React.FC = () => {
             { id: 'all', label: 'Todos' },
             { id: 'Pendente', label: '🕒 Pendentes' },
             { id: 'Em Produção 3D', label: '⚙️ Em Produção' },
-            { id: 'Enviado', label: '🚚 Enviados' },
-            { id: 'Concluído', label: '✅ Entregues' }
+            { id: 'Enviado', label: '✨ Finalizados' },
+            { id: 'Concluído', label: '✅ Concluídos' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -463,7 +463,7 @@ export const Orders: React.FC = () => {
 
               return (
                 `👋 *Olá equipe SunLab 3D!*\n` +
-                `Gostaria de informações e acompanhamento sobre a produção/envio do meu pedido:\n\n` +
+                `Gostaria de informações e acompanhamento sobre a produção do meu pedido:\n\n` +
                 `🔖 *CÓDIGO DO PEDIDO:* #${o.orderNumber}\n` +
                 `📊 *Status Atual:* ${o.status}\n` +
                 `💰 *Valor Total Pago:* R$ ${Number(o.totalAmount).toFixed(2).replace('.', ',')} (Pix 5% OFF)\n` +
@@ -472,12 +472,12 @@ export const Orders: React.FC = () => {
                 `• *Nome:* ${o.customerName}\n` +
                 `• *E-mail:* ${o.customerEmail}\n` +
                 `• *WhatsApp/Telefone:* ${o.customerPhone || 'Não informado'}\n\n` +
-                `📍 *ENDEREÇO DE ENTREGA:*\n` +
+                `📍 *ENDEREÇO:*\n` +
                 `• ${o.shippingAddress}\n\n` +
                 `📦 *ITENS DO PEDIDO:*\n` +
                 `${itemsText || '   (Projeto / Peça sob consulta)'}\n\n` +
                 `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-                `Vocês poderiam me atualizar sobre a previsão de conclusão da impressão 3D e o envio/rastreio? Muito obrigado!`
+                `Vocês poderiam me atualizar sobre a previsão de conclusão da impressão 3D? Muito obrigado!`
               );
             };
 
@@ -511,14 +511,14 @@ export const Orders: React.FC = () => {
                 {/* Progress Stepper for 3D Manufacturing */}
                 <div className="px-4 sm:px-6 py-4 border-b border-zinc-100 bg-white">
                   <div className="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-3">
-                    Etapas da Produção 3D & Envio:
+                    Etapas da Produção 3D:
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
                       { step: 1, title: '1. Pedido Confirmado', desc: 'Dados salvos no banco' },
                       { step: 2, title: '2. Em Impressão 3D', desc: 'Filamento sendo extrusado' },
                       { step: 3, title: '3. Acabamento & QA', desc: 'Remoção de suportes e cura' },
-                      { step: 4, title: '4. Enviado / Entregue', desc: 'Despachado ao destinatário' }
+                      { step: 4, title: '4. Concluído', desc: 'Peça finalizada e inspecionada' }
                     ].map((st) => {
                       const isDone = stepIndex >= st.step;
                       const isCurrent = stepIndex === st.step;
@@ -621,7 +621,7 @@ export const Orders: React.FC = () => {
                     <div className="p-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 text-xs text-zinc-600 space-y-1">
                       <div className="font-bold text-zinc-900 flex items-center gap-1.5">
                         <MapPin className="w-3.5 h-3.5 text-zinc-500" />
-                        <span>Endereço de Envio:</span>
+                        <span>Endereço Cadastrado:</span>
                       </div>
                       <p className="text-zinc-700 pl-5">{order.shippingAddress}</p>
                     </div>

@@ -152,7 +152,7 @@ export const Catalog: React.FC = () => {
                 onChange={(e) => setInStockOnly(e.target.checked)}
                 className="rounded border-zinc-300 text-blue-600 focus:ring-0 cursor-pointer"
               />
-              <span>Pronta entrega</span>
+              <span>Em estoque</span>
             </label>
           </div>
         </div>

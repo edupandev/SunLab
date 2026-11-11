@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
-import { ArrowRight, ShieldCheck, Truck, RefreshCw, Sparkles, Check, Instagram, MessageCircle } from 'lucide-react';
+import { ArrowRight, ShieldCheck, RefreshCw, Sparkles, Check, Instagram, MessageCircle } from 'lucide-react';
 import SunLabLogo from './SunLabLogo';
 import { CATEGORIES } from '@/data/products';
 
@@ -23,12 +23,12 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 border-b border-zinc-200">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="flex items-center gap-3.5 p-4 rounded-xl bg-white border border-zinc-200 shadow-xs">
-            <div className="w-10 h-10 rounded-lg bg-zinc-100 text-zinc-700 flex items-center justify-center shrink-0">
-              <Truck className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">Envio Seguro para o Brasil</h4>
-              <p className="text-[11px] text-zinc-500 mt-0.5">Embalagem anti-impacto e rastreio total</p>
+              <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">Design Autoral & Exclusivo</h4>
+              <p className="text-[11px] text-slate-500 mt-0.5">Modelagem 3D e acabamento minucioso</p>
             </div>
           </div>
 

@@ -27,8 +27,8 @@ export const Contact: React.FC = () => {
       a: 'Nossos vasos para flores possuem tratamento e selagem resinada impermeável na parte interna, permitindo colocar água fresca sem vazamentos. Para produtos decorativos internos, utilizamos PLA mineral. Para itens que ficarão expostos a calor automotivo ou sol constante, recomendamos a produção em PETG ou ASA que resistem a temperaturas de até 85°C.'
     },
     {
-      q: 'Qual o prazo total entre o pedido e o recebimento?',
-      a: 'Como trabalhamos com manufatura on-demand sob demanda, o tempo de impressão e acabamento artesanal leva de 1 a 3 dias úteis. Em seguida, a encomenda é despachada via Correios ou transportadora com rastreio total enviado para o seu e-mail e WhatsApp.'
+      q: 'Qual o tempo de produção das peças?',
+      a: 'Como trabalhamos com manufatura aditiva autoral e sob demanda, o tempo médio de impressão e acabamento artesanal leva de 1 a 3 dias úteis com controle rigoroso de qualidade em cada camada.'
     },
     {
       q: 'Posso solicitar uma cor especial Pantone ou acabamento diferenciado?',
@@ -159,7 +159,7 @@ export const Contact: React.FC = () => {
                     className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
                   >
                     <option value="Dúvida sobre produto">Dúvida sobre produto do catálogo</option>
-                    <option value="Prazo de entrega">Prazo ou rastreio de pedido</option>
+                    <option value="Dúvida sobre produção">Dúvida sobre produção de pedido</option>
                     <option value="Parceria comercial">Parceria comercial / Arquitetura</option>
                     <option value="Outro assunto">Outro assunto</option>
                   </select>

@@ -698,7 +698,7 @@ export const AdminProducts: React.FC = () => {
           }`}
         >
           <ShoppingBag className="w-4 h-4" />
-          <span>Gestão de Pedidos (Vendas)</span>
+          <span>Gestão de Pedidos</span>
           <span className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold border ${
             pendingOrders > 0
               ? 'bg-amber-100 text-amber-800 border-amber-300'
@@ -743,7 +743,7 @@ export const AdminProducts: React.FC = () => {
                 <CheckCircle className="w-4 h-4 text-blue-700" />
               </div>
               <div className="text-2xl font-bold text-blue-950 font-display">{inStockCount}</div>
-              <span className="text-[10px] text-blue-500">Pronta entrega disponível</span>
+              <span className="text-[10px] text-blue-500">Disponíveis em estoque</span>
             </div>
 
             <div className="p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs">

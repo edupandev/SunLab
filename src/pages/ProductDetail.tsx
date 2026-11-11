@@ -5,7 +5,6 @@ import {
   ShoppingBag,
   ArrowRight,
   ShieldCheck,
-  Truck,
   Check,
   Sparkles,
   ChevronRight,
@@ -28,13 +27,6 @@ export const ProductDetail: React.FC = () => {
   const [selectedSize, setSelectedSize] = useState<string | undefined>(product?.sizes?.[0]);
   const [quantity, setQuantity] = useState(1);
   const [addedToast, setAddedToast] = useState(false);
-  
-  // Shipping calculation simulation
-  const [cep, setCep] = useState('');
-  const [shippingResult, setShippingResult] = useState<{
-    pac: { price: number; days: string };
-    sedex: { price: number; days: string };
-  } | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -43,7 +35,6 @@ export const ProductDetail: React.FC = () => {
       setSelectedColor(product.colors[0]);
       setSelectedSize(product.sizes?.[0]);
       setQuantity(1);
-      setShippingResult(null);
     }
   }, [slug, product]);
 
@@ -74,16 +65,6 @@ export const ProductDetail: React.FC = () => {
     if (selectedColor) {
       addToCart(product, quantity, selectedColor, selectedSize);
       openCheckout();
-    }
-  };
-
-  const handleCalculateShipping = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (cep.trim().length >= 8) {
-      setShippingResult({
-        pac: { price: 0, days: '3 a 5 dias úteis' },
-        sedex: { price: 19.90, days: '1 a 2 dias úteis' }
-      });
     }
   };
 
@@ -331,47 +312,6 @@ export const ProductDetail: React.FC = () => {
                 <span>Solicitar Orçamento Deste Projeto</span>
                 <ArrowRight className="w-4 h-4 text-blue-700" />
               </Link>
-            )}
-          </div>
-
-          {/* Shipping Calculator */}
-          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-blue-800">
-              <Truck className="w-4 h-4 text-blue-600" />
-              <span>Calcular Frete e Prazo de Entrega:</span>
-            </div>
-            <form onSubmit={handleCalculateShipping} className="flex gap-2">
-              <input
-                type="text"
-                value={cep}
-                onChange={(e) => setCep(e.target.value)}
-                placeholder="00000-000"
-                maxLength={9}
-                className="flex-1 bg-white border border-zinc-300 rounded-lg px-3 py-2 text-xs text-blue-950 placeholder-blue-300 outline-none focus:border-blue-500"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-zinc-200 hover:bg-zinc-300 text-blue-950 border border-zinc-300 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Calcular
-              </button>
-            </form>
-
-            {shippingResult && (
-              <div className="space-y-1.5 pt-2 border-t border-zinc-200 text-xs">
-                <div className="flex justify-between items-center text-zinc-700">
-                  <span>Envio Econômico (PAC):</span>
-                  <span className="font-semibold text-zinc-800">
-                    {shippingResult.pac.price === 0 ? 'Grátis' : `R$ ${shippingResult.pac.price.toFixed(2).replace('.', ',')}`} ({shippingResult.pac.days})
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-zinc-700">
-                  <span>Envio Expresso (Sedex):</span>
-                  <span className="font-semibold text-zinc-900">
-                    R$ {shippingResult.sedex.price.toFixed(2).replace('.', ',')} ({shippingResult.sedex.days})
-                  </span>
-                </div>
-              </div>
             )}
           </div>
 

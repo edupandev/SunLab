@@ -7,7 +7,6 @@ import {
   Copy,
   Check,
   MessageCircle,
-  Truck,
   Clock,
   Printer,
   Package,
@@ -239,13 +238,12 @@ export const CheckoutModal: React.FC = () => {
       `• *Nome:* ${order.customerName}\n` +
       `• *E-mail:* ${order.customerEmail}\n` +
       `• *Telefone/WhatsApp:* ${order.customerPhone || 'Não informado'}\n\n` +
-      `📍 *ENDEREÇO DE ENTREGA:*\n` +
+      `📍 *ENDEREÇO CADASTRADO:*\n` +
       `• ${order.shippingAddress}\n\n` +
       `📦 *PRODUTOS ESCOLHIDOS:*\n` +
       `${itemsText}\n\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `💰 *VALOR TOTAL: R$ ${order.totalAmount.toFixed(2).replace('.', ',')}*\n` +
-      `🚚 *FRETE:* Grátis para todo o Brasil\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
       `💬 *Olá SunLab! Gostaria de confirmar meu pedido #${order.orderNumber} e receber as informações para pagamento e início da fabricação 3D!*\n` +
       `_SunLab Design & Fabricação Digital_`
@@ -382,7 +380,7 @@ export const CheckoutModal: React.FC = () => {
           <div className="flex items-center gap-2 sm:gap-2.5">
             <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-blue-700 shrink-0" />
             <h3 className="text-sm sm:text-base font-bold text-blue-950 truncate max-w-[260px] sm:max-w-none">
-              {step === 'form' && 'Finalizar Pedido — Dados de Entrega'}
+              {step === 'form' && 'Finalizar Pedido — Dados de Cadastro'}
               {step === 'success' && 'Pedido Registrado com Sucesso!'}
             </h3>
           </div>
@@ -410,7 +408,7 @@ export const CheckoutModal: React.FC = () => {
                   Identifique-se para Continuar
                 </h3>
                 <p className="text-xs text-zinc-600 leading-relaxed">
-                  Para acompanhar seu pedido, receber o rastreio e salvar seus dados de entrega com segurança, faça login ou crie sua conta antes de finalizar.
+                  Para acompanhar seu pedido e salvar seus dados com segurança, faça login ou crie sua conta antes de finalizar.
                 </p>
               </div>
 
@@ -454,7 +452,7 @@ export const CheckoutModal: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* STEP 1: Formulário de Entrega e Envio Direto ao WhatsApp */}
+              {/* STEP 1: Formulário e Pedido Direto ao WhatsApp */}
               {step === 'form' && (
                 <form onSubmit={handleCompleteOrder} className="space-y-4">
                   {/* Banner de Identificação do Usuário */}
@@ -524,10 +522,10 @@ export const CheckoutModal: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Endereço de Entrega */}
+                  {/* Endereço Cadastrado */}
                   <div className="pt-2 border-t border-zinc-100 space-y-3">
                     <span className="text-xs font-bold text-zinc-900 block">
-                      Endereço de Entrega (Frete Grátis)
+                      Endereço Cadastrado
                     </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -638,8 +636,8 @@ export const CheckoutModal: React.FC = () => {
                   {/* Order Mini Summary */}
                   <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
                     <div className="flex items-center gap-2 text-zinc-600">
-                      <Truck className="w-4 h-4 text-emerald-600" />
-                      <span>Frete Grátis com rastreamento</span>
+                      <CheckCircle className="w-4 h-4 text-emerald-600" />
+                      <span>Produção sob demanda garantida</span>
                     </div>
                     <div className="text-right">
                       <span className="text-zinc-400 text-[10px] block">Valor Total</span>
@@ -671,7 +669,7 @@ export const CheckoutModal: React.FC = () => {
                     
                     <p className="text-[11px] text-zinc-500 text-center flex items-center justify-center gap-1.5 pt-0.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>O pedido ficará salvo na sua conta e o WhatsApp abrirá para envio do comprovante.</span>
+                      <span>O pedido ficará salvo na sua conta e o WhatsApp abrirá para confirmação imediata.</span>
                     </p>
                   </div>
                 </form>
@@ -720,7 +718,7 @@ export const CheckoutModal: React.FC = () => {
                       <span className="text-zinc-900 font-medium font-mono">{formData.phone}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-zinc-500">Endereço de Entrega:</span>
+                      <span className="text-zinc-500">Endereço Cadastrado:</span>
                       <span className="text-zinc-900 font-medium text-right max-w-[260px] truncate" title={`${formData.street}, ${formData.number} — ${formData.city}/${formData.state}`}>
                         {formData.street}, {formData.number} — {formData.city}/${formData.state}
                       </span>

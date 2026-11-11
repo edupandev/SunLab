@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag, Truck } from 'lucide-react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Tag } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { useNavigate } from 'react-router';
 
@@ -99,17 +99,6 @@ export const CartDrawer: React.FC = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-          </div>
-
-          {/* Free Shipping Highlight Banner */}
-          <div className="p-3.5 bg-blue-50/80 border-b border-blue-200/60 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 font-semibold text-blue-900">
-              <Truck className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>Frete Grátis ativado para todo o Brasil!</span>
-            </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold shrink-0">
-              Grátis
-            </span>
           </div>
 
           {/* Cart Items List */}
@@ -259,12 +248,6 @@ export const CartDrawer: React.FC = () => {
                     <span>- R$ {discount.toFixed(2).replace('.', ',')}</span>
                   </div>
                 )}
-                <div className="flex justify-between items-center">
-                  <span>Frete estimado</span>
-                  <span className="font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md text-xs border border-emerald-200">
-                    Grátis (Promoção)
-                  </span>
-                </div>
                 <div className="flex justify-between text-base font-bold text-zinc-950 pt-2 border-t border-zinc-200">
                   <span>Total</span>
                   <span className="text-zinc-900 text-lg">
