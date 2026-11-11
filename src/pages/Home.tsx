@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
   Sparkles,
-  Layers,
   Star,
   ChevronRight,
   Mail,
@@ -14,59 +13,38 @@ import {
   Cpu,
   ShieldCheck,
   Box,
-  RefreshCw,
   ShoppingBag
 } from 'lucide-react';
 import { REVIEWS } from '@/data/products';
 import { useProducts } from '@/context/ProductContext';
 import { ProductCard } from '@/components/ProductCard';
 
-// Interactive Showcase Palette for Hero 3D Studio (Coleção Natal SunLab)
-const FILAMENTS = [
+// Featured Showcase Collection
+const SHOWCASE_ITEMS = [
   {
     id: 'vela-renas',
     name: 'Conjunto Vela & Renas',
-    hex: '#f8fafc',
-    accent: 'from-blue-600 to-indigo-600',
-    image: '/products/natal/01_vela_renas/01_hero_estudio.jpg',
-    material: 'PLA Mineral Fosco',
-    temp: '210°C'
+    image: '/products/natal/01_vela_renas/01_hero_estudio.jpg'
   },
   {
     id: 'presepio',
     name: 'Presépio Sagrada Família',
-    hex: '#f1f5f9',
-    accent: 'from-slate-200 to-slate-400',
-    image: '/products/natal/02_presepio_familia/01_hero_estudio.jpg',
-    material: 'PLA Silk Acetinado',
-    temp: '215°C'
+    image: '/products/natal/02_presepio_familia/01_hero_estudio.jpg'
   },
   {
     id: 'pinheiro',
     name: 'Pinheiro Feliz Natal',
-    hex: '#15803d',
-    accent: 'from-emerald-600 to-teal-700',
-    image: '/products/natal/03_pinheiro_natal/01_hero_estudio.jpg',
-    material: 'Polímero Eco-Green',
-    temp: '205°C'
+    image: '/products/natal/03_pinheiro_natal/01_hero_estudio.jpg'
   },
   {
     id: 'flocos',
     name: 'Kit Flocos de Neve',
-    hex: '#e0f2fe',
-    accent: 'from-sky-400 to-blue-600',
-    image: '/products/natal/04_flocos_neve/01_flatlay_conjunto.jpg',
-    material: 'Cristalino Translúcido',
-    temp: '215°C'
+    image: '/products/natal/04_flocos_neve/01_flatlay_conjunto.jpg'
   },
   {
     id: 'bicolor',
     name: 'Tags Bicolores Natal',
-    hex: '#dc2626',
-    accent: 'from-red-600 to-rose-700',
-    image: '/products/natal/05_enfeites_bicolores/01_flatlay_catalogo.jpg',
-    material: 'Coextrusão Dupla Cor',
-    temp: '220°C'
+    image: '/products/natal/05_enfeites_bicolores/01_flatlay_catalogo.jpg'
   }
 ];
 
@@ -76,10 +54,8 @@ export const Home: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
-  // Creative 3D Studio States
-  const [selectedFilament] = useState(FILAMENTS[0]);
-  const [slicerMode, setSlicerMode] = useState(false);
-  const [rotationAngle, setRotationAngle] = useState(0);
+  // Featured Showcase State
+  const [selectedShowcase] = useState(SHOWCASE_ITEMS[0]);
 
   // Interactive Manufacturing Steps State
   const [activeStep, setActiveStep] = useState(0);
@@ -104,38 +80,38 @@ export const Home: React.FC = () => {
   const stepsData = [
     {
       num: '01',
-      title: 'Modelagem Paramétrica 3D',
-      subtitle: 'Algoritmos generativos & CAD avançado',
-      desc: 'Nossos designers desenvolvem geometrias computacionais impossíveis de moldar na injeção plástica convencional, como malhas Voronoi, treliças Gyroid e curvas fluidas matemáticas.',
+      title: 'Design & Modelagem 3D',
+      subtitle: 'Projetos autorais e exclusivos',
+      desc: 'Desenvolvemos geometrias sofisticadas e produtos exclusivos para decoração, organização e presentes personalizados.',
       icon: Cpu,
-      badge: 'Software CAD Paramétrico',
-      stat: '100% Autoral'
+      badge: 'Design Autoral',
+      stat: '100% Exclusivo'
     },
     {
       num: '02',
-      title: 'Fatiamento Micrométrico G-Code',
-      subtitle: 'Simulação física e trajetórias de bocal',
-      desc: 'O modelo é convertido em até 1.400 fatias micrométricas. Otimizamos caminhos de extrusão, perímetros contínuos e taxas de retração para acabamento liso e sedoso sem costuras visíveis.',
+      title: 'Planejamento & Otimização',
+      subtitle: 'Cuidado minucioso em cada detalhe',
+      desc: 'Planejamos a fabricação para garantir uma superfície uniforme, suave ao toque e sem imperfeições visíveis.',
       icon: Sliders,
-      badge: 'Camadas de 0.08mm',
-      stat: 'Zero Rebarbas'
+      badge: 'Alta Resolução',
+      stat: 'Sem Marcas'
     },
     {
       num: '03',
-      title: 'Impressão Aditiva de Alta Precisão',
-      subtitle: 'Bancada industrial com controle térmico',
-      desc: 'Extrusão precisa de material de alta qualidade em câmaras isoladas com nivelamento óptico a laser. Sem emissão de fumos tóxicos e com 100% de eficiência energética.',
+      title: 'Fabricação 3D de Alta Fidelidade',
+      subtitle: 'Equipamentos modernos e matérias-primas premium',
+      desc: 'Produção sob demanda utilizando materiais de alta qualidade com máxima fidelidade e durabilidade.',
       icon: Flame,
-      badge: 'Bocal de 0.4mm a 215°C',
+      badge: 'Máxima Fidelidade',
       stat: 'Material de Qualidade'
     },
     {
       num: '04',
-      title: 'Pós-Processamento Artesanal & Acabamento',
-      subtitle: 'Acabamento manual e controle de qualidade rigoroso',
-      desc: 'Cada peça é desmoldada, limpa e inspecionada visualmente sob luz tangencial. Finalizada com atenção minuciosa aos detalhes e selo de garantia de acabamento.',
+      title: 'Acabamento Artesanal & Inspeção',
+      subtitle: 'Acabamento manual e controle rigoroso',
+      desc: 'Cada peça é desmoldada, limpa e inspecionada visualmente com atenção minuciosa aos detalhes para um acabamento impecável.',
       icon: ShieldCheck,
-      badge: 'Inspeção Manual 1 a 1',
+      badge: 'Inspeção 1 a 1',
       stat: 'Acabamento Premium'
     }
   ];
@@ -147,7 +123,7 @@ export const Home: React.FC = () => {
       <div className="w-full bg-[#0A2540] text-white py-2.5 overflow-hidden border-b border-slate-800 text-[11px] font-medium tracking-wide shadow-xs select-none">
         <div className="animate-marquee whitespace-nowrap flex items-center gap-8">
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Acabamento <strong>Impecável e Suave</strong>
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
@@ -168,7 +144,7 @@ export const Home: React.FC = () => {
           <span className="text-slate-500">•</span>
           {/* Loop repeat for seamless marquee */}
           <span className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Acabamento <strong>Impecável e Suave</strong>
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
@@ -192,7 +168,7 @@ export const Home: React.FC = () => {
       {/* 1. HERO SECTION CRIATIVO & ANIMADO */}
       <section className="relative w-full pt-6 pb-16 overflow-hidden bg-gradient-to-b from-amber-50/30 via-white to-slate-50/50 border-b border-zinc-200">
         
-        {/* Subtle CAD Background Grid */}
+        {/* Subtle Background Pattern */}
         <div className="absolute inset-0 bg-grid-tech opacity-60 pointer-events-none" />
 
         {/* Ambient Subtle Glow Orbs */}
@@ -234,24 +210,24 @@ export const Home: React.FC = () => {
                 </a>
               </div>
 
-              {/* Quick Metrics */}
+              {/* Quick Quality Highlights */}
               <div className="grid grid-cols-3 gap-2 sm:gap-6 pt-4 sm:pt-6 border-t border-zinc-200 max-w-lg">
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
-                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">0.08<span className="text-amber-500 text-xs sm:text-sm font-semibold">mm</span></div>
-                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Camadas de precisão</div>
+                  <div className="text-base sm:text-lg font-bold text-zinc-900 font-display">Design</div>
+                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Autoral & exclusivo</div>
                 </div>
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
-                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">100<span className="text-amber-500 text-xs sm:text-sm font-semibold">%</span></div>
+                  <div className="text-base sm:text-lg font-bold text-zinc-900 font-display">100%</div>
                   <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Material de qualidade</div>
                 </div>
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
-                  <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">48<span className="text-amber-500 text-xs sm:text-sm font-semibold">h</span></div>
+                  <div className="text-base sm:text-lg font-bold text-zinc-900 font-display">48h</div>
                   <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Média de fabricação</div>
                 </div>
               </div>
             </motion.div>
 
-            {/* Right Interactive 3D Studio Showcase */}
+            {/* Right Product Showcase */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -259,81 +235,32 @@ export const Home: React.FC = () => {
               className="lg:col-span-5 relative"
             >
               {/* Outer Decorative Glow */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 to-indigo-400/20 rounded-3xl blur-2xl transform rotate-1 scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-tr from-blue-400/20 to-amber-400/10 rounded-3xl blur-2xl transform rotate-1 scale-105" />
 
-              <div className="relative rounded-3xl bg-white border border-zinc-200 shadow-xl p-4 overflow-hidden">
-                
-                {/* 3D Studio Header HUD */}
-                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse" />
-                    <span className="text-xs font-bold text-zinc-800 tracking-tight">SUNLAB SLICER STUDIO 3D</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={() => setSlicerMode(!slicerMode)}
-                      className={`text-[11px] font-bold px-2.5 py-1 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
-                        slicerMode
-                          ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                          : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border-zinc-200'
-                      }`}
-                      title="Ativar simulação de camadas de impressão"
-                    >
-                      <Layers className="w-3 h-3" />
-                      <span>{slicerMode ? 'Modo Camadas ATIVO' : 'Ver Camadas CAD'}</span>
-                    </button>
-                    <button
-                      onClick={() => setRotationAngle(prev => (prev + 90) % 360)}
-                      className="p-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 text-zinc-600 border border-zinc-200 transition-colors cursor-pointer"
-                      title="Girar ângulo de inspeção"
-                    >
-                      <RefreshCw className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
+              <div className="relative rounded-3xl bg-white border border-zinc-200 shadow-xl p-3 sm:p-4 overflow-hidden">
+                {/* Main Viewport Area */}
+                <div className="relative aspect-4/5 rounded-2xl overflow-hidden bg-zinc-100 border border-zinc-200 group">
+                  <img
+                    src={selectedShowcase.image}
+                    alt={selectedShowcase.name}
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  />
 
-                {/* Main 3D Viewport Area */}
-                <div className="relative aspect-4/5 rounded-2xl overflow-hidden bg-zinc-950 mt-3 border border-zinc-800 group">
-                  
-                  {/* Subtle 3D Grid Overlay inside viewport */}
-                  <div className="absolute inset-0 bg-grid-tech opacity-15 pointer-events-none" />
-
-                  {/* Rendered 3D Image with dynamic transition */}
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={selectedFilament.id + rotationAngle}
-                      src={selectedFilament.image}
-                      alt={selectedFilament.name}
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      style={{ transform: `rotate(${rotationAngle}deg)` }}
-                      className="w-full h-full object-cover transition-transform duration-500 ease-out"
-                    />
-                  </AnimatePresence>
-
-                  {/* Slicer Laser Scanline (when slicerMode is active) */}
-                  {slicerMode && (
-                    <>
-                      <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_15px_#3b82f6] animate-scan-laser pointer-events-none z-20" />
-                      <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent,transparent_3px,rgba(37,99,235,0.18)_4px)] pointer-events-none z-10" />
-                      <div className="absolute top-3 left-3 z-20 bg-blue-900/90 backdrop-blur-md border border-blue-400/50 text-blue-200 text-[10px] font-mono px-2 py-1 rounded-md">
-                        SLICING: 0.08mm | Z: 142.4mm
-                      </div>
-                    </>
-                  )}
-
-                  {/* Floating Badges inside Viewport */}
+                  {/* Floating Badge */}
                   <div className="absolute top-3 right-3 z-20 flex flex-col items-end gap-1.5">
-                    <span className="backdrop-blur-md bg-white/90 border border-zinc-200 px-2.5 py-1 rounded-full text-[11px] font-bold text-zinc-800 shadow-xs flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-blue-600" />
-                      Coleção 2026
+                    <span className="backdrop-blur-md bg-white/95 border border-zinc-200 px-3 py-1 rounded-full text-[11px] font-bold text-zinc-800 shadow-xs flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      Coleção Exclusiva
                     </span>
                   </div>
 
+                  {/* Subtle Bottom Title */}
+                  <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/60 via-black/20 to-transparent text-white">
+                    <span className="text-xs font-semibold tracking-wide block text-white/95">
+                      {selectedShowcase.name}
+                    </span>
+                  </div>
                 </div>
-
               </div>
             </motion.div>
 
@@ -417,7 +344,7 @@ export const Home: React.FC = () => {
                 to="/custom"
                 className="px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-100 border border-zinc-300 text-zinc-800 font-bold text-xs transition-colors"
               >
-                Orçar Peça Personalizada (.STL)
+                Orçar Peça Personalizada
               </Link>
             </div>
           </div>
@@ -556,7 +483,7 @@ export const Home: React.FC = () => {
                 Projetos Personalizados
               </h3>
               <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
-                Envie seu arquivo 3D (.STL / .OBJ / .STEP) para produzirmos sob medida com garantia.
+                Envie sua ideia ou modelo 3D para produzirmos sob medida com garantia.
               </p>
             </div>
             <div className="relative mt-5 pt-3 border-t border-amber-200/70 flex items-center justify-between text-xs font-bold text-amber-800 group-hover:text-amber-950">
@@ -578,8 +505,8 @@ export const Home: React.FC = () => {
               📏
             </div>
             <div>
-              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">Precisão Milimétrica</h3>
-              <p className="text-[11px] text-zinc-500 mt-0.5">Camadas de 0.08 a 0.16mm sem rebarbas</p>
+              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-blue-700 transition-colors">Acabamento Suave</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5">Superfície lisa, suave e sem rebarbas</p>
             </div>
           </motion.div>
 
@@ -591,8 +518,8 @@ export const Home: React.FC = () => {
               🌿
             </div>
             <div>
-              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors">Polímeros Sustentáveis</h3>
-              <p className="text-[11px] text-zinc-500 mt-0.5">PLA Mineral ecológico, PETG e resinas</p>
+              <h3 className="text-xs font-bold text-zinc-900 group-hover:text-emerald-700 transition-colors">Materiais Premium</h3>
+              <p className="text-[11px] text-zinc-500 mt-0.5">Matérias-primas de alta qualidade e durabilidade</p>
             </div>
           </motion.div>
 
@@ -630,13 +557,13 @@ export const Home: React.FC = () => {
           
           <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-bold uppercase tracking-wider text-blue-600 flex items-center justify-center gap-1.5">
-              <Cpu className="w-4 h-4" /> Engenharia & Manufatura Digital
+              <Sparkles className="w-4 h-4 text-amber-500" /> Qualidade & Fabricação SunLab
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight font-display mt-1">
               Como fabricamos cada peça SunLab
             </h2>
             <p className="text-xs sm:text-sm text-zinc-600 mt-2 leading-relaxed">
-              Clique em cada etapa para explorar os parâmetros de qualidade, calibração e acabamento que diferenciam a manufatura aditiva SunLab.
+              Conheça as etapas de cuidado, precisão e acabamento que tornam cada peça especial.
             </p>
           </div>
 
@@ -719,11 +646,11 @@ export const Home: React.FC = () => {
                   {React.createElement(stepsData[activeStep].icon, { className: 'w-10 h-10' })}
                 </div>
                 <div>
-                  <div className="text-xs font-mono uppercase tracking-wider text-zinc-400">Padrão de Precisão</div>
+                  <div className="text-xs uppercase tracking-wider text-zinc-400 font-semibold">Padrão SunLab</div>
                   <div className="text-lg font-bold text-zinc-900 mt-0.5">{stepsData[activeStep].badge}</div>
                 </div>
                 <div className="text-[11px] text-zinc-500 bg-white px-3 py-1.5 rounded-xl border border-zinc-200 w-full">
-                  Inspecionado digitalmente com tolerância dimensional de ±0.1mm
+                  Acabamento refinado e inspeção cuidadosa em cada peça
                 </div>
               </div>
             </motion.div>
@@ -740,10 +667,10 @@ export const Home: React.FC = () => {
           </div>
           <div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-display">
-              Receba Lançamentos & Arquivos 3D Exclusivos
+              Receba Lançamentos & Modelos Exclusivos
             </h2>
             <p className="text-xs sm:text-sm text-zinc-500 max-w-md mx-auto mt-1.5 leading-relaxed">
-              Junte-se à nossa comunidade para receber cupons de desconto, novos modelos em .STL e novidades do atelier.
+              Junte-se à nossa comunidade para receber cupons de desconto, novos lançamentos e novidades do atelier.
             </p>
           </div>
 

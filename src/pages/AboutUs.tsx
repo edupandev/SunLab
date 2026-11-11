@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Compass, Layers, ShieldCheck, Leaf, HeartHandshake } from 'lucide-react';
+import { Compass, Sparkles, ShieldCheck, Leaf, HeartHandshake } from 'lucide-react';
 
 export const AboutUs: React.FC = () => {
   return (
@@ -65,21 +65,21 @@ export const AboutUs: React.FC = () => {
       <div className="space-y-8">
         <div className="text-center max-w-xl mx-auto space-y-2">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
-            Os 4 Pilares da Nossa Engenharia
+            Os 4 Pilares da SunLab
           </h2>
           <p className="text-xs text-slate-500">
-            Cada linha de código G-code e cada filamento é cuidadosamente calibrado.
+            Cada detalhe é cuidadosamente trabalhado para oferecer o melhor acabamento.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
             <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Layers className="w-5 h-5" />
+              <Sparkles className="w-5 h-5 text-amber-500" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Algoritmos Paramétricos</h3>
+            <h3 className="text-base font-bold text-slate-900">Design Exclusivo</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Formas orgânicas inspiradas em equações matemáticas que seriam impossíveis de serem fabricadas por moldes convencionais.
+              Formas orgânicas e contemporâneas criadas com originalidade para transformar qualquer espaço.
             </p>
           </div>
 
@@ -87,9 +87,9 @@ export const AboutUs: React.FC = () => {
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Leaf className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Compromisso Ecológico</h3>
+            <h3 className="text-base font-bold text-slate-900">Qualidade dos Materiais</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Utilização de PLA puro atóxico e PETG reciclado. Nossos resíduos de calibração são 100% triturados e re-extrudados.
+              Utilização de materiais selecionados, atóxicos e resistentes, com máxima durabilidade e estabilidade.
             </p>
           </div>
 
@@ -97,9 +97,9 @@ export const AboutUs: React.FC = () => {
             <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Inspeção Milimétrica</h3>
+            <h3 className="text-base font-bold text-slate-900">Inspeção Minuciosa</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Cada camada é monitorada por sensores de fluxo e câmeras térmicas de IA para garantir adesão perfeita e zero delaminação.
+              Cada peça é inspecionada para garantir estrutura sólida, linhas contínuas e acabamento impecável.
             </p>
           </div>
 
@@ -107,9 +107,9 @@ export const AboutUs: React.FC = () => {
             <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
               <HeartHandshake className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Acabamento Manual</h3>
+            <h3 className="text-base font-bold text-slate-900">Acabamento Artesanal</h3>
             <p className="text-xs text-slate-600 leading-relaxed">
-              Após o resfriamento na mesa térmica, cada produto recebe lixamento refinado de arestas e impermeabilização artesanal.
+              Cuidado manual no pós-processamento de arestas para garantir toque suave e acabamento refinado.
             </p>
           </div>
         </div>

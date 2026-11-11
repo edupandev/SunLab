@@ -349,31 +349,23 @@ export const ProductDetail: React.FC = () => {
         {/* Specs Table */}
         <div className="md:col-span-6 space-y-4">
           <h3 className="text-xl font-bold text-zinc-900 font-display">
-            Ficha Técnica de Manufatura
+            Detalhes do Produto
           </h3>
           <div className="rounded-xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 text-xs bg-white shadow-xs">
             <div className="flex justify-between p-3.5 bg-zinc-50/60">
-              <span className="text-zinc-500">Material do Filamento</span>
+              <span className="text-zinc-500">Material</span>
               <span className="font-semibold text-zinc-900">{product.specs.material}</span>
             </div>
             <div className="flex justify-between p-3.5 bg-white">
-              <span className="text-zinc-500">Resolução de Altura de Camada</span>
-              <span className="font-semibold text-zinc-900">{product.specs.layerHeight}</span>
-            </div>
-            <div className="flex justify-between p-3.5 bg-zinc-50/60">
-              <span className="text-zinc-500">Dimensões Físicas (AxLxP)</span>
+              <span className="text-zinc-500">Dimensões (AxLxP)</span>
               <span className="font-semibold text-zinc-900">{product.specs.dimensions}</span>
             </div>
-            <div className="flex justify-between p-3.5 bg-white">
-              <span className="text-zinc-500">Peso do Produto</span>
+            <div className="flex justify-between p-3.5 bg-zinc-50/60">
+              <span className="text-zinc-500">Peso Aproximado</span>
               <span className="font-semibold text-zinc-900">{product.specs.weight}</span>
             </div>
-            <div className="flex justify-between p-3.5 bg-zinc-50/60">
-              <span className="text-zinc-500">Preenchimento Interno (Infill)</span>
-              <span className="font-semibold text-zinc-900">{product.specs.infill}</span>
-            </div>
             <div className="flex justify-between p-3.5 bg-white">
-              <span className="text-zinc-500">Pós-processamento & Acabamento</span>
+              <span className="text-zinc-500">Acabamento</span>
               <span className="font-semibold text-zinc-900 text-right max-w-[240px]">{product.specs.finish}</span>
             </div>
           </div>
