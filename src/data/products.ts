@@ -94,7 +94,7 @@ export const PRODUCTS: Product[] = [
       "Padrão Mesa (24cm x 12cm x 16cm)"
     ],
     "specs": {
-      "material": "Bio-PLA Mineral Sustentável",
+      "material": "Material Premium de Alta Qualidade",
       "layerHeight": "0.12mm (Ultra Definição)",
       "dimensions": "24 x 12 x 16 cm",
       "weight": "210g",
@@ -104,7 +104,7 @@ export const PRODUCTS: Product[] = [
     "highlights": [
       "Acomoda velas tealight padrão de até 40mm",
       "Textura sem emendas nem marcas de suporte",
-      "Material 100% ecológico e biodegradável",
+      "Material de alta qualidade e resistência",
       "Embalagem para presente com laço e papel kraft"
     ],
     "images": [
@@ -219,7 +219,7 @@ export const PRODUCTS: Product[] = [
       "Grande (26cm altura)"
     ],
     "specs": {
-      "material": "Bio-Polímero Eco-Friendly",
+      "material": "Polímero Premium de Alta Qualidade",
       "layerHeight": "0.12mm",
       "dimensions": "20 x 14 x 6 cm",
       "weight": "160g",
@@ -339,7 +339,7 @@ export const PRODUCTS: Product[] = [
       "Kit 4 Peças Bicolores (9cm cada)"
     ],
     "specs": {
-      "material": "Biopolímero Coextrudado",
+      "material": "Polímero de Alta Qualidade",
       "layerHeight": "0.12mm",
       "dimensions": "9 x 7 x 0.4 cm cada",
       "weight": "18g por peça",

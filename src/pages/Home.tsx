@@ -29,7 +29,7 @@ const FILAMENTS = [
     hex: '#f8fafc',
     accent: 'from-blue-600 to-indigo-600',
     image: '/products/natal/01_vela_renas/01_hero_estudio.jpg',
-    material: 'Bio-PLA Mineral Fosco',
+    material: 'PLA Mineral Fosco',
     temp: '210°C'
   },
   {
@@ -47,7 +47,7 @@ const FILAMENTS = [
     hex: '#15803d',
     accent: 'from-emerald-600 to-teal-700',
     image: '/products/natal/03_pinheiro_natal/01_hero_estudio.jpg',
-    material: 'Bio-Polímero Eco-Green',
+    material: 'Polímero Eco-Green',
     temp: '205°C'
   },
   {
@@ -124,10 +124,10 @@ export const Home: React.FC = () => {
       num: '03',
       title: 'Impressão Aditiva de Alta Precisão',
       subtitle: 'Bancada industrial com controle térmico',
-      desc: 'Extrusão precisa de biopolímeros ecológicos em câmaras isoladas com nivelamento óptico a laser. Sem emissão de fumos tóxicos e com 100% de eficiência energética.',
+      desc: 'Extrusão precisa de material de alta qualidade em câmaras isoladas com nivelamento óptico a laser. Sem emissão de fumos tóxicos e com 100% de eficiência energética.',
       icon: Flame,
       badge: 'Bocal de 0.4mm a 215°C',
-      stat: 'Bio-PLA Ecológico'
+      stat: 'Material de Qualidade'
     },
     {
       num: '04',
@@ -146,21 +146,12 @@ export const Home: React.FC = () => {
       {/* 🚀 TICKER ANIMADO DINÂMICO (Marquee Infinito com estilo 3D Studio) */}
       <div className="w-full bg-[#0A2540] text-white py-2.5 overflow-hidden border-b border-slate-800 text-[11px] font-medium tracking-wide shadow-xs select-none">
         <div className="animate-marquee whitespace-nowrap flex items-center gap-8">
-          <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <strong className="text-amber-400">ATELIER ATIVO:</strong> 12 Impressoras em Operação 24/7
-          </span>
-          <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Atendimento e Pagamento Direto no <strong>WhatsApp</strong>
-          </span>
-          <span className="text-slate-500">•</span>
-          <span className="flex items-center gap-1.5">
-            <Box className="w-3.5 h-3.5 text-sky-400" /> Biopolímeros 100% Biodegradáveis
+            <Box className="w-3.5 h-3.5 text-sky-400" /> Material de Alta Qualidade
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
@@ -171,18 +162,29 @@ export const Home: React.FC = () => {
             ⭐ <strong>4.9/5</strong> Avaliação de Excelência e Satisfação
           </span>
           <span className="text-slate-500">•</span>
-          {/* Loop repeat for seamless marquee */}
-          <span className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <strong className="text-amber-400">ATELIER ATIVO:</strong> 12 Impressoras em Operação 24/7
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Pagamento Seguro via <strong>PIX</strong>
           </span>
           <span className="text-slate-500">•</span>
+          {/* Loop repeat for seamless marquee */}
           <span className="flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Camadas Ultrarrefinadas de <strong>0.08mm</strong>
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Atendimento e Pagamento Direto no <strong>WhatsApp</strong>
+            <Box className="w-3.5 h-3.5 text-sky-400" /> Material de Alta Qualidade
+          </span>
+          <span className="text-slate-500">•</span>
+          <span className="flex items-center gap-1.5">
+            💬 Atendimento e Pedidos Direto no <strong>WhatsApp</strong>
+          </span>
+          <span className="text-slate-500">•</span>
+          <span className="flex items-center gap-1.5">
+            ⭐ <strong>4.9/5</strong> Avaliação de Excelência e Satisfação
+          </span>
+          <span className="text-slate-500">•</span>
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Pagamento Seguro via <strong>PIX</strong>
           </span>
         </div>
       </div>
@@ -240,7 +242,7 @@ export const Home: React.FC = () => {
                 </div>
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
                   <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">100<span className="text-amber-500 text-xs sm:text-sm font-semibold">%</span></div>
-                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Biopolímeros ecológicos</div>
+                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Material de qualidade</div>
                 </div>
                 <div className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs text-center sm:text-left">
                   <div className="text-lg sm:text-2xl font-bold text-zinc-900 font-display">48<span className="text-amber-500 text-xs sm:text-sm font-semibold">h</span></div>

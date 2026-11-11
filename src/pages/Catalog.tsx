@@ -94,7 +94,7 @@ export const Catalog: React.FC = () => {
               Catálogo de Produtos 3D
             </h1>
             <p className="text-sm text-zinc-500 mt-1 max-w-xl">
-              Peças de design autoral, utilitários modulares e acessórios tecnológicos impressos em biopolímeros sustentáveis de ultra-alta resolução.
+              Peças de design autoral, utilitários modulares e acessórios tecnológicos impressos em materiais de alta qualidade com ultra-alta resolução.
             </p>
           </div>
           <span className="text-xs font-medium px-3.5 py-1.5 rounded-full bg-white border border-zinc-200 text-zinc-600 shadow-xs self-start sm:self-auto shrink-0">

@@ -30,7 +30,7 @@ export const AboutUs: React.FC = () => {
             Fundada por designers industriais e entusiastas de manufatura digital, a <strong className="text-blue-950">SunLab</strong> surgiu para preencher o abismo entre o artesanato tradicional e a produção em massa despersonalizada.
           </p>
           <p className="text-sm text-blue-800/85 leading-relaxed">
-            Enquanto as indústrias tradicionais produzem centenas de milhares de unidades idênticas de plástico descartável em moldes de aço pesados, nós produzimos sob demanda com biopolímeros minerais de origem vegetal renovável (milho, cana e pó de pedra basáltica).
+            Enquanto as indústrias tradicionais produzem centenas de milhares de unidades idênticas de plástico descartável em moldes de aço pesados, nós produzimos sob demanda com materiais de alta qualidade e acabamento impecável.
           </p>
 
           <div className="grid grid-cols-2 gap-4 pt-2">

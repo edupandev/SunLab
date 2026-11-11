@@ -57,8 +57,8 @@ export const Footer: React.FC = () => {
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">100% Polímeros Bio</h4>
-              <p className="text-[11px] text-amber-700 mt-0.5">Matéria-prima renovável de origem vegetal</p>
+              <h4 className="text-xs font-bold text-[#0a2540] uppercase tracking-wider">Material de Qualidade</h4>
+              <p className="text-[11px] text-amber-700 mt-0.5">Filamentos selecionados de alta precisão e durabilidade</p>
             </div>
           </div>
         </div>

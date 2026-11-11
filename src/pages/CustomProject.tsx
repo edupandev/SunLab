@@ -221,7 +221,7 @@ export const CustomProject: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, material: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-blue-600 cursor-pointer"
                 >
-                  <option value="pla">PLA Bio-Mineral (Acabamento Fosco)</option>
+                  <option value="pla">PLA Premium (Acabamento Fosco)</option>
                   <option value="petg">PETG Resistente (Uso Externo/Mecânico)</option>
                   <option value="resin">Resina UV 8K (Altíssimo Nível de Detalhe)</option>
                   <option value="carbon">PETG Carbon Fiber (Alta Rigidez)</option>
