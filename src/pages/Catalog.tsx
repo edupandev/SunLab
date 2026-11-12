@@ -91,10 +91,10 @@ export const Catalog: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-950 tracking-tight font-display">
-              Catálogo de Produtos 3D
+              Catálogo de Produtos
             </h1>
             <p className="text-sm text-zinc-500 mt-1 max-w-xl">
-              Peças de design autoral, utilitários modulares e acessórios tecnológicos impressos em materiais de alta qualidade com ultra-alta resolução.
+              Peças de design autoral, utilitários elegantes e coleções exclusivas feitas para você.
             </p>
           </div>
           <span className="text-xs font-medium px-3.5 py-1.5 rounded-full bg-white border border-zinc-200 text-zinc-600 shadow-xs self-start sm:self-auto shrink-0">

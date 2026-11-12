@@ -95,7 +95,7 @@ export const Navbar: React.FC = () => {
                   className="absolute top-full left-0 mt-1 w-64 rounded-xl bg-white border border-zinc-200 shadow-lg p-2 z-50 animate-in fade-in zoom-in-95 duration-150"
                 >
                   <div className="text-[10px] uppercase font-bold text-amber-600 px-3 py-1.5 tracking-wider">
-                    Linhas de Fabricação 3D
+                    Coleções SunLab
                   </div>
                   {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
                     <Link

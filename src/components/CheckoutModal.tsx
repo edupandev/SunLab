@@ -245,8 +245,8 @@ export const CheckoutModal: React.FC = () => {
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
       `💰 *VALOR TOTAL: R$ ${order.totalAmount.toFixed(2).replace('.', ',')}*\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `💬 *Olá SunLab! Gostaria de confirmar meu pedido #${order.orderNumber} e receber as informações para pagamento e início da fabricação 3D!*\n` +
-      `_SunLab Design & Fabricação Digital_`
+      `💬 *Olá SunLab! Gostaria de confirmar meu pedido #${order.orderNumber} e receber as informações para pagamento e envio!*\n` +
+      `_SunLab • Ideias que ganham forma_`
     );
   };
 
@@ -637,7 +637,7 @@ export const CheckoutModal: React.FC = () => {
                   <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-between text-xs text-zinc-700">
                     <div className="flex items-center gap-2 text-zinc-600">
                       <CheckCircle className="w-4 h-4 text-emerald-600" />
-                      <span>Produção sob demanda garantida</span>
+                      <span>Qualidade e garantia SunLab</span>
                     </div>
                     <div className="text-right">
                       <span className="text-zinc-400 text-[10px] block">Valor Total</span>
@@ -696,7 +696,7 @@ export const CheckoutModal: React.FC = () => {
                       Pedido Realizado com Sucesso!
                     </h4>
                     <p className="text-xs text-zinc-500 max-w-md mx-auto mt-1 leading-relaxed">
-                      O seu pedido já está salvo na sua conta SunLab. Você foi direcionado ao WhatsApp da loja para combinar o pagamento. Assim que recebido, confirmamos o status e iniciamos a fabricação 3D!
+                      O seu pedido já está salvo na sua conta SunLab. Você foi direcionado ao WhatsApp da loja para combinar o pagamento. Assim que recebido, confirmamos o status e preparamos o seu envio!
                     </p>
                   </div>
 

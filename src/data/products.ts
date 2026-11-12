@@ -52,8 +52,8 @@ export const PRODUCTS: Product[] = [
     "slug": "conjunto-natalino-vela-renas-pinheiro-3d",
     "name": "Conjunto Natalino Vela, Renas & Pinheiro 3D",
     "tagline": "Centro de mesa escultural com porta-vela, silhuetas de renas e pinheiro nórdico.",
-    "description": "Composição de decoração natalina impressa em 3D de alta precisão. Apresenta base integrada para velas tealight (LED ou tradicional), silhueta elegante de renas e pinheiro estilizado com texturas facetadas. Ideal para ceias de Natal, aparadores e mesas de centro.",
-    "story": "Projetado pelos designers da SunLab para criar uma iluminação aconchegante e contemporânea. As sombras projetadas pela chama criam um efeito mágico nas silhuetas das renas e do pinheiro.",
+    "description": "Composição de decoração natalina exclusiva e elegante. Apresenta base integrada para velas tealight (LED ou tradicional), silhueta estilizada de renas e pinheiro com belas texturas facetadas. Ideal para ceias de Natal, aparadores e mesas de centro.",
+    "story": "Projetado com todo carinho para criar uma iluminação aconchegante e contemporânea no seu fim de ano.",
     "price": 89.9,
     "originalPrice": 119.9,
     "category": "decor",
@@ -95,15 +95,15 @@ export const PRODUCTS: Product[] = [
     ],
     "specs": {
       "material": "Material Premium de Alta Qualidade",
-      "layerHeight": "0.12mm (Ultra Definição)",
+      "layerHeight": "Alta Definição",
       "dimensions": "24 x 12 x 16 cm",
       "weight": "210g",
-      "infill": "20% Gyroid Antitorção",
+      "infill": "Estrutura Reforçada",
       "finish": "Fosco Mate Aveludado"
     },
     "highlights": [
       "Acomoda velas tealight padrão de até 40mm",
-      "Textura sem emendas nem marcas de suporte",
+      "Toque suave e acabamento refinado",
       "Material de alta qualidade e resistência",
       "Embalagem para presente com laço e papel kraft"
     ],
@@ -116,10 +116,10 @@ export const PRODUCTS: Product[] = [
   {
     "id": "prt-natal-02",
     "slug": "presepio-sagrada-familia-contemporaneo-3d",
-    "name": "Presépio Sagrada Família Minimalista 3D",
-    "tagline": "Composição escultural da Sagrada Família com geometria suave e acabamento cerâmico.",
+    "name": "Presépio Sagrada Família Minimalista",
+    "tagline": "Composição escultural da Sagrada Família com geometria suave e acabamento refinado.",
     "description": "Presépio contemporâneo com figuras estilizadas de Maria, José, o Menino Jesus e a estrela guia. As linhas minimalistas valorizam a serenidade da cena, proporcionando um toque de arte sofisticada para a decoração da sua casa no fim de ano.",
-    "story": "Uma reinterpretação artística das clássicas representações renascentistas da Sagrada Família, adaptada para a estética de design moderno através da modelagem digital paramétrica.",
+    "story": "Uma reinterpretação artística das clássicas representações da Sagrada Família, com formas harmoniosas para enriquecer a sua decoração natalina.",
     "price": 129.9,
     "originalPrice": 169.9,
     "category": "decor",
@@ -156,18 +156,18 @@ export const PRODUCTS: Product[] = [
       "Conjunto Completo (Base 28cm)"
     ],
     "specs": {
-      "material": "PLA Silk Mineral com partículas cerâmicas",
-      "layerHeight": "0.08mm (Qualidade Joalheria)",
+      "material": "Material Nobre com Toque Acetinado",
+      "layerHeight": "Alta Definição",
       "dimensions": "28 x 14 x 18 cm",
       "weight": "340g",
-      "infill": "25% Estrutural",
+      "infill": "Estrutura Sólida",
       "finish": "Toque Cerâmico Fosco Suave"
     },
     "highlights": [
-      "Resolução de 0.08mm com toque ultra suave",
-      "Estabilidade balanceada com base pesada",
-      "Não quebra em caso de pequenas quedas acidentais",
-      "Peça atemporal para colecionar por décadas"
+      "Toque sedoso com acabamento acetinado",
+      "Estabilidade balanceada com base estável",
+      "Alta durabilidade e resistência",
+      "Peça atemporal para colecionar e decorar"
     ],
     "images": [
       "/products/natal/02_presepio_familia/01_hero_estudio.jpg",
@@ -179,9 +179,9 @@ export const PRODUCTS: Product[] = [
     "id": "prt-natal-03",
     "slug": "pinheiro-escultural-feliz-natal-3d",
     "name": "Pinheiro Escultural \"Feliz Natal\" com Base",
-    "tagline": "Árvore de Natal geométrica em camadas com lettering vazado e encaixe de precisão.",
-    "description": "Árvore decorativa de mesa em camadas geométricas sobrepostas com tipografia integrada Feliz Natal. Fácil de montar e desmontar, possui base estável e detalhes de precisão milimétrica que capturam a luz ambiente.",
-    "story": "Desenvolvido para compor escritórios, setups, mesas de jantar e recepções corporativas que buscam elegância festiva com zero excesso visual.",
+    "tagline": "Árvore de Natal escultural com lettering vazado Feliz Natal e base de apoio.",
+    "description": "Árvore decorativa de mesa com tipografia integrada Feliz Natal. Fácil de montar e desmontar, possui base estável e detalhes elegantes que valorizam a luz ambiente.",
+    "story": "Desenvolvido para compor escritórios, setups, mesas de jantar e recepções corporativas que buscam elegância festiva.",
     "price": 74.9,
     "originalPrice": 99.9,
     "category": "decor",
@@ -189,7 +189,7 @@ export const PRODUCTS: Product[] = [
     "rating": 4.9,
     "reviewsCount": 29,
     "inStock": true,
-    "leadTime": "Fabricação em 24h",
+    "leadTime": "Pronta Entrega",
     "featured": true,
     "bestseller": false,
     "newArrival": true,
@@ -219,18 +219,18 @@ export const PRODUCTS: Product[] = [
       "Grande (26cm altura)"
     ],
     "specs": {
-      "material": "Polímero Premium de Alta Qualidade",
-      "layerHeight": "0.12mm",
+      "material": "Polímero Premium de Alta Durabilidade",
+      "layerHeight": "Alta Definição",
       "dimensions": "20 x 14 x 6 cm",
       "weight": "160g",
-      "infill": "15% Honeycomb",
+      "infill": "Estrutura Firme",
       "finish": "Fosco Satin"
     },
     "highlights": [
       "Design autoral modular com montagem em 2 passos",
       "Encaixe firme sem necessidade de cola",
       "Perfeito para setups e mesas de escritório",
-      "Acompanha base com gravação oficial SunLab"
+      "Acompanha base oficial SunLab"
     ],
     "images": [
       "/products/natal/03_pinheiro_natal/01_hero_estudio.jpg",
@@ -241,10 +241,10 @@ export const PRODUCTS: Product[] = [
   {
     "id": "prt-natal-04",
     "slug": "kit-6-flocos-de-neve-ornamentos-arvore-3d",
-    "name": "Kit 6 Enfeites Flocos de Neve Paramétricos",
+    "name": "Kit 6 Enfeites Flocos de Neve Exclusivos",
     "tagline": "Coleção com 6 flocos de neve rendados exclusivos para pendurar na árvore ou guirlandas.",
-    "description": "Conjunto com 6 ornamentos de flocos de neve, cada um com padrão geométrico fractal único inspirado em cristais de gelo naturais. Extremamente leves, duráveis e acompanhados de cordão rústico em fio dourado para pendurar.",
-    "story": "Algoritmos generativos baseados na cristalografia natural de Wilson Bentley foram usados para criar 6 variações fractais distintas, impossíveis de reproduzir manualmente.",
+    "description": "Conjunto com 6 ornamentos de flocos de neve, cada um com padrão geométrico único inspirado em cristais de gelo naturais. Extremamente leves, duráveis e acompanhados de cordão rústico em fio dourado para pendurar.",
+    "story": "Coleção delicada inspirada na beleza única dos cristais de gelo para decorar sua árvore com sofisticação.",
     "price": 59.9,
     "originalPrice": 79.9,
     "category": "gifts",
@@ -252,7 +252,7 @@ export const PRODUCTS: Product[] = [
     "rating": 5,
     "reviewsCount": 64,
     "inStock": true,
-    "leadTime": "Fabricação em 24h",
+    "leadTime": "Pronta Entrega",
     "featured": true,
     "bestseller": true,
     "newArrival": true,
@@ -281,11 +281,11 @@ export const PRODUCTS: Product[] = [
       "Kit 6 Unidades (8cm cada)"
     ],
     "specs": {
-      "material": "PLA de Alta Pureza",
-      "layerHeight": "0.12mm",
+      "material": "Material Leve de Alta Durabilidade",
+      "layerHeight": "Alta Definição",
       "dimensions": "8 x 8 x 0.3 cm cada",
       "weight": "12g por peça (72g total)",
-      "infill": "100% Sólido",
+      "infill": "Estrutura Sólida",
       "finish": "Brilho Glacial Suave"
     },
     "highlights": [
@@ -304,9 +304,9 @@ export const PRODUCTS: Product[] = [
     "id": "prt-natal-05",
     "slug": "colecao-tags-enfeites-bicolores-natal-3d",
     "name": "Coleção Tags & Enfeites Bicolores de Natal (Sinos & Botas)",
-    "tagline": "Enfeites suspensos em dupla camada colorida (vermelho escarlate e branco puro).",
-    "description": "Kit com enfeites natalinos bicolores impressos com tecnologia de extrusão dupla sem pintura. Relevos nítidos de sinos natalinos, botas de Papai Noel e estrelas com contraste impecável entre o vermelho vivo e o branco fosco.",
-    "story": "Produzido com troca precisa de filamento na camada exata para garantir que a cor nunca desbote, descasque ou rache, permanecendo viva por muitos anos.",
+    "tagline": "Enfeites suspensos em dupla cor permanente (vermelho escarlate e branco puro).",
+    "description": "Kit com enfeites natalinos bicolores exclusivos. Relevos nítidos de sinos natalinos, botas de Papai Noel e estrelas com contraste marcante entre o vermelho vivo e o branco fosco.",
+    "story": "Cores vivas e permanentes que não desbotam nem descascam, permanecendo lindas por muitas festas.",
     "price": 49.9,
     "originalPrice": 69.9,
     "category": "gifts",
@@ -339,15 +339,15 @@ export const PRODUCTS: Product[] = [
       "Kit 4 Peças Bicolores (9cm cada)"
     ],
     "specs": {
-      "material": "Polímero de Alta Qualidade",
-      "layerHeight": "0.12mm",
+      "material": "Polímero Bicolor de Alta Qualidade",
+      "layerHeight": "Alta Definição",
       "dimensions": "9 x 7 x 0.4 cm cada",
       "weight": "18g por peça",
-      "infill": "100% Sólido Coextrudado",
-      "finish": "Relevo Bicolor Alto Brilho"
+      "infill": "Estrutura Sólida",
+      "finish": "Relevo Bicolor de Alto Contraste"
     },
     "highlights": [
-      "Dupla cor permanente (não é pintado, é plástico fundido)",
+      "Cores permanentes e duradouras",
       "Serve como ornamento de árvore ou tag de presente luxo",
       "Cordão encerado natalino incluso",
       "Alta nitidez de relevo tátil"

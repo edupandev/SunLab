@@ -23,24 +23,24 @@ export const Contact: React.FC = () => {
 
   const faqs = [
     {
-      q: 'Os produtos suportam água e exposição solar?',
-      a: 'Nossos vasos para flores possuem tratamento e selagem resinada impermeável na parte interna, permitindo colocar água fresca sem vazamentos. Para produtos decorativos internos, utilizamos PLA mineral. Para itens que ficarão expostos a calor automotivo ou sol constante, recomendamos a produção em PETG ou ASA que resistem a temperaturas de até 85°C.'
+      q: 'Os produtos suportam água e exposição ao tempo?',
+      a: 'Nossos produtos possuem excelente resistência e durabilidade para ambientes internos e áreas cobertas, mantendo as cores e o formato sempre conservados.'
     },
     {
-      q: 'Qual o tempo de produção das peças?',
-      a: 'Como trabalhamos com manufatura aditiva autoral e sob demanda, o tempo médio de impressão e acabamento artesanal leva de 1 a 3 dias úteis com controle rigoroso de qualidade em cada camada.'
+      q: 'Qual o prazo de envio das peças?',
+      a: 'Nosso prazo de postagem é de 1 a 3 dias úteis para pedidos a pronta entrega. Para peças personalizadas, o prazo é combinado diretamente com você.'
     },
     {
-      q: 'Posso solicitar uma cor especial Pantone ou acabamento diferenciado?',
-      a: 'Com certeza! Nosso atelier dispõe de mais de 40 tons de filamentos técnicos, incluindo filamentos carregados com fibra de carbono, madeira verdadeira, pó de pedra basáltica, e filamentos de seda metálica. Acesse nossa página de Personalizados para nos consultar.'
+      q: 'Posso solicitar uma cor especial ou modelo personalizado?',
+      a: 'Com certeza! Você pode solicitar modelos sob medida ou cores exclusivas através da nossa página de Personalizados ou diretamente pelo WhatsApp.'
     },
     {
-      q: 'Vocês imprimem arquivos prontos (.STL / .OBJ baixados da internet)?',
-      a: 'Sim! Se você encontrou um modelo no Printables, MakerWorld ou Thingiverse, basta nos enviar o link ou arquivo através da página de Personalizados. Calcularemos o tempo de máquina, peso em gramas e enviaremos o orçamento exato em minutos.'
+      q: 'Como solicitar um projeto ou ideia própria?',
+      a: 'Basta nos enviar sua ideia, foto de referência ou arquivo através da página de Personalizados para receber um orçamento rápido sem compromisso.'
     },
     {
       q: 'Como funciona a garantia e a política de trocas?',
-      a: 'Garantimos 1 ano contra defeitos de fabricação ou delaminação de camadas. Além disso, de acordo com o Código de Defesa do Consumidor, você possui 7 dias incondicionais após o recebimento para troca ou reembolso total se não estiver 100% satisfeito.'
+      a: 'Garantimos 1 ano contra defeitos e você conta com 7 dias de garantia incondicional após o recebimento para troca ou reembolso total se não estiver 100% satisfeito.'
     }
   ];
 
@@ -101,10 +101,10 @@ export const Contact: React.FC = () => {
             <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <MapPin className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-bold text-slate-900">Atelier & Fábrica</h3>
-            <p className="text-xs text-slate-500">Av. Paulista, 1000 — Bela Vista, São Paulo/SP</p>
+            <h3 className="text-base font-bold text-slate-900">Atelier SunLab</h3>
+            <p className="text-xs text-slate-500">Santos, Litoral Paulista — SP</p>
             <span className="text-[11px] text-slate-400 block pt-1">
-              *Produção fechada; visitas técnicas com agendamento prévio.
+              Atendimento online e envio rápido para todo o Brasil.
             </span>
           </div>
         </div>

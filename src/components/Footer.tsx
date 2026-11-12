@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
               <SunLabLogo size="lg" variant="light" />
             </Link>
             <p className="text-xs text-slate-600 leading-relaxed max-w-sm">
-              Não somos uma gráfica 3D comum. A SunLab é um estúdio de design e manufatura aditiva focado em objetos contemporâneos, utilitários ergonômicos e projetos autorais sob demanda.
+              Nascemos em Santos com essência caiçara e paixão por tecnologia. Criamos peças exclusivas e personalizadas para transformar ideias em realidade.
             </p>
             
             <div className="flex items-center gap-3 pt-2">

@@ -70,7 +70,7 @@ export const CustomProject: React.FC = () => {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-lime-600" />
-          <span>Atelier de Fabricação Exclusiva</span>
+          <span>Projetos Sob Medida</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-950 tracking-tight font-display">
           Criar Algo Personalizado
@@ -91,7 +91,7 @@ export const CustomProject: React.FC = () => {
               Orçamento Solicitado com Sucesso!
             </h2>
             <p className="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
-              Obrigado, <strong className="text-slate-900">{formData.name}</strong>. Nossa equipe de engenheiros e designers industriais já recebeu suas especificações e retornará em até 24 horas úteis.
+              Obrigado, <strong className="text-slate-900">{formData.name}</strong>. Nossa equipe já recebeu suas informações e retornará em até 24 horas úteis com o seu orçamento.
             </p>
           </div>
 
@@ -343,7 +343,7 @@ export const CustomProject: React.FC = () => {
               <span>Solicitar Orçamento Gratuito</span>
             </button>
             <p className="text-[11px] text-slate-500 text-center mt-3">
-              Não cobramos pelo orçamento. Resposta com estimativa de custo e prazo de fabricação em poucas horas.
+              Não cobramos pelo orçamento. Resposta com estimativa de custo e prazo de envio em poucas horas.
             </p>
           </div>
 

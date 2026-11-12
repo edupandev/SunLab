@@ -198,7 +198,7 @@ export const Home: React.FC = () => {
                   className="p-2.5 sm:p-3 rounded-xl bg-white border border-zinc-100 shadow-2xs hover:shadow-md text-center sm:text-left transition-shadow cursor-default"
                 >
                   <div className="text-base sm:text-lg font-bold text-zinc-900 font-display">48h</div>
-                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Média de fabricação</div>
+                  <div className="text-[10px] sm:text-xs text-zinc-500 mt-0.5 leading-tight">Envio rápido</div>
                 </motion.div>
               </motion.div>
             </motion.div>
@@ -264,7 +264,7 @@ export const Home: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5" /> Catálogo Selecionado
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight font-display">
-              Peças Prontas para Fabricação
+              Coleções em Destaque
             </h2>
           </div>
 

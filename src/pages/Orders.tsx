@@ -320,13 +320,13 @@ export const Orders: React.FC = () => {
               <Sparkles className="w-3.5 h-3.5 text-blue-600" />
               Painel do Cliente SunLab
             </span>
-            <span className="text-xs font-medium text-zinc-400">• Manufatura 3D</span>
+            <span className="text-xs font-medium text-zinc-400">• Pedidos</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-blue-950 font-display tracking-tight">
             Produtos Comprados & Meus Pedidos
           </h1>
           <p className="text-xs sm:text-sm text-zinc-600 mt-1 max-w-2xl leading-relaxed">
-            Consulte abaixo os produtos adquiridos, status de impressão na matriz e comprovantes detalhados com suporte direto via WhatsApp.
+            Consulte abaixo os produtos adquiridos, status de envio e comprovantes detalhados com suporte direto via WhatsApp.
           </p>
         </div>
 
@@ -511,14 +511,14 @@ export const Orders: React.FC = () => {
                 {/* Progress Stepper for 3D Manufacturing */}
                 <div className="px-4 sm:px-6 py-4 border-b border-zinc-100 bg-white">
                   <div className="text-[11px] font-bold text-blue-900 uppercase tracking-wider mb-3">
-                    Etapas da Produção 3D:
+                    Status do Pedido:
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {[
-                      { step: 1, title: '1. Pedido Confirmado', desc: 'Dados salvos no banco' },
-                      { step: 2, title: '2. Em Impressão 3D', desc: 'Filamento sendo extrusado' },
-                      { step: 3, title: '3. Acabamento & QA', desc: 'Remoção de suportes e cura' },
-                      { step: 4, title: '4. Concluído', desc: 'Peça finalizada e inspecionada' }
+                      { step: 1, title: '1. Pedido Confirmado', desc: 'Dados e pagamento verificados' },
+                      { step: 2, title: '2. Em Preparação', desc: 'Processamento do seu pedido' },
+                      { step: 3, title: '3. Controle de Qualidade', desc: 'Inspeção e acabamento' },
+                      { step: 4, title: '4. Pronto para Envio', desc: 'Embalado com todo carinho' }
                     ].map((st) => {
                       const isDone = stepIndex >= st.step;
                       const isCurrent = stepIndex === st.step;

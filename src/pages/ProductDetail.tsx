@@ -127,7 +127,7 @@ export const ProductDetail: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 pt-2 sm:pt-4 text-xs text-zinc-600">
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
               <Clock className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>Produção: {product.leadTime}</span>
+              <span>Envio: {product.leadTime}</span>
             </div>
             <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -181,7 +181,7 @@ export const ProductDetail: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-xs text-emerald-700 font-medium">
-                  Atendimento direto e liberação para a fila de manufatura 3D
+                  Atendimento direto e confirmação imediata do seu pedido
                 </p>
               </>
             ) : (
@@ -190,7 +190,7 @@ export const ProductDetail: React.FC = () => {
                   Projeto Sob Medida
                 </span>
                 <p className="text-xs text-zinc-500 mt-0.5">
-                  Orçamento personalizado conforme geometria e volume
+                  Orçamento personalizado para a sua ideia
                 </p>
               </div>
             )}
@@ -318,22 +318,19 @@ export const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Technical Specifications & Description Accordions */}
+      {/* Detalhes & Descrição */}
       <div className="pt-10 border-t border-zinc-200 grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-6 space-y-4">
           <h3 className="text-xl font-bold text-zinc-900 font-display">
-            Sobre o Objeto & Narrativa
+            Sobre o Produto
           </h3>
           <p className="text-sm text-zinc-600 leading-relaxed">
             {product.description}
           </p>
-          <p className="text-sm text-zinc-600 leading-relaxed italic bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-            "{product.story}"
-          </p>
 
           <div className="space-y-2 pt-2">
             <h4 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">
-              Destaques de Design:
+              Destaques:
             </h4>
             <ul className="space-y-1.5 text-xs text-zinc-700">
               {product.highlights.map((h, i) => (

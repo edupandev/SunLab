@@ -193,7 +193,7 @@ export const QuickViewModal: React.FC = () => {
                 </div>
                 <div className="p-2 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center gap-2">
                   <Box className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
-                  <span className="truncate">Camada {quickViewProduct.specs.layerHeight}</span>
+                  <span className="truncate">{quickViewProduct.specs.dimensions}</span>
                 </div>
               </div>
             </div>
