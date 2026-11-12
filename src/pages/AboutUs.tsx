@@ -1,145 +1,112 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { Compass, Sparkles, ShieldCheck, Leaf, HeartHandshake } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Waves } from 'lucide-react';
 
 export const AboutUs: React.FC = () => {
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-20">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 w-full space-y-12">
       
-      {/* Hero Banner */}
-      <div className="max-w-3xl space-y-4">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-700 shadow-sm">
-          <Compass className="w-3.5 h-3.5" />
-          <span>O Manifesto SunLab</span>
-        </div>
-        <h1 className="text-4xl sm:text-5xl font-extrabold text-blue-950 tracking-tight font-display leading-tight">
-          A matéria física elevada pela geometria computacional.
-        </h1>
-        <p className="text-base text-blue-800/85 leading-relaxed">
-          Nascemos com a convicção de que a manufatura aditiva (impressão 3D) não é um método de prototipagem rápida qualquer, mas a tecnologia de fabricação definitiva para o design contemporâneo.
-        </p>
-      </div>
+      {/* Badge de Localização */}
+      <motion.div 
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-xs font-semibold text-blue-800 shadow-2xs"
+      >
+        <Waves className="w-3.5 h-3.5 text-blue-600" />
+        <span>Santos • Litoral Paulista</span>
+      </motion.div>
 
-      {/* Narrative Section with Split Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-        <div className="lg:col-span-6 space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-blue-950 font-display">
-            Da tela dos softwares generativos para as mãos de pessoas que valorizam o detalhe.
-          </h2>
-          <p className="text-sm text-blue-800/85 leading-relaxed">
-            Fundada por designers industriais e entusiastas de manufatura digital, a <strong className="text-blue-950">SunLab</strong> surgiu para preencher o abismo entre o artesanato tradicional e a produção em massa despersonalizada.
-          </p>
-          <p className="text-sm text-blue-800/85 leading-relaxed">
-            Enquanto as indústrias tradicionais produzem centenas de milhares de unidades idênticas de plástico descartável em moldes de aço pesados, nós produzimos sob demanda com materiais de alta qualidade e acabamento impecável.
-          </p>
+      {/* Grid Principal: Texto da SunLab + Imagem Simples e Limpa */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+        
+        {/* Texto Institucional */}
+        <motion.div 
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="lg:col-span-7 space-y-6"
+        >
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 tracking-tight font-display leading-tight">
+            🌊 Prazer, somos a SunLab!
+          </h1>
 
-          <div className="grid grid-cols-2 gap-4 pt-2">
-            <div className="p-4 rounded-xl bg-white border border-zinc-200 shadow-xs">
-              <span className="text-2xl font-bold text-blue-950 font-display">100%</span>
-              <p className="text-xs text-blue-600 mt-1">Design autoral com produção local no Brasil</p>
-            </div>
-            <div className="p-4 rounded-xl bg-white border border-zinc-200 shadow-xs">
-              <span className="text-2xl font-bold text-blue-950 font-display">Zero</span>
-              <p className="text-xs text-blue-600 mt-1">Desperdício de matéria-prima em estoque ocioso</p>
+          <div className="space-y-4 text-base text-zinc-600 leading-relaxed font-normal">
+            <p>
+              Nascemos em Santos, no litoral paulista, trazendo um pouco da nossa essência caiçara para um universo cheio de criatividade e tecnologia.
+            </p>
+            <p>
+              A SunLab surgiu da vontade de transformar ideias em algo real. Aqui, misturamos impressão 3D, personalização e tecnologia para criar peças que tenham identidade e façam sentido para quem recebe.
+            </p>
+            <p>
+              Mais do que imprimir objetos, queremos explorar possibilidades: criar, personalizar, experimentar e dar vida a novas ideias.
+            </p>
+            <p>
+              De peças personalizadas a soluções com tecnologia NFC, estamos sempre buscando algo novo para tirar do papel.
+            </p>
+            <p>
+              Tudo isso com criatividade, curiosidade e aquele toque de quem nasceu perto do mar. ☀️
+            </p>
+          </div>
+
+          <div className="pt-2">
+            <div className="p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 text-zinc-900 font-bold text-base shadow-2xs">
+              Somos a SunLab. Ideias que ganham forma.
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="lg:col-span-6">
-          <div className="rounded-3xl overflow-hidden aspect-4/3 bg-slate-100 border border-slate-200 shadow-xl relative">
+        {/* Imagem simples, sem desenhos e sem enfeitar o pavão */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="lg:col-span-5"
+        >
+          <div className="rounded-2xl overflow-hidden border border-zinc-200 shadow-sm bg-zinc-100 aspect-4/3 sm:aspect-square lg:aspect-4/5">
             <img
-              src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=85"
-              alt="Laboratório SunLab 3D"
+              src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80"
+              alt="Atelier SunLab - Criação e Tecnologia 3D"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-6">
-              <p className="text-xs text-slate-200">
-                Fazenda de manufatura digital SunLab — parque de impressão fechado com filtragem de ar HEPA e calibração a laser.
-              </p>
-            </div>
           </div>
-        </div>
+        </motion.div>
+
       </div>
 
-      {/* Four Pillars Grid */}
-      <div className="space-y-8">
-        <div className="text-center max-w-xl mx-auto space-y-2">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
-            Os 4 Pilares da SunLab
+      {/* Caixa de Chamada (CTA) Simples e Direta */}
+      <motion.div 
+        initial={{ opacity: 0, y: 16 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="p-8 sm:p-10 rounded-2xl bg-zinc-100 border border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs"
+      >
+        <div className="space-y-1.5 text-center sm:text-left">
+          <h2 className="text-xl font-bold text-zinc-900 font-display">
+            Quer transformar sua ideia em realidade?
           </h2>
-          <p className="text-xs text-slate-500">
-            Cada detalhe é cuidadosamente trabalhado para oferecer o melhor acabamento.
+          <p className="text-xs sm:text-sm text-zinc-500">
+            Conheça nossos produtos disponíveis no catálogo ou solicite um projeto personalizado.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Design Exclusivo</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Formas orgânicas e contemporâneas criadas com originalidade para transformar qualquer espaço.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <Leaf className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Qualidade dos Materiais</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Utilização de materiais selecionados, atóxicos e resistentes, com máxima durabilidade e estabilidade.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Inspeção Minuciosa</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Cada peça é inspecionada para garantir estrutura sólida, linhas contínuas e acabamento impecável.
-            </p>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-              <HeartHandshake className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Acabamento Artesanal</h3>
-            <p className="text-xs text-slate-600 leading-relaxed">
-              Cuidado manual no pós-processamento de arestas para garantir toque suave e acabamento refinado.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Box */}
-      <div className="p-8 sm:p-12 rounded-3xl bg-zinc-100 text-zinc-900 border border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xs">
-        <div className="space-y-2 text-center sm:text-left">
-          <h3 className="text-2xl font-bold text-zinc-900 font-display">
-            Pronto para transformar seu espaço?
-          </h3>
-          <p className="text-xs text-zinc-600 max-w-md">
-            Conheça as peças da nossa coleção ou solicite um projeto autoral sob encomenda.
-          </p>
-        </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap items-center gap-3 shrink-0">
           <Link
             to="/catalog"
-            className="px-6 py-3 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-zinc-900 border border-zinc-300 font-semibold text-xs transition-colors cursor-pointer shadow-xs"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-xs"
           >
-            Ver Loja
+            <span>Ver Catálogo</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <Link
             to="/custom"
-            className="px-6 py-3 rounded-xl bg-white hover:bg-zinc-50 text-zinc-700 font-semibold text-xs transition-colors cursor-pointer border border-zinc-200 shadow-xs"
+            className="px-5 py-2.5 rounded-xl bg-white hover:bg-zinc-50 text-zinc-800 border border-zinc-300 font-semibold text-xs transition-colors shadow-xs"
           >
-            Personalizados
+            Projetos Sob Medida
           </Link>
         </div>
-      </div>
+      </motion.div>
 
     </div>
   );
