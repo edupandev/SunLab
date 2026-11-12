@@ -4,8 +4,6 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Sparkles,
-  Mail,
-  Check,
   ShieldCheck,
   Box,
   ShoppingBag
@@ -45,22 +43,9 @@ const SHOWCASE_ITEMS = [
 export const Home: React.FC = () => {
   const { products } = useProducts();
   const [activeTab, setActiveTab] = useState<'featured' | 'bestsellers' | 'newArrivals'>('featured');
-  const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
   // Featured Showcase State
   const [selectedShowcase] = useState(SHOWCASE_ITEMS[0]);
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newsletterEmail) {
-      setNewsletterSubscribed(true);
-      setTimeout(() => {
-        setNewsletterSubscribed(false);
-        setNewsletterEmail('');
-      }, 4000);
-    }
-  };
 
   const filteredProducts = products.filter(p => {
     if (activeTab === 'bestsellers') return p.bestseller;
@@ -369,124 +354,6 @@ export const Home: React.FC = () => {
           </motion.div>
         )}
       </section>
-
-      {/* 4. BENEFÍCIOS & GARANTIAS DO ATELIER (Com Stagger & Spring Hover) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            {
-              icon: '📏',
-              bg: 'bg-blue-50',
-              border: 'border-blue-100',
-              hoverBorder: 'hover:border-blue-300',
-              titleColor: 'group-hover:text-blue-700',
-              title: 'Acabamento Suave',
-              desc: 'Superfície lisa, suave e sem rebarbas'
-            },
-            {
-              icon: '🌿',
-              bg: 'bg-emerald-50',
-              border: 'border-emerald-100',
-              hoverBorder: 'hover:border-emerald-300',
-              titleColor: 'group-hover:text-emerald-700',
-              title: 'Materiais Premium',
-              desc: 'Matérias-primas de alta qualidade e durabilidade'
-            },
-            {
-              icon: '⚙️',
-              bg: 'bg-purple-50',
-              border: 'border-purple-100',
-              hoverBorder: 'hover:border-purple-300',
-              titleColor: 'group-hover:text-purple-700',
-              title: 'Encaixe & Ergonomia',
-              desc: 'Ajuste perfeito para sua mesa e setup'
-            },
-            {
-              icon: '🛡️',
-              bg: 'bg-amber-50',
-              border: 'border-amber-100',
-              hoverBorder: 'hover:border-amber-300',
-              titleColor: 'group-hover:text-amber-700',
-              title: 'Garantia & Mercado Pago',
-              desc: '100% inspecionado e compra protegida'
-            }
-          ].map((item, idx) => (
-            <motion.div
-              key={item.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.45, delay: idx * 0.08 }}
-              whileHover={{ y: -5, scale: 1.02 }}
-              className={`flex items-center gap-3.5 p-4 rounded-2xl bg-white border border-zinc-200 shadow-xs ${item.hoverBorder} hover:shadow-md transition-all group cursor-default`}
-            >
-              <div className={`w-12 h-12 rounded-xl ${item.bg} border ${item.border} flex items-center justify-center text-2xl shrink-0 group-hover:scale-115 group-hover:rotate-6 transition-transform duration-300`}>
-                {item.icon}
-              </div>
-              <div>
-                <h3 className={`text-xs font-bold text-zinc-900 ${item.titleColor} transition-colors`}>{item.title}</h3>
-                <p className="text-[11px] text-zinc-500 mt-0.5">{item.desc}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* 5. NEWSLETTER INTERATIVA COM CUPOM */}
-      <motion.section 
-        initial={{ opacity: 0, y: 25 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl mx-auto px-4 sm:px-6 w-full"
-      >
-        <div className="bg-white border border-zinc-200 rounded-3xl p-8 sm:p-12 text-center shadow-xs space-y-6">
-          <motion.div 
-            whileHover={{ rotate: 12, scale: 1.1 }}
-            className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100 shadow-2xs transition-transform"
-          >
-            <Mail className="w-6 h-6" />
-          </motion.div>
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 font-display">
-              Receba Lançamentos & Modelos Exclusivos
-            </h2>
-            <p className="text-xs sm:text-sm text-zinc-500 max-w-md mx-auto mt-1.5 leading-relaxed">
-              Junte-se à nossa comunidade para receber cupons de desconto, novos lançamentos e novidades do atelier.
-            </p>
-          </div>
-
-          <form onSubmit={handleNewsletterSubmit} className="max-w-md mx-auto flex flex-col sm:flex-row gap-2.5">
-            <input
-              required
-              type="email"
-              value={newsletterEmail}
-              onChange={(e) => setNewsletterEmail(e.target.value)}
-              placeholder="seu.email@exemplo.com"
-              className="flex-1 bg-zinc-50 border border-zinc-300 rounded-xl px-4 py-3 text-xs text-zinc-900 outline-none focus:bg-white focus:border-blue-600 shadow-xs transition-colors"
-            />
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              type="submit"
-              className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-xs cursor-pointer"
-            >
-              Inscrever-se
-            </motion.button>
-          </form>
-
-          {newsletterSubscribed && (
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 text-xs font-semibold border border-emerald-200"
-            >
-              <Check className="w-4 h-4 text-emerald-600" />
-              <span>Inscrição confirmada! Use o cupom <strong>SUNLAB10</strong> para 10% OFF no Checkout Mercado Pago.</span>
-            </motion.div>
-          )}
-        </div>
-      </motion.section>
 
     </div>
   );
