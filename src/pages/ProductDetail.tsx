@@ -4,12 +4,9 @@ import {
   Star,
   ShoppingBag,
   ArrowRight,
-  ShieldCheck,
   Check,
   Sparkles,
-  ChevronRight,
-  RotateCcw,
-  Clock
+  ChevronRight
 } from 'lucide-react';
 import { useProducts } from '@/context/ProductContext';
 import { useCart } from '@/context/CartContext';
@@ -118,22 +115,6 @@ export const ProductDetail: React.FC = () => {
               ))}
             </div>
           )}
-
-          {/* Production Guarantee Banner */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 pt-2 sm:pt-4 text-xs text-zinc-600">
-            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-600 shrink-0" />
-              <span>Envio: {product.leadTime}</span>
-            </div>
-            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>Garantia de 1 ano</span>
-            </div>
-            <div className="p-2.5 sm:p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-              <RotateCcw className="w-4 h-4 text-zinc-500 shrink-0" />
-              <span>Troca em 7 dias</span>
-            </div>
-          </div>
         </div>
 
         {/* Product Purchase Actions & Specs */}
