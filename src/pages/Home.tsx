@@ -142,20 +142,28 @@ export const Home: React.FC = () => {
                 transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-zinc-900 tracking-tight leading-[1.15] sm:leading-[1.1] font-display"
               >
-                Se dá pra imaginar, <br />
+                Ideias que <br className="hidden sm:inline" />
                 <span className="bg-gradient-to-r from-[#0A2540] via-[#0284C7] to-[#F59E0B] bg-clip-text text-transparent">
-                  a gente imprime.
+                  ganham forma.
                 </span>
               </motion.h1>
 
-              {/* Subtitle */}
-              <motion.p 
+              {/* Subtitle & Narrative */}
+              <motion.div 
                 variants={{ hidden: { opacity: 0, y: 18 }, visible: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.5 }}
-                className="text-sm sm:text-lg text-zinc-600 max-w-xl font-normal leading-relaxed"
+                className="space-y-3 text-sm sm:text-base text-zinc-600 max-w-xl font-normal leading-relaxed"
               >
-                De chaveiros e colecionáveis a peças personalizadas pra sua marca ou pro seu setup. Sem complicação, com acabamento impecável e direto na sua porta.
-              </motion.p>
+                <p>
+                  Da imaginação para o mundo real. Criamos peças em impressão 3D, personalizadas para você, para sua marca ou para transformar aquele projeto que só existia na sua cabeça.
+                </p>
+                <p>
+                  Unimos criatividade, personalização e tecnologia para dar vida a novas possibilidades. Do pequeno detalhe a projetos exclusivos, cada criação tem seu propósito.
+                </p>
+                <p className="font-semibold text-zinc-900 italic pt-0.5">
+                  Você imagina. A SunLab dá forma.
+                </p>
+              </motion.div>
 
               {/* Call to Actions */}
               <motion.div 
