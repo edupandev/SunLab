@@ -123,7 +123,7 @@ export const ProductDetail: React.FC = () => {
               {product.name}
             </h1>
             <p className="text-sm text-zinc-600 mt-2 leading-relaxed">
-              {product.tagline}
+              {product.description || product.tagline}
             </p>
           </div>
 
@@ -257,56 +257,7 @@ export const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Detalhes & Descrição */}
-      <div className="pt-10 border-t border-zinc-200 grid grid-cols-1 md:grid-cols-12 gap-8">
-        <div className="md:col-span-6 space-y-4">
-          <h3 className="text-xl font-bold text-zinc-900 font-display">
-            Sobre o Produto
-          </h3>
-          <p className="text-sm text-zinc-600 leading-relaxed">
-            {product.description}
-          </p>
 
-          <div className="space-y-2 pt-2">
-            <h4 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">
-              Destaques:
-            </h4>
-            <ul className="space-y-1.5 text-xs text-zinc-700">
-              {product.highlights.map((h, i) => (
-                <li key={i} className="flex items-center gap-2">
-                  <Check className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                  <span>{h}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Specs Table */}
-        <div className="md:col-span-6 space-y-4">
-          <h3 className="text-xl font-bold text-zinc-900 font-display">
-            Detalhes do Produto
-          </h3>
-          <div className="rounded-xl border border-zinc-200 overflow-hidden divide-y divide-zinc-100 text-xs bg-white shadow-xs">
-            <div className="flex justify-between p-3.5 bg-zinc-50/60">
-              <span className="text-zinc-500">Material</span>
-              <span className="font-semibold text-zinc-900">{product.specs.material}</span>
-            </div>
-            <div className="flex justify-between p-3.5 bg-white">
-              <span className="text-zinc-500">Dimensões (AxLxP)</span>
-              <span className="font-semibold text-zinc-900">{product.specs.dimensions}</span>
-            </div>
-            <div className="flex justify-between p-3.5 bg-zinc-50/60">
-              <span className="text-zinc-500">Peso Aproximado</span>
-              <span className="font-semibold text-zinc-900">{product.specs.weight}</span>
-            </div>
-            <div className="flex justify-between p-3.5 bg-white">
-              <span className="text-zinc-500">Acabamento</span>
-              <span className="font-semibold text-zinc-900 text-right max-w-[240px]">{product.specs.finish}</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Related Products Carousel / Grid */}
       {relatedProducts.length > 0 && (

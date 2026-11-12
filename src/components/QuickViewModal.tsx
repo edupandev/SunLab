@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { X, ShoppingBag, ArrowRight, Cpu, Box, Check } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export const QuickViewModal: React.FC = () => {
@@ -146,18 +146,6 @@ export const QuickViewModal: React.FC = () => {
                   </div>
                 </div>
               )}
-
-              {/* Quick specs pill */}
-              <div className="grid grid-cols-2 gap-2 mt-4 text-[11px] text-zinc-600">
-                <div className="p-2 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-                  <Cpu className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
-                  <span className="truncate">{quickViewProduct.specs.material}</span>
-                </div>
-                <div className="p-2 rounded-lg bg-zinc-50 border border-zinc-200 flex items-center gap-2">
-                  <Box className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
-                  <span className="truncate">{quickViewProduct.specs.dimensions}</span>
-                </div>
-              </div>
             </div>
 
             {/* Actions */}
@@ -221,7 +209,7 @@ export const QuickViewModal: React.FC = () => {
                 onClick={handleViewFullPage}
                 className="w-full flex items-center justify-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer py-1"
               >
-                <span>Ver página completa com todas as fotos e detalhes técnicos</span>
+                <span>Ver página completa do produto</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
