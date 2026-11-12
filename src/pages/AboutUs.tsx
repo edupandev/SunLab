@@ -57,17 +57,17 @@ export const AboutUs: React.FC = () => {
           </div>
         </motion.div>
 
-        {/* Imagem simples, sem desenhos e sem enfeitar o pavão */}
+        {/* Imagem Oficial SunLab */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="lg:col-span-5"
         >
-          <div className="rounded-2xl overflow-hidden border border-zinc-200 shadow-sm bg-zinc-100 aspect-4/3 sm:aspect-square lg:aspect-4/5">
+          <div className="rounded-2xl overflow-hidden border border-zinc-200 shadow-md bg-white aspect-square">
             <img
-              src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80"
-              alt="Atelier SunLab - Criação e Tecnologia 3D"
+              src="/sunlab-sobre.jpg"
+              alt="Prazer, somos a SunLab! Impressões 3D em Santos"
               className="w-full h-full object-cover"
             />
           </div>
