@@ -181,8 +181,9 @@ export const CartDrawer: React.FC = () => {
                         </button>
                       </div>
 
-                      <span className="text-sm font-bold text-zinc-900">
-                        R$ {(item.unitPrice * item.quantity).toFixed(2).replace('.', ',')}
+                      <span className="text-sm font-bold text-zinc-900 whitespace-nowrap inline-flex items-baseline">
+                        <span className="mr-0.5">R$</span>
+                        <span>{(item.unitPrice * item.quantity).toFixed(2).replace('.', ',')}</span>
                       </span>
                     </div>
                   </div>
@@ -237,20 +238,25 @@ export const CartDrawer: React.FC = () => {
               <div className="space-y-1.5 text-xs text-zinc-600 pt-1">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="font-medium text-zinc-900">
-                    R$ {subtotal.toFixed(2).replace('.', ',')}
+                  <span className="font-medium text-zinc-900 whitespace-nowrap inline-flex items-baseline">
+                    <span className="mr-0.5">R$</span>
+                    <span>{subtotal.toFixed(2).replace('.', ',')}</span>
                   </span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-zinc-700 font-medium">
                     <span>Desconto do Cupom</span>
-                    <span>- R$ {discount.toFixed(2).replace('.', ',')}</span>
+                    <span className="whitespace-nowrap inline-flex items-baseline">
+                      <span className="mr-0.5">- R$</span>
+                      <span>{discount.toFixed(2).replace('.', ',')}</span>
+                    </span>
                   </div>
                 )}
                 <div className="flex justify-between text-base font-bold text-zinc-950 pt-2 border-t border-zinc-200">
                   <span>Total</span>
-                  <span className="text-zinc-900 text-lg">
-                    R$ {total.toFixed(2).replace('.', ',')}
+                  <span className="text-zinc-900 text-lg whitespace-nowrap inline-flex items-baseline">
+                    <span className="mr-0.5">R$</span>
+                    <span>{total.toFixed(2).replace('.', ',')}</span>
                   </span>
                 </div>
                 <p className="text-[11px] text-zinc-400 text-right">

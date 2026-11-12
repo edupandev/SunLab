@@ -179,12 +179,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             {product.price > 0 ? (
               <div>
                 <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
-                  <span className="text-sm sm:text-lg font-extrabold text-zinc-900 tracking-tight">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
+                  <span className="text-sm sm:text-lg font-extrabold text-zinc-900 tracking-tight whitespace-nowrap inline-flex items-baseline">
+                    <span className="mr-0.5">R$</span>
+                    <span>{product.price.toFixed(2).replace('.', ',')}</span>
                   </span>
                   {product.originalPrice && (
-                    <span className="text-[10px] sm:text-[11px] text-zinc-400 line-through">
-                      R$ {product.originalPrice.toFixed(2).replace('.', ',')}
+                    <span className="text-[10px] sm:text-[11px] text-zinc-400 line-through whitespace-nowrap inline-flex items-baseline">
+                      <span className="mr-0.5">R$</span>
+                      <span>{product.originalPrice.toFixed(2).replace('.', ',')}</span>
                     </span>
                   )}
                 </div>

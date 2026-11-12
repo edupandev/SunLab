@@ -128,19 +128,23 @@ export const ProductDetail: React.FC = () => {
           </div>
 
           {/* Price Box */}
-          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200 space-y-1">
+          <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
             {product.price > 0 ? (
               <>
-                <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-extrabold text-zinc-900">
-                    R$ {product.price.toFixed(2).replace('.', ',')}
-                  </span>
-                  {product.originalPrice && (
-                    <span className="text-sm text-zinc-400 line-through">
-                      R$ {product.originalPrice.toFixed(2).replace('.', ',')}
+                <div className="flex flex-wrap items-center justify-between gap-2.5">
+                  <div className="flex items-baseline gap-2.5 whitespace-nowrap">
+                    <span className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight whitespace-nowrap inline-flex items-baseline">
+                      <span className="mr-1">R$</span>
+                      <span>{product.price.toFixed(2).replace('.', ',')}</span>
                     </span>
-                  )}
-                  <span className="text-xs font-semibold px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 border border-emerald-300">
+                    {product.originalPrice && (
+                      <span className="text-sm text-zinc-400 line-through whitespace-nowrap inline-flex items-baseline">
+                        <span className="mr-1">R$</span>
+                        <span>{product.originalPrice.toFixed(2).replace('.', ',')}</span>
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-300 shrink-0 whitespace-nowrap">
                     Pagamento via WhatsApp
                   </span>
                 </div>
@@ -283,8 +287,9 @@ export const ProductDetail: React.FC = () => {
         <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-zinc-200 px-4 py-2.5 flex items-center justify-between gap-3 shadow-2xl safe-area-bottom">
           <div className="min-w-0">
             <span className="text-[10px] text-zinc-400 block font-medium">Preço à vista</span>
-            <div className="text-base font-extrabold text-zinc-900 tracking-tight truncate">
-              R$ {(product.price * quantity).toFixed(2).replace('.', ',')}
+            <div className="text-base font-extrabold text-zinc-900 tracking-tight whitespace-nowrap inline-flex items-baseline">
+              <span className="mr-1">R$</span>
+              <span>{(product.price * quantity).toFixed(2).replace('.', ',')}</span>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">

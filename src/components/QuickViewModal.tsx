@@ -99,16 +99,18 @@ export const QuickViewModal: React.FC = () => {
               {/* Price */}
               <div className="mt-4 pb-4 border-b border-zinc-100">
                 {quickViewProduct.price > 0 ? (
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-2xl font-bold text-zinc-900">
-                      R$ {quickViewProduct.price.toFixed(2).replace('.', ',')}
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <span className="text-2xl font-bold text-zinc-900 whitespace-nowrap inline-flex items-baseline">
+                      <span className="mr-1">R$</span>
+                      <span>{quickViewProduct.price.toFixed(2).replace('.', ',')}</span>
                     </span>
                     {quickViewProduct.originalPrice && (
-                      <span className="text-sm text-zinc-400 line-through">
-                        R$ {quickViewProduct.originalPrice.toFixed(2).replace('.', ',')}
+                      <span className="text-sm text-zinc-400 line-through whitespace-nowrap inline-flex items-baseline">
+                        <span className="mr-1">R$</span>
+                        <span>{quickViewProduct.originalPrice.toFixed(2).replace('.', ',')}</span>
                       </span>
                     )}
-                    <span className="text-xs text-zinc-700 font-medium bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200">
+                    <span className="text-xs text-zinc-700 font-medium bg-zinc-100 px-2 py-0.5 rounded border border-zinc-200 shrink-0 whitespace-nowrap">
                       5% OFF no Pix
                     </span>
                   </div>
