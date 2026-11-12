@@ -4,15 +4,12 @@ import { motion } from 'framer-motion';
 import {
   ArrowRight,
   Sparkles,
-  Star,
-  ChevronRight,
   Mail,
   Check,
   ShieldCheck,
   Box,
   ShoppingBag
 } from 'lucide-react';
-import { REVIEWS } from '@/data/products';
 import { useProducts } from '@/context/ProductContext';
 import { ProductCard } from '@/components/ProductCard';
 
@@ -318,137 +315,6 @@ export const Home: React.FC = () => {
         )}
       </section>
 
-      {/* 3. CATEGORIAS DE PRODUTOS CRIATIVAS (Cards Pastel com Micro-interações) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1 flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Curadoria de Linhas SunLab
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight font-display">
-              Explorar Coleções em 3D
-            </h2>
-          </div>
-          <Link
-            to="/catalog"
-            className="text-xs font-bold text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 transition-colors group"
-          >
-            <span>Ver todas as coleções do atelier</span>
-            <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* Card 1: Decoração (#e8f4f8 soft sky) */}
-          <Link
-            to="/catalog?cat=decor"
-            className="group relative p-6 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg flex flex-col justify-between border border-zinc-200/80 overflow-hidden"
-            style={{ backgroundColor: '#e8f4f8' }}
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-300/20 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-            <div className="relative text-4xl mb-4 group-hover:rotate-6 transition-transform duration-300">
-              🏺
-            </div>
-            <div className="relative">
-              <span className="text-[10px] uppercase font-bold text-blue-700 tracking-wider">
-                Linha Autoral
-              </span>
-              <h3 className="text-lg font-bold text-zinc-900 mt-1">
-                Decoração Paramétrica
-              </h3>
-              <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
-                Vasos esculturais, luminárias Voronoi e centros de mesa de geometria fluida.
-              </p>
-            </div>
-            <div className="relative mt-5 pt-3 border-t border-blue-200/70 flex items-center justify-between text-xs font-bold text-blue-700 group-hover:text-blue-900">
-              <span>Ver peças decorativas</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </Link>
-
-          {/* Card 2: Utilitários (#f0e8f8 soft purple) */}
-          <Link
-            to="/catalog?cat=utility"
-            className="group relative p-6 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg flex flex-col justify-between border border-zinc-200/80 overflow-hidden"
-            style={{ backgroundColor: '#f0e8f8' }}
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-            <div className="relative text-4xl mb-4 group-hover:rotate-6 transition-transform duration-300">
-              💻
-            </div>
-            <div className="relative">
-              <span className="text-[10px] uppercase font-bold text-purple-700 tracking-wider">
-                Ergonomia & Mesa
-              </span>
-              <h3 className="text-lg font-bold text-zinc-900 mt-1">
-                Utilitários & Desk Setup
-              </h3>
-              <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
-                Docks modulares magnéticos MagSafe, organizadores de mesa e elevadores de laptop.
-              </p>
-            </div>
-            <div className="relative mt-5 pt-3 border-t border-purple-200/70 flex items-center justify-between text-xs font-bold text-purple-700 group-hover:text-purple-900">
-              <span>Ver utilitários</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </Link>
-
-          {/* Card 3: Tecnologia (#e8f8f0 soft emerald) */}
-          <Link
-            to="/catalog?cat=tech"
-            className="group relative p-6 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg flex flex-col justify-between border border-zinc-200/80 overflow-hidden"
-            style={{ backgroundColor: '#e8f8f0' }}
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-300/20 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-            <div className="relative text-4xl mb-4 group-hover:rotate-6 transition-transform duration-300">
-              🎧
-            </div>
-            <div className="relative">
-              <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-wider">
-                Setup & Periféricos
-              </span>
-              <h3 className="text-lg font-bold text-zinc-900 mt-1">
-                Tecnologia & Stands
-              </h3>
-              <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
-                Suportes de headset Gyroid, bases de carregamento e organizadores de cabos.
-              </p>
-            </div>
-            <div className="relative mt-5 pt-3 border-t border-emerald-200/70 flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-900">
-              <span>Ver linha tech</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </Link>
-
-          {/* Card 4: Personalizados (#f8f0e8 soft amber) */}
-          <Link
-            to="/custom"
-            className="group relative p-6 rounded-3xl transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg flex flex-col justify-between border border-zinc-200/80 overflow-hidden"
-            style={{ backgroundColor: '#f8f0e8' }}
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-amber-300/20 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-            <div className="relative text-4xl mb-4 group-hover:rotate-6 transition-transform duration-300">
-              🛠️
-            </div>
-            <div className="relative">
-              <span className="text-[10px] uppercase font-bold text-amber-800 tracking-wider">
-                Atelier Sob Medida
-              </span>
-              <h3 className="text-lg font-bold text-zinc-900 mt-1">
-                Projetos Personalizados
-              </h3>
-              <p className="text-xs text-zinc-600 mt-1.5 leading-relaxed">
-                Envie sua ideia ou modelo 3D para produzirmos sob medida com garantia.
-              </p>
-            </div>
-            <div className="relative mt-5 pt-3 border-t border-amber-200/70 flex items-center justify-between text-xs font-bold text-amber-800 group-hover:text-amber-950">
-              <span>Orçar projeto exclusivo</span>
-              <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </div>
-          </Link>
-        </div>
-      </section>
-
       {/* 4. BENEFÍCIOS & GARANTIAS DO ATELIER (Hover Strip) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -544,51 +410,6 @@ export const Home: React.FC = () => {
               <span>Inscrição confirmada! Use o cupom <strong>SUNLAB10</strong> para 10% OFF no Checkout Mercado Pago.</span>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* 7. DEPOIMENTOS DE CLIENTES */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-        <div className="text-center max-w-xl mx-auto mb-10">
-          <div className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1 flex items-center justify-center gap-1.5">
-            <Star className="w-3.5 h-3.5 fill-blue-600 text-blue-600" /> Avaliações Verificadas
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 tracking-tight font-display">
-            O que dizem os clientes SunLab
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {REVIEWS.map(rev => (
-            <motion.div
-              key={rev.id}
-              whileHover={{ y: -4 }}
-              className="p-6 rounded-3xl bg-white border border-zinc-200 shadow-xs flex flex-col justify-between space-y-4 hover:border-zinc-300 hover:shadow-md transition-all"
-            >
-              <div>
-                <div className="flex items-center gap-1 text-amber-400 mb-3">
-                  {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
-                  ))}
-                </div>
-                <p className="text-xs sm:text-sm text-zinc-600 leading-relaxed italic">
-                  "{rev.comment}"
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3 pt-4 border-t border-zinc-100">
-                <img
-                  src={rev.avatar}
-                  alt={rev.author}
-                  className="w-10 h-10 rounded-full object-cover border border-zinc-200 shadow-2xs"
-                />
-                <div>
-                  <h4 className="text-xs font-bold text-zinc-900">{rev.author}</h4>
-                  <p className="text-[11px] text-zinc-500">{rev.role}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
         </div>
       </section>
 
