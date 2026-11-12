@@ -25,14 +25,12 @@ export const QuickViewModal: React.FC = () => {
   if (!quickViewProduct) return null;
 
   const handleAdd = () => {
-    if (selectedColor) {
-      addToCart(quickViewProduct, quantity, selectedColor, selectedSize);
-      setAdded(true);
-      setTimeout(() => {
-        setAdded(false);
-        closeQuickView();
-      }, 800);
-    }
+    addToCart(quickViewProduct, quantity, selectedColor, selectedSize);
+    setAdded(true);
+    setTimeout(() => {
+      setAdded(false);
+      closeQuickView();
+    }, 800);
   };
 
   const handleViewFullPage = () => {
@@ -133,11 +131,11 @@ export const QuickViewModal: React.FC = () => {
                 )}
               </div>
 
-              {/* Color Selector */}
-              {quickViewProduct.colors && (
+              {/* Color Selector - Exibido apenas se houver cores cadastradas */}
+              {quickViewProduct.colors && quickViewProduct.colors.length > 0 && (
                 <div className="mt-4">
                   <label className="block text-xs font-medium text-zinc-700 mb-2">
-                    Cor Selecionada: <strong className="text-zinc-900">{selectedColor?.name}</strong>
+                    Cor Selecionada: <strong className="text-zinc-900">{selectedColor?.name || quickViewProduct.colors[0]?.name}</strong>
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {quickViewProduct.colors.map(col => (
@@ -155,30 +153,6 @@ export const QuickViewModal: React.FC = () => {
                           style={{ backgroundColor: col.hex }}
                         />
                         <span>{col.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Size Selector if available */}
-              {quickViewProduct.sizes && (
-                <div className="mt-4">
-                  <label className="block text-xs font-medium text-zinc-700 mb-2">
-                    Dimensão / Tamanho:
-                  </label>
-                  <div className="flex gap-2">
-                    {quickViewProduct.sizes.map(size => (
-                      <button
-                        key={size}
-                        onClick={() => setSelectedSize(size)}
-                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all cursor-pointer ${
-                          selectedSize === size
-                            ? 'bg-zinc-200 border-zinc-400 text-zinc-900 font-bold'
-                            : 'bg-white border-zinc-200 text-zinc-600 hover:text-zinc-900'
-                        }`}
-                      >
-                        {size}
                       </button>
                     ))}
                   </div>

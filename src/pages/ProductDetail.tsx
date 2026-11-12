@@ -54,18 +54,14 @@ export const ProductDetail: React.FC = () => {
   }
 
   const handleAddToCart = () => {
-    if (selectedColor) {
-      addToCart(product, quantity, selectedColor, selectedSize);
-      setAddedToast(true);
-      setTimeout(() => setAddedToast(false), 2000);
-    }
+    addToCart(product, quantity, selectedColor, selectedSize);
+    setAddedToast(true);
+    setTimeout(() => setAddedToast(false), 2000);
   };
 
   const handleBuyNow = () => {
-    if (selectedColor) {
-      addToCart(product, quantity, selectedColor, selectedSize);
-      openCheckout();
-    }
+    addToCart(product, quantity, selectedColor, selectedSize);
+    openCheckout();
   };
 
   const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
@@ -196,11 +192,11 @@ export const ProductDetail: React.FC = () => {
             )}
           </div>
 
-          {/* Color Selection */}
-          {product.colors && (
+          {/* Color Selection - Exibido apenas se o admin cadastrou cores */}
+          {product.colors && product.colors.length > 0 && (
             <div className="space-y-2">
               <label className="block text-xs font-medium text-zinc-700">
-                Cor do Acabamento: <strong className="text-zinc-900">{selectedColor?.name}</strong>
+                Cor: <strong className="text-zinc-900">{selectedColor?.name || product.colors[0]?.name}</strong>
               </label>
               <div className="flex flex-wrap gap-2.5">
                 {product.colors.map(col => (
@@ -219,31 +215,6 @@ export const ProductDetail: React.FC = () => {
                       style={{ backgroundColor: col.hex }}
                     />
                     <span>{col.name}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Size Selection */}
-          {product.sizes && (
-            <div className="space-y-2">
-              <label className="block text-xs font-medium text-zinc-700">
-                Dimensão / Tamanho:
-              </label>
-              <div className="flex gap-2.5">
-                {product.sizes.map(size => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => setSelectedSize(size)}
-                    className={`px-4 py-2 rounded-xl border text-xs font-semibold transition-all cursor-pointer ${
-                      selectedSize === size
-                        ? 'bg-zinc-200 border-zinc-400 text-zinc-900 font-bold shadow-xs'
-                        : 'bg-white border-zinc-200 text-zinc-600 hover:text-zinc-900'
-                    }`}
-                  >
-                    {size}
                   </button>
                 ))}
               </div>

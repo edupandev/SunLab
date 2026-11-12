@@ -535,11 +535,8 @@ export const AdminProducts: React.FC = () => {
       bestseller: false,
       newArrival: true,
       images: ['https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80'],
-      colors: [
-        { name: 'Onyx Black', hex: '#121214' },
-        { name: 'Chalk White', hex: '#EBEAE5' }
-      ],
-      sizes: ['Padrão'],
+      colors: [],
+      sizes: [],
       specs: {
         material: 'PLA Pro Biodegradável',
         layerHeight: '0.12 mm',
@@ -1673,6 +1670,56 @@ export const AdminProducts: React.FC = () => {
                   placeholder="Descrição completa do produto e seus materiais..."
                   className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none resize-none"
                 />
+              </div>
+
+              {/* Row 5: Cores Disponíveis (Admin digita as cores do produto) */}
+              <div>
+                <label className="block text-xs font-medium text-zinc-700 mb-1">
+                  Cores Disponíveis (opcional — digite separando por vírgula)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Preto, Branco, Dourado, Verde"
+                  value={
+                    editingProduct.colors && editingProduct.colors.length > 0
+                      ? editingProduct.colors.map(c => c.name).join(', ')
+                      : ''
+                  }
+                  onChange={(e) => {
+                    const raw = e.target.value;
+                    if (!raw.trim()) {
+                      setEditingProduct({ ...editingProduct, colors: [] });
+                      return;
+                    }
+                    const parsedColors = raw.split(',').map(name => {
+                      const trimmed = name.trim();
+                      const lower = trimmed.toLowerCase();
+                      let hex = '#71717a';
+                      if (lower.includes('preto') || lower.includes('black')) hex = '#18181b';
+                      else if (lower.includes('branco') || lower.includes('white')) hex = '#f8fafc';
+                      else if (lower.includes('ouro') || lower.includes('dourado') || lower.includes('gold')) hex = '#d97706';
+                      else if (lower.includes('prata') || lower.includes('silver')) hex = '#94a3b8';
+                      else if (lower.includes('verde') || lower.includes('green')) hex = '#16a34a';
+                      else if (lower.includes('vermelho') || lower.includes('red')) hex = '#dc2626';
+                      else if (lower.includes('azul') || lower.includes('blue')) hex = '#2563eb';
+                      else if (lower.includes('amarelo') || lower.includes('yellow')) hex = '#eab308';
+                      else if (lower.includes('laranja') || lower.includes('orange')) hex = '#ea580c';
+                      else if (lower.includes('rosa') || lower.includes('pink')) hex = '#ec4899';
+                      else if (lower.includes('roxo') || lower.includes('purple')) hex = '#9333ea';
+                      else if (lower.includes('marrom') || lower.includes('brown')) hex = '#78350f';
+                      else if (lower.includes('terracota')) hex = '#ea580c';
+                      else if (lower.includes('marmore')) hex = '#f1f5f9';
+
+                      return { name: trimmed, hex };
+                    }).filter(c => c.name.length > 0);
+
+                    setEditingProduct({ ...editingProduct, colors: parsedColors });
+                  }}
+                  className="w-full bg-zinc-50 border border-zinc-300 rounded-xl px-3.5 py-2 text-xs text-zinc-900 focus:bg-white focus:border-zinc-500 outline-none"
+                />
+                <p className="text-[11px] text-zinc-500 mt-1">
+                  Se você escrever as cores aqui, os botões de seleção de cor aparecerão na página do produto. Se deixar vazio, nenhuma cor será exibida.
+                </p>
               </div>
 
               {/* Section: Photos of the product */}

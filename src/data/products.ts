@@ -72,27 +72,8 @@ export const PRODUCTS: Product[] = [
       "02_lifestyle_45graus.jpg",
       "03_macro_detalhe.jpg"
     ],
-    "colors": [
-      {
-        "name": "Branco Neve Fosco",
-        "hex": "#f8fafc"
-      },
-      {
-        "name": "Ouro Real Metálico",
-        "hex": "#d97706"
-      },
-      {
-        "name": "Verde Pinheiro Nórdico",
-        "hex": "#15803d"
-      },
-      {
-        "name": "Vermelho Natalício",
-        "hex": "#dc2626"
-      }
-    ],
-    "sizes": [
-      "Padrão Mesa (24cm x 12cm x 16cm)"
-    ],
+    "colors": [],
+    "sizes": [],
     "specs": {
       "material": "Material Premium de Alta Qualidade",
       "layerHeight": "Alta Definição",
@@ -138,23 +119,8 @@ export const PRODUCTS: Product[] = [
       "02_lifestyle_sala.jpg",
       "03_macro_detalhe.jpg"
     ],
-    "colors": [
-      {
-        "name": "Mármore Silk Acetinado",
-        "hex": "#f1f5f9"
-      },
-      {
-        "name": "Terracota Artesanal",
-        "hex": "#ea580c"
-      },
-      {
-        "name": "Branco Cerâmica Fosco",
-        "hex": "#ffffff"
-      }
-    ],
-    "sizes": [
-      "Conjunto Completo (Base 28cm)"
-    ],
+    "colors": [],
+    "sizes": [],
     "specs": {
       "material": "Material Nobre com Toque Acetinado",
       "layerHeight": "Alta Definição",
@@ -200,24 +166,8 @@ export const PRODUCTS: Product[] = [
       "02_lifestyle_mesa.jpg",
       "03_macro_detalhe.jpg"
     ],
-    "colors": [
-      {
-        "name": "Verde Esmeralda Fosco",
-        "hex": "#047857"
-      },
-      {
-        "name": "Branco Neve Texturizado",
-        "hex": "#ffffff"
-      },
-      {
-        "name": "Dourado Champanhe",
-        "hex": "#fbbf24"
-      }
-    ],
-    "sizes": [
-      "Médio (20cm altura)",
-      "Grande (26cm altura)"
-    ],
+    "colors": [],
+    "sizes": [],
     "specs": {
       "material": "Polímero Premium de Alta Durabilidade",
       "layerHeight": "Alta Definição",
@@ -263,23 +213,8 @@ export const PRODUCTS: Product[] = [
       "02_lifestyle_arvore.jpg",
       "03_macro_textura.jpg"
     ],
-    "colors": [
-      {
-        "name": "Branco Neve Cristalino",
-        "hex": "#ffffff"
-      },
-      {
-        "name": "Prata Lunar Metálico",
-        "hex": "#94a3b8"
-      },
-      {
-        "name": "Dourado Solar",
-        "hex": "#f59e0b"
-      }
-    ],
-    "sizes": [
-      "Kit 6 Unidades (8cm cada)"
-    ],
+    "colors": [],
+    "sizes": [],
     "specs": {
       "material": "Material Leve de Alta Durabilidade",
       "layerHeight": "Alta Definição",
@@ -325,19 +260,8 @@ export const PRODUCTS: Product[] = [
       "02_lifestyle_sino.jpg",
       "03_macro_relevo.jpg"
     ],
-    "colors": [
-      {
-        "name": "Bicolor Vermelho & Branco",
-        "hex": "#dc2626"
-      },
-      {
-        "name": "Bicolor Verde & Dourado",
-        "hex": "#16a34a"
-      }
-    ],
-    "sizes": [
-      "Kit 4 Peças Bicolores (9cm cada)"
-    ],
+    "colors": [],
+    "sizes": [],
     "specs": {
       "material": "Polímero Bicolor de Alta Qualidade",
       "layerHeight": "Alta Definição",
