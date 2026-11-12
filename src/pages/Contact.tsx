@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MessageCircle, MapPin, Send, CheckCircle2, ChevronDown, HelpCircle } from 'lucide-react';
+import { Mail, MessageCircle, Send, CheckCircle2, ChevronDown, HelpCircle } from 'lucide-react';
 
 export const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -95,17 +95,6 @@ export const Contact: React.FC = () => {
               <span>contato@sunlab.com.br</span>
               <span>→</span>
             </a>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-3">
-            <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
-              <MapPin className="w-5 h-5" />
-            </div>
-            <h3 className="text-base font-bold text-slate-900">Atelier SunLab</h3>
-            <p className="text-xs text-slate-500">Santos, Litoral Paulista — SP</p>
-            <span className="text-[11px] text-slate-400 block pt-1">
-              Atendimento online e envio rápido para todo o Brasil.
-            </span>
           </div>
         </div>
 
