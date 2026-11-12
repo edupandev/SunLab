@@ -138,7 +138,7 @@ export const Footer: React.FC = () => {
       {/* Bottom Bar & Payments */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-zinc-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-zinc-500">
         <div>
-          © {new Date().getFullYear()} SunLab Studio 3D Ltda. CNPJ: 45.892.110/0001-92. Todos os direitos reservados.
+          © {new Date().getFullYear()} SunLab. Todos os direitos reservados.
         </div>
 
         {/* Payment badges */}
