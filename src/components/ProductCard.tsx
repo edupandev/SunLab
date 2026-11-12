@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router';
 import { motion } from 'framer-motion';
-import { Eye, ShoppingBag, Star, Sparkles, Check } from 'lucide-react';
+import { Eye, ShoppingBag, Sparkles, Check } from 'lucide-react';
 import type { Product } from '@/data/products';
 import { useCart } from '@/context/CartContext';
 
@@ -133,10 +133,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="uppercase tracking-wider font-bold text-[9px] sm:text-[10px] text-amber-800 bg-amber-50 px-1.5 sm:px-2 py-0.5 rounded-md truncate max-w-[110px]">
               {product.categoryLabel}
             </span>
-            <div className="flex items-center gap-1 text-[11px] sm:text-xs">
-              <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-amber-400 text-amber-400 shrink-0" />
-              <span className="font-bold text-zinc-800">{product.rating.toFixed(1)}</span>
-            </div>
           </div>
 
           <Link to={`/product/${product.slug}`} className="group/title block">

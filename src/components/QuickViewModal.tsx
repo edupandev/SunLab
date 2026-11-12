@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { X, Star, ShoppingBag, ArrowRight, Cpu, Box, Check } from 'lucide-react';
+import { X, ShoppingBag, ArrowRight, Cpu, Box, Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 export const QuickViewModal: React.FC = () => {
@@ -89,18 +89,6 @@ export const QuickViewModal: React.FC = () => {
           {/* Details Section */}
           <div className="p-6 sm:p-8 flex flex-col justify-between space-y-6">
             <div>
-              <div className="flex items-center gap-2 text-xs text-zinc-500 mb-1">
-                <span className="uppercase tracking-wider font-semibold text-zinc-500">
-                  {quickViewProduct.categoryLabel}
-                </span>
-                <span>•</span>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                  <span className="font-semibold text-zinc-800">{quickViewProduct.rating.toFixed(1)}</span>
-                  <span className="text-zinc-400">({quickViewProduct.reviewsCount} avaliações)</span>
-                </div>
-              </div>
-
               <h2 className="text-2xl font-bold text-zinc-900 tracking-tight">
                 {quickViewProduct.name}
               </h2>

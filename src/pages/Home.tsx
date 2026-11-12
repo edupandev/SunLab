@@ -72,7 +72,7 @@ export const Home: React.FC = () => {
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            ⭐ <strong>4.9/5</strong> Avaliação de Excelência e Satisfação
+            🌊 <strong>Essência Caiçara</strong> & Criatividade
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
@@ -93,7 +93,7 @@ export const Home: React.FC = () => {
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">
-            ⭐ <strong>4.9/5</strong> Avaliação de Excelência e Satisfação
+            🌊 <strong>Essência Caiçara</strong> & Criatividade
           </span>
           <span className="text-slate-500">•</span>
           <span className="flex items-center gap-1.5">

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router';
 import {
-  Star,
   ShoppingBag,
   ArrowRight,
   Check,
@@ -120,18 +119,6 @@ export const ProductDetail: React.FC = () => {
         {/* Product Purchase Actions & Specs */}
         <div className="lg:col-span-5 space-y-6">
           <div>
-            <div className="flex items-center gap-3 text-xs text-zinc-500 mb-2">
-              <span className="uppercase tracking-wider font-bold text-zinc-500">
-                {product.categoryLabel}
-              </span>
-              <span>•</span>
-              <div className="flex items-center gap-1">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span className="font-semibold text-zinc-800">{product.rating.toFixed(1)}</span>
-                <span className="text-zinc-400">({product.reviewsCount} avaliações)</span>
-              </div>
-            </div>
-
             <h1 className="text-3xl font-extrabold text-zinc-900 tracking-tight font-display">
               {product.name}
             </h1>

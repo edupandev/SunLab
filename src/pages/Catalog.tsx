@@ -140,7 +140,6 @@ export const Catalog: React.FC = () => {
                 <option value="featured">Destaques SunLab</option>
                 <option value="price-asc">Menor Preço</option>
                 <option value="price-desc">Maior Preço</option>
-                <option value="rating">Melhores Avaliações</option>
                 <option value="name">Nome (A - Z)</option>
               </select>
             </div>
