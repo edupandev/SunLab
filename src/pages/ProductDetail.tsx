@@ -127,6 +127,26 @@ export const ProductDetail: React.FC = () => {
             </p>
           </div>
 
+          {/* Lista de peças inclusas (quando for um Kit) */}
+          {Array.isArray((product.specs as any)?.kitItems) && (product.specs as any).kitItems.length > 0 && (
+            <div className="p-3.5 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
+              <h3 className="text-xs font-bold text-zinc-900 uppercase tracking-wider">
+                Peças inclusas no kit:
+              </h3>
+              <ul className="space-y-1.5 text-sm text-zinc-700">
+                {(product.specs as any).kitItems.map((item: { name: string; qty?: number }, idx: number) => (
+                  <li key={idx} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
+                    <span>
+                      {item.qty && item.qty > 1 ? <strong className="text-zinc-900">{item.qty}x </strong> : null}
+                      {item.name}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Price Box */}
           <div className="p-4 rounded-xl bg-zinc-50 border border-zinc-200 space-y-2">
             {product.price > 0 ? (
