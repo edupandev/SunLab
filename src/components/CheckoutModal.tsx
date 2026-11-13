@@ -21,7 +21,7 @@ import { isSupabaseConfigured, upsertSupabaseOrder } from '@/lib/supabase';
 
 export const CheckoutModal: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { isCheckoutOpen, closeCheckout, total, clearCart, cart } = useCart();
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [copiedWhatsAppText, setCopiedWhatsAppText] = useState(false);
@@ -206,17 +206,19 @@ export const CheckoutModal: React.FC = () => {
     closeCheckout();
   };
 
-  const isProfileComplete = Boolean(
-    formData.name.trim() &&
-    formData.phone.trim() &&
-    formData.cpf.trim() &&
-    isValidCPF(formData.cpf) &&
-    formData.cep.trim() &&
-    formData.street.trim() &&
-    formData.number.trim() &&
-    formData.city.trim() &&
-    formData.state.trim()
-  );
+  const isProfileComplete = isAdmin
+    ? true
+    : Boolean(
+        formData.name.trim() &&
+        formData.phone.trim() &&
+        formData.cpf.trim() &&
+        isValidCPF(formData.cpf) &&
+        formData.cep.trim() &&
+        formData.street.trim() &&
+        formData.number.trim() &&
+        formData.city.trim() &&
+        formData.state.trim()
+      );
 
   // Gerador da mensagem completa e detalhada para o WhatsApp
   const generateWhatsAppMessage = (order: NonNullable<typeof completedOrderData>) => {
@@ -266,10 +268,17 @@ export const CheckoutModal: React.FC = () => {
     }));
 
     let confirmedOrderNumber = orderNumber || `SLB-${Math.floor(100000 + Math.random() * 900000)}`;
-    const finalPaymentMethodLabel = 'WhatsApp (A Combinar)';
+    const finalPaymentMethodLabel = isAdmin ? 'Venda Direta (Admin)' : 'WhatsApp (A Combinar)';
     const payableTotal = total;
 
-    const shippingAddr = `${formData.street}, nº ${formData.number}${formData.complement ? ' (' + formData.complement + ')' : ''}${formData.neighborhood ? ', ' + formData.neighborhood : ''} — ${formData.city}/${formData.state} (CEP: ${formData.cep})`;
+    const finalCustomerName = formData.name.trim() || (isAdmin ? 'Venda Direta (Admin)' : 'Cliente');
+    const finalCustomerEmail = formData.email.trim() || user?.email || 'admin@sunlab.com.br';
+    const finalCustomerPhone = formData.phone.trim();
+
+    const hasAddress = Boolean(formData.street.trim() || formData.city.trim() || formData.cep.trim());
+    const shippingAddr = hasAddress
+      ? `${formData.street || 'Não informado'}, nº ${formData.number || 'S/N'}${formData.complement ? ' (' + formData.complement + ')' : ''}${formData.neighborhood ? ', ' + formData.neighborhood : ''} — ${formData.city || ''}/${formData.state || ''}${formData.cep ? ` (CEP: ${formData.cep})` : ''}`
+      : 'Venda Direta / Sem endereço informado';
 
     // Sincronizar criação do pedido com a API de pedidos (Vercel e Express)
     try {
@@ -278,9 +287,9 @@ export const CheckoutModal: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderNumber: confirmedOrderNumber,
-          customerName: formData.name,
-          customerEmail: formData.email,
-          customerPhone: formData.phone,
+          customerName: finalCustomerName,
+          customerEmail: finalCustomerEmail,
+          customerPhone: finalCustomerPhone,
           shippingAddress: shippingAddr,
           paymentMethod: finalPaymentMethodLabel,
           items: itemsPayload,
@@ -298,9 +307,9 @@ export const CheckoutModal: React.FC = () => {
     }
 
     const fullOrder = {
-      customerName: formData.name,
-      customerEmail: formData.email,
-      customerPhone: formData.phone || '',
+      customerName: finalCustomerName,
+      customerEmail: finalCustomerEmail,
+      customerPhone: finalCustomerPhone,
       shippingAddress: shippingAddr,
       paymentMethod: finalPaymentMethodLabel,
       items: itemsPayload,
@@ -318,9 +327,9 @@ export const CheckoutModal: React.FC = () => {
       upsertSupabaseOrder({
         id: `ord-${confirmedOrderNumber}`,
         orderNumber: confirmedOrderNumber,
-        customerName: formData.name,
-        customerEmail: formData.email,
-        customerPhone: formData.phone || '',
+        customerName: finalCustomerName,
+        customerEmail: finalCustomerEmail,
+        customerPhone: finalCustomerPhone,
         shippingAddress: shippingAddr,
         paymentMethod: finalPaymentMethodLabel,
         items: itemsPayload,
@@ -334,7 +343,7 @@ export const CheckoutModal: React.FC = () => {
       const stored = JSON.parse(localStorage.getItem('sunlab_my_orders') || '[]');
       stored.unshift(fullOrder);
       localStorage.setItem('sunlab_my_orders', JSON.stringify(stored));
-      localStorage.setItem('sunlab_customer_email', formData.email);
+      localStorage.setItem('sunlab_customer_email', finalCustomerEmail);
     } catch (e) {
       console.warn('Erro ao salvar localmente:', e);
     }
@@ -343,12 +352,14 @@ export const CheckoutModal: React.FC = () => {
     setIsProcessing(false);
     setStep('success');
 
-    // Redirecionar / Abrir conversa no WhatsApp automaticamente
-    const msg = generateWhatsAppMessage(fullOrder);
-    const waUrl = `https://wa.me/5513996061681?text=${encodeURIComponent(msg)}`;
-    try {
-      window.open(waUrl, '_blank');
-    } catch (_) {}
+    // Redirecionar / Abrir conversa no WhatsApp automaticamente apenas para clientes
+    if (!isAdmin) {
+      const msg = generateWhatsAppMessage(fullOrder);
+      const waUrl = `https://wa.me/5513996061681?text=${encodeURIComponent(msg)}`;
+      try {
+        window.open(waUrl, '_blank');
+      } catch (_) {}
+    }
   };
 
   const copyWhatsAppDetails = () => {
@@ -454,7 +465,7 @@ export const CheckoutModal: React.FC = () => {
             <>
               {/* STEP 1: Formulário e Pedido Direto ao WhatsApp */}
               {step === 'form' && (
-                <form onSubmit={handleCompleteOrder} className="space-y-4">
+                <form onSubmit={handleCompleteOrder} noValidate={isAdmin} className="space-y-4">
                   {/* Banner de Identificação do Usuário */}
                   <div className="flex items-center justify-between p-3 rounded-xl bg-blue-50/70 border border-blue-200 text-xs">
                     <div className="flex items-center gap-2">
@@ -467,9 +478,15 @@ export const CheckoutModal: React.FC = () => {
                       </div>
                     </div>
                     <span className="text-[10px] bg-white px-2 py-0.5 rounded-full border border-blue-200 text-blue-800 font-medium">
-                      Conta Conectada
+                      {isAdmin ? 'Admin (Sem Validação)' : 'Conta Conectada'}
                     </span>
                   </div>
+
+                  {isAdmin && (
+                    <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900">
+                      <strong>Modo Admin ativo:</strong> Você pode finalizar e salvar esta venda diretamente mesmo sem preencher CPF, telefone ou endereço.
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="sm:col-span-2">
@@ -657,12 +674,12 @@ export const CheckoutModal: React.FC = () => {
                       {isProcessing ? (
                         <div className="flex items-center gap-2">
                           <Loader2 className="w-4 h-4 animate-spin text-white" />
-                          <span>Registrando pedido e abrindo WhatsApp...</span>
+                          <span>{isAdmin ? 'Salvando venda...' : 'Registrando pedido e abrindo WhatsApp...'}</span>
                         </div>
                       ) : (
                         <>
                           <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
-                          <span>Finalizar Pedido e Pagar no WhatsApp</span>
+                          <span>{isAdmin ? 'Salvar Compra Direta (Sem Validação)' : 'Finalizar Pedido e Pagar no WhatsApp'}</span>
                         </>
                       )}
                     </button>
