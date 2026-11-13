@@ -120,11 +120,12 @@ export default async function handler(req, res) {
     const baseSlug = slugify(title) || slugify(id);
     const slug = baseSlug;
 
-    const images = Array.isArray(body.images) && body.images.length > 0
+    const rawImages = Array.isArray(body.images) && body.images.length > 0
       ? body.images.filter(Boolean)
       : body.image
         ? [String(body.image)]
         : [];
+    const images = rawImages.length > 0 ? rawImages : ['/sunlab-sobre.jpg'];
 
     const kitItems = Array.isArray(body.items)
       ? body.items

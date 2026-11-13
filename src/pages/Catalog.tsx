@@ -76,7 +76,7 @@ export const Catalog: React.FC = () => {
       if (sortBy === 'name') return a.name.localeCompare(b.name);
       return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
     });
-  }, [selectedCategory, searchQuery, sortBy, priceRange, inStockOnly]);
+  }, [products, selectedCategory, searchQuery, sortBy, priceRange, inStockOnly]);
 
   const hasActiveFilters = selectedCategory !== 'all' || searchQuery !== '' || priceRange !== 'all' || inStockOnly;
 
