@@ -405,34 +405,69 @@ export const AdminProducts: React.FC = () => {
   const [newImageUrl, setNewImageUrl] = useState('');
   const [isDraggingOver, setIsDraggingOver] = useState(false);
 
+  const compressImageToDataUrl = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Falha ao ler arquivo'));
+      reader.onload = () => {
+        const result = reader.result as string;
+        const img = new Image();
+        img.onerror = () => resolve(result);
+        img.onload = () => {
+          const maxDim = 1200;
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            if (width > height) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(result);
+            return;
+          }
+          ctx.drawImage(img, 0, 0, width, height);
+          const mime = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          resolve(canvas.toDataURL(mime, 0.85));
+        };
+        img.src = result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = async (files: FileList | null) => {
     if (!files || files.length === 0 || !editingProduct) return;
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
+      const uploadedUrls: string[] = [];
       for (let i = 0; i < files.length; i++) {
-        formData.append('photos', files[i]);
+        const file = files[i];
+        if (!file.type.startsWith('image/')) continue;
+        const dataUrl = await compressImageToDataUrl(file);
+        uploadedUrls.push(dataUrl);
       }
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await res.json();
-      if (res.ok && data.urls && data.urls.length) {
+      if (uploadedUrls.length > 0) {
         const currentImages = editingProduct.images || [];
         setEditingProduct({
           ...editingProduct,
-          images: [...currentImages, ...data.urls]
+          images: [...currentImages, ...uploadedUrls]
         });
-        setActionFeedback({ message: `${data.urls.length} foto(s) enviada(s) para o servidor com sucesso!` });
+        setActionFeedback({ message: `${uploadedUrls.length} foto(s) adicionada(s) com sucesso!` });
       } else {
-        setActionFeedback({ message: data.error || 'Falha ao enviar fotos.', isError: true });
+        setActionFeedback({ message: 'Selecione arquivos de imagem válidos (JPG, PNG, WEBP).', isError: true });
       }
     } catch {
-      setActionFeedback({ message: 'Erro de comunicação ao enviar fotos.', isError: true });
+      setActionFeedback({ message: 'Erro ao processar as imagens selecionadas.', isError: true });
     } finally {
       setIsUploading(false);
       setTimeout(() => setActionFeedback(null), 3500);
