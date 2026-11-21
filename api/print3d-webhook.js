@@ -47,6 +47,16 @@ function slugify(text) {
     .replace(/(^-|-$)+/g, '');
 }
 
+// Regra de arredondamento para o site (múltiplos inteiros de R$ 5):
+// 5,50–12,50 -> 10 | 12,51–17,50 -> 15 | 17,51–22,50 -> 20 | e assim por diante
+function roundSitePriceTo5(value) {
+  const n = Math.round((Number(value) || 0) * 100) / 100;
+  if (n <= 0) return 0;
+  if (n < 5.5) return 5;
+  if (n <= 12.5) return 10;
+  return Math.ceil((n - 2.5) / 5) * 5;
+}
+
 function mapCategory(rawCategory) {
   const cat = String(rawCategory || '').toLowerCase();
   if (cat.includes('kit') || cat.includes('geek') || cat.includes('presente') || cat.includes('lembran')) {
@@ -95,7 +105,7 @@ export default async function handler(req, res) {
 
     const id = String(body.id || '').trim();
     const title = String(body.title || body.name || '').trim();
-    const price = Number(body.price);
+    const rawPrice = Number(body.price);
 
     if (!id) {
       return res.status(400).json({ ok: false, error: 'Campo "id" é obrigatório.' });
@@ -103,17 +113,23 @@ export default async function handler(req, res) {
     if (!title) {
       return res.status(400).json({ ok: false, error: 'Campo "title" é obrigatório.' });
     }
-    if (!Number.isFinite(price) || price < 0) {
+    if (!Number.isFinite(rawPrice) || rawPrice < 0) {
       return res.status(400).json({ ok: false, error: 'Campo "price" inválido.' });
     }
 
-    const regularPrice =
+    const price = roundSitePriceTo5(rawPrice);
+
+    const rawRegularPrice =
       body.regular_price !== undefined && body.regular_price !== null
         ? Number(body.regular_price)
         : null;
+    const roundedRegularPrice =
+      rawRegularPrice !== null && Number.isFinite(rawRegularPrice) && rawRegularPrice > 0
+        ? roundSitePriceTo5(rawRegularPrice)
+        : null;
     const originalPrice =
-      regularPrice !== null && Number.isFinite(regularPrice) && regularPrice > price
-        ? regularPrice
+      roundedRegularPrice !== null && roundedRegularPrice > price
+        ? roundedRegularPrice
         : null;
 
     const description = String(body.description || '').trim();
